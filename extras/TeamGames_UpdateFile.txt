@@ -1,0 +1,35 @@
+"Updater"
+{
+	"Information"
+	{
+		"Version"
+		{
+			"Latest"	"0.2.5"
+		}
+		
+		"Notes"	"..."
+	}
+	
+	"Files"
+	{
+		"Plugin"	"Path_SM/plugins/TeamGames.smx"
+		"Plugin"	"Path_SM/translations/TeamGames.phrases.txt"
+		"Plugin"	"Path_SM/translations/TeamGames_settings.phrases.txt"
+		
+		"Source"	"Path_SM/scripting/TeamGames.sp"
+		"Source"	"Path_SM/scripting/TeamGames/ModuleData.sp"
+		"Source"	"Path_SM/scripting/TeamGames/PlayerData.sp"
+		"Source"	"Path_SM/scripting/TeamGames/Teams.sp"
+		"Source"	"Path_SM/scripting/TeamGames/Games.sp"
+		"Source"	"Path_SM/scripting/TeamGames/LaserFences.sp"
+		"Source"	"Path_SM/scripting/TeamGames/Chat.sp"
+		"Source"	"Path_SM/scripting/TeamGames/Marks.sp"
+		"Source"	"Path_SM/scripting/TeamGames/ConfigFiles.sp"
+		"Source"	"Path_SM/scripting/TeamGames/Commands.sp"
+		"Source"	"Path_SM/scripting/TeamGames/Api.sp"
+		"Source"	"Path_SM/scripting/include/teamgames.inc"
+		"Source"	"Path_SM/scripting/include/teamgames-stocks.inc"
+		"Source"	"Path_SM/scripting/include/teamgames-natives.inc"
+		"Source"	"Path_SM/scripting/include/teamgames-forwards.inc"
+	}
+}

@@ -1,0 +1,304 @@
+//------------------------------------------------------------------------------------------------
+// All natives
+//------------------------------------------------------------------------------------------------
+/*
+*/
+//------------------------------------------------------------------------------------------------
+
+/**
+ * Get client team ( 0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), client must be valid and connected.
+ *
+ * @param client		Client index.
+ * @return				{0, 1, 2} on success (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), -1 on failure.
+ */
+native TG_Team:TG_GetPlayerTeam( client );
+
+/**
+ * Set client team ( 0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), client and activator must be valid and connected.
+ * This native use phrases "PLAYER_MOVED_TO_NONE", "PLAYER_MOVED_TO_RED" and "PLAYER_MOVED_TO_BLUE".
+ *
+ * @param activator		Activator client index (use non valid client index for set client team without an activator - doesn't use any phrase).
+ * @param client		Client index.
+ * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
+ * @return				True on success, false on failure.
+ */
+native TG_SetPlayerTeam( activator, client, TG_Team:team );
+
+native bool:TG_IsPlayerRedOrBlue( client );
+
+/**
+ * Switch a random RedTeam player to BlueTeam.
+ *
+ * @return				Clinet index on success, 0 = no RedTeam player found, ( -1 * Clinet index ) = Player could not be switched.
+ */
+native TG_SwitchRandomRedToBlue();
+
+/**
+ * Bool native returns if players are in different teams.
+ *
+ * @param client1		Client 1 index.
+ * @param client2		Client 2 index.
+ * @return				True on (client 1 team != client 2 team), false otherwise.
+ */
+native bool:TG_InOppositeTeams( client1, client2 );
+
+native TG_Team:TG_GetTeamFromString( String:team[] );
+
+native bool:TG_IsGameTypeAvailable( TG_GameType:type );
+
+/**
+ * Loads saved player weapons, health and armor.
+ *
+ * @param client		Client index.
+ * @return				True on success, false on failure.
+ */
+native bool:TG_LoadPlayerWeapons( client );
+
+/**
+ * Create fence from two points (a, c)
+ *
+ * @param a			Array with x,y,z coordinates of point a.
+ * @param c			Array with x,y,z coordinates of point c.
+ * @noreturn
+ */
+native TG_FenceCreate( Float:a[ 3 ], Float:c[ 3 ] );
+
+/**
+ * Destroy existed fence.
+ *
+ * @noreturn
+ */
+native TG_FenceDestroy();
+
+/**
+ * Punish player due to cross the laser fence.
+ *
+ * @param client			Client index.
+ * @param CallForward		Call forward TG_OnLaserFenceCrossed ?.
+ * @noreturn
+ */
+native TG_FencePlayerCross( client, bool:CallForward = true );
+
+native bool:TG_SpawnMark( client, TG_Team:team, Float:position[ 3 ], Float:life = 0.0, bool:fireEvent = true, bool:counter = false );
+
+/**
+ * Get team count of connected and alive players.
+ *
+ * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
+ * @return				Count (>= 0) of players in team (@param team).
+ */
+native TG_GetTeamCount( TG_Team:team );
+
+/**
+ * Switch all players in team (@param team) to NoneTeam.
+ *
+ * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
+ * @noreturn
+ */
+native TG_ClearTeam( TG_Team:team );
+
+/**
+ * Set teams lock.
+ *
+ * @param lock			True or false (true = lock teams, false = unlock teams).
+ * @noreturn
+ */
+native TG_SetTeamsLock( bool:lock );
+
+/**
+ * Get teams lock.
+ *
+ * @param lock			True or false (true = lock teams, false = unlock teams).
+ * @return				True or false (true = teams are locked, false = teams are unlocked).
+ */
+native bool:TG_GetTeamsLock();
+
+/**
+ * Register Game to TeamGames.
+ *
+ * @param name			Game name (showed in games menu via TG_ShowGamesMenu).
+ * @param id			Game ID (!!! MUST BE UNIQUE !!!).
+ * @return				0 on success, otherwise on failure (1 = TG_RegGame #1, 2 = TG_RegGame #2, 3 = TG_RegGame #3 ).
+ *
+ * Error - "TG_RegGame #1"		Game registration Failed! Couldn't get Arg1 (Game name)!
+ * Error - "TG_RegGame #2"		Game registration Failed! Couldn't get Arg2 (Game ID)!
+ * Error - "TG_RegGame #3"		Game registration Failed! Game ID (Arg2) must be unique!
+ * Error - "TG_RegGame #4"		Game registration Failed! Game name "Core_NoGame" is reserved!
+ * Error - "TG_RegGame #5"		Game registration Failed! Game ID "Core_NoGame" is reserved!
+ */
+native TG_RegGame( const String:id[ 64 ], const String:name[ 64 ], TG_GameType:type = FiftyFifty );
+
+/**
+ * Unregister Game from TeamGames.
+ *
+ * @param id			Game ID.
+ * @return				0 on success, otherwise on failure (1 = TG_RegGame #1, 2 = TG_RegGame #2 ).
+ *
+ * Error - "TG_RegGame #1"		Game unregistration Failed! Couldn't get Arg1 (Game ID)!
+ * Error - "TG_RegGame #2"		Game unregistration Failed! No game with "Game ID" = (Arg2) found!
+ */
+native TG_UnRegGame( const String:id[] );
+
+/**
+ * Get all registred game IDs.
+ *
+ * @return				Handle to dynamic array with game IDs. YOU MUST CLOSE THAT HANDLE !!!
+ */
+native TG_GetRegGames();
+
+/**
+ * Shows main TeamGames menu to client.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+native TG_ShowMainMenu( client );
+
+/**
+ * Shows games TeamGames menu to client.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+native TG_ShowGamesMenu( client );
+
+/**
+ * Shows teams TeamGames menu to client.
+ *
+ * @param client		Client index.
+ * @noreturn
+ */
+native TG_ShowTeamsMenu( client );
+
+/**
+ * Register (add) item to TeamGames main menu.
+ *
+ * @param name			Item name (showed in main menu via TG_ShowMainMenu).
+ * @param id			Item ID (!!! MUST BE UNIQUE !!!).
+ * @param flag			Required flag to show item in menu. Leave blank for none.
+ * @return				0 on success, otherwise on failure (1 = TG_AddMainMenuItem #1, 2 = TG_AddMainMenuItem #2, 3 = TG_AddMainMenuItem #3 ).
+ *
+ * Error - "TG_AddMainMenuItem #1"		Modul main menu item registration Failed! Couldn't get Arg1 (Item name)!
+ * Error - "TG_AddMainMenuItem #2"		Modul main menu item registration Failed! Couldn't get Arg2 (Item ID)!
+ * Error - "TG_AddMainMenuItem #3"		Modul main menu item registration Failed! Item ID (Arg2) must be unique!
+ */
+native TG_AddMenuItem( const String:id[], const String:name[] );
+
+/**
+ * Unregister (remove) item from TeamGames main menu.
+ *
+ * @param id			Item ID.
+ * @return				0 on success, otherwise on failure (1 = TG_RemoveMainMenuItem #1, 2 = TG_RemoveMainMenuItem #2 ).
+ *
+ * Error - "TG_RegGame #1"		Modul main menu item unregistration Failed! Couldn't get Arg1 (Item ID)!
+ * Error - "TG_RegGame #2"		Modul main menu item unregistration Failed! No menu item with "Item ID" = (Arg2) found!
+ */
+native TG_RemoveMenuItem( const String:id[] );
+
+native TG_GetMenuItemName( const String:id[], String:name[], size );
+
+native bool:TG_KvAddString( TG_ModuleType:type = MenuItem, const String:ModuleID[], const String:key[], const String:value[] );
+native bool:TG_KvSetString( TG_ModuleType:type = MenuItem, const String:ModuleID[], const String:key[], const String:value[] );
+native bool:TG_KvGetString( TG_ModuleType:type = MenuItem, const String:ModuleID[], const String:key[], String:buffer[], maxsize, const String:defaulValue[] );
+
+/**
+ * Start game (preparation for game and then game) with game id = @param id. And lock teams.
+ *
+ * @param client			Client index who start game.
+ * @param id				Game ID.
+ * @param CustomGameName	Custom game name to print in phrases "GAME_PREPARATION" and "GAME_STARTED".
+ * @param DataPack			Datapack to pass in forwards TG_OnGamePrepare and TG_OnGameStart. If start game failed, datapack handle would be closed.
+ * @noreturn
+ *
+ * Fire forwards: TG_OnGamePrepare, TG_OnGameStart (after 5 seconds) and TG_OnGameStartError (if start game failed).
+ */
+native TG_StartGame( client, const String:id[], const String:CustomGameName[] = "", Handle:DataPack = INVALID_HANDLE );
+
+/**
+ * Get current game id.
+ *
+ * @param id			Buffer for game id
+ * @param size			Size of buffer.
+ * @return				True on success, false on failure (buffer is smaller then 64).
+ */
+native TG_GetCurrentGameID( String:id[], size );
+
+/**
+ * Is current game id.
+ *
+ * @param id			Tested game id.
+ * @return				True if "id" = "current game id", false otherwise.
+ */
+native bool:TG_IsCurrentGameID( const String:id[] );
+
+native Handle:TG_GetCurrentDataPack();
+
+native TG_GetCurrentStarter();
+
+native bool:TG_GetCurrentCustomName( String:CustomName[], size );
+
+native TG_GetGameName( const String:id[], String:name[], size );
+
+/**
+ *	Get game type.
+ *
+ * @param id			Game ID.
+ * @return				Return game type of the game with given Game ID.
+ */
+native TG_GameType:TG_GetGameType( const String:id[] );
+
+native TG_GetGameRequiredFlag( const String:id[], String:flag[], size );
+
+/**
+ * Stop game with game id = @param id. And unlock teams.
+ *
+ * @param team				Team index of winner team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
+ * @param ClearTeams		Clear teams? (move all players in RedTeam or BlueTeam to NoneTeam) (True/False)
+ * @param ReturnWeapons		Should players recieve striped weapons in game preparation? (True/False)
+ * @noreturn
+ *
+ * Fire forward: TG_OnGameEnd
+ */
+native TG_StopGame( TG_Team:team, bool:ClearTeams = true, bool:ReturnWeapons = true );
+
+
+/**
+ * Get game status (TG_Enum_GameProgress).
+ *
+ * @return				TG_GameProgress:status
+ */
+native TG_GameProgress:TG_GetGameStatus();
+
+/**
+ * Is current game status (TG_Enum_GameProgress).
+ *
+ * @param status		Game status to check (TG_Enum_GameProgress:status).
+ * @return				True on success, false otherwise.
+ */
+native bool:TG_IsGameStatus( TG_GameProgress:status );
+
+/**
+ * Prints a message to a specific client in the chat area. Use tg prefix and process tg color codes (and motecolors.inc codes).
+ *
+ * @param client		Client index.
+ * @param format		Formatting rules.
+ * @param ...			Variable number of format parameters.
+ * @noreturn
+ */
+native TG_PrintToChat( client, const String:format[], any:... );
+
+/**
+ * Prints a message to a specific client in the chat area. But DOES NOT USE tg prefix and process tg color codes (and motecolors.inc codes).
+ *
+ * @param client		Client index.
+ * @param format		Formatting rules.
+ * @param ...			Variable number of format parameters.
+ * @noreturn
+ */
+native TG_PrintToChatEx( client, const String:format[], any:... );
+
+native TG_LogMessage( const String:prefix[] = "", const String:format[], any:... );
+
+native TG_LogRoundMessage( const String:prefix[] = "", const String:format[], any:... );
+
+native TG_LogGameMessage( const String:GameID[], const String:prefix[] = "", const String:format[], any:... );

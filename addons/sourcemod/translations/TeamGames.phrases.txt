@@ -1,0 +1,275 @@
+"Phrases"
+{
+//------------------------------------------------------------------------------------------------
+// Player moved to team
+	"Player moved to Red team" // msg for all players when player {1} moved {2} to team red
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} přesunul hráče{highlight} {2}{default} do teamu{redteam} červených {default}!"
+		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{redteam} červených {default}!"
+	}
+	"Player moved to Blue team" // msg for all players when player {1} moved {2} to team blue
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"{1} přesunul hráče{highlight} {2}{default} do teamu{blueteam} modrých {default}!"
+		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{blueteam} modrých {default}!"
+	}
+	"Player moved to None team" // msg for all players when player {1} was moved out of any team
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} is not in a team anymore!"
+		"cze"		"{1} už není v žádném teamu!"
+	}
+	"Player moved to Red team by module"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{redteam} red {default} team!"
+		"cze"		"Hra {highlight}{1}{default} přesunula hráče{highlight} {2}{default} do teamu{redteam} červených {default}!"
+	}
+	"Player moved to Blue team by module"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{blueteam} blue {default} team!"
+		"cze"		"Hra {highlight}{1}{default} přesunula hráče{highlight} {2}{default} do teamu{blueteam} modrých {default}!"
+	}
+//------------------------------------------------------------------------------------------------
+// Player team hints
+	"Hint Red team" // hint msg for player in team red
+	{
+		"en"		"You are in team red !"
+		"cze"		"Jsi v teamu červených !"
+	}	
+	"Hint Blue team" // hint msg for player in team blue
+	{
+		"en"		"You are in team blue !"
+		"cze"		"Jsi v teamu modrých !"
+	}
+	"Hint None team" // hint msg for player moved out of team
+	{
+		"en"		"You are not in a team !"
+		"cze"		"Nejsi v žádném teamu !"
+	}
+//------------------------------------------------------------------------------------------------
+// Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
+	"Chat prefix Red team" // player prefix in chat (team red)
+	{
+		"en"		"[red]"
+		"cze"		"[červený]"
+	}
+	"Chat prefix Blue team" // player prefix in chat (team blue)
+	{
+		"en"		"[blue]"
+		"cze"		"[modrý]"
+	}
+//------------------------------------------------------------------------------------------------
+// Game progress
+	"Game preparation" // msg for all players when started preparation for game ({1} = game name)
+	{
+		"#format"	"{1:s}"
+		"en"		"Preparation for game {highlight}{1}{default} !!!"
+		"cze"		"Příprava na hru{highlight} {1}{default} !!!"
+	}
+	"Game started" // msg for all players when game started ({1} = game name)
+	{
+		"#format"	"{1:s}"
+		"en"		"Game {highlight}{1}{default} started !!!"
+		"cze"		"Začala hra{highlight} {1}{default} !!!"
+	}
+	"Game stopped" // msg for all players when someone stop the game ({1} = player name)
+	{
+		"#format"	"{1:s}"
+		"en"		"Player {highlight}{1}{default} stopped the game !!!"
+		"cze"		"Hráč {highlight}{1}{default} zastavil hru !!!"
+	}
+	"Player death Red team" // msg for all players that player from team red died ({1} = red player name)
+	{
+		"#format"	"{1:s}"
+		"en"		"Died {1} from{redteam} red {default}team !"
+		"cze"		"Zemřel {1} z teamu{redteam} červených {default}!"
+	}
+	"Player death Blue team" // msg for all players that player from team blue died ({1} = blue player name)
+	{
+		"#format"	"{1:s}"
+		"en"		"Died {1} from team{blueteam} blue{default} !"
+		"cze"		"Zemřel {1} z teamu{blueteam} modrých {default}!"
+	}
+	"Team won Red team" // msg for all players that team red just won
+	{
+		"en"		"Team{redteam} red{default} won !!!"
+		"cze"		"Vyhrál team{redteam} červených{default} !!!"
+	}
+	"Team won Blue team" // msg for all players that team blue just won
+	{
+		"en"		"Team{blueteam} blue{default} won !!!"
+		"cze"		"Vyhrál team{blueteam} modrých{default} !!!"
+	}
+//------------------------------------------------------------------------------------------------
+// Main menu - lock/unlock
+	"Menu Error Alive only" // msg for dead CT player trying open main menu
+	{
+		"en"		"Only alive players can use teams and games !"
+		"cze"		"Pouze živí hráči mohou určovat teamy a vybírat hry !"
+	}
+	"Menu Error CT only" // msg for T player trying open main menu
+	{
+		"en"		"Only CT players can use teams and games !"
+		"cze"		"Pouze CT hráči mohou určovat teamy a vybírat hry !"
+	}
+	"Menu Error Locked" // msg for all players if somebody (must be CT and alive) try to open main menu and main menu is locked
+	{
+		"#format"	"{1:d},{2:d}"
+		"en"		"{highlight}{1}/{2}{default} required{highlight} !tg{default} for unlock."
+		"cze"		"{highlight}{1}/{2}{default} požadovaných{highlight} !tg{default} pro odemčení."
+	}
+	"Menu unlocked" // msg for all players when main menu is unlocked
+	{
+		"en"		"{default}!tg menu{highlight} is unlocked !"
+		"cze"		"{default}!tg menu{highlight} odemčeno !"
+	}
+//------------------------------------------------------------------------------------------------
+// Main menu
+	"Menu title"
+	{
+		"en"		"TeamGames:"
+		"cze"		"TeamGames:"
+	}
+	"Menu teams"
+	{
+		"en"		"Distribute to teams"
+		"cze"		"Rozdělit do teamů"
+	}
+	"Menu games"
+	{
+		"en"		"Choose game"
+		"cze"		"Vybrat hru"
+	}
+	"Menu fences"
+	{
+		"en"		"Laser fences"
+		"cze"		"Laserové ploty"
+	}
+	"Menu stop game"
+	{
+		"en"		"Stop current game !"
+		"cze"		"Ukončit probíhající hru !"
+	}
+	"Menu count games info"
+	{
+		"#format"	"{1:d}"
+		"en"		"You can play {1} games in this round."
+		"cze"		"V tomto kole můžete spustit ještě {1} hry."
+	}
+	"Menu no more games"
+	{
+		"en"		"You can't play any game at this moment."
+		"cze"		"Už není možné spustit hru."
+	}
+//------------------------------------------------------------------------------------------------
+// Teams menu
+	"Menu teams title"
+	{
+		"en"		"Move player to:"
+		"cze"		"Přesunout hráče do:"
+	}
+	"Menu teams move to red"
+	{
+		"en"		"Red team"
+		"cze"		"Teamu červených"
+	}
+	"Menu teams move to blue"
+	{
+		"en"		"None team"
+		"cze"		"Teamu modrých"
+	}
+	"Menu teams move to none"
+	{
+		"en"		"Out of team"
+		"cze"		"Odebrat z teamu"
+	}
+	"Menu teams move all to none"
+	{
+		"en"		"Everyone out of team"
+		"cze"		"Všechny hráče odebrat z teamů"
+	}
+//------------------------------------------------------------------------------------------------
+// Games menu
+	"Menu games title"
+	{
+		"en"		"Choose game:"
+		"cze"		"Vyberte hru:"
+	}
+	"Menu games start title" // {1} = game name
+	{
+		"#format"	"{1:s}"
+		"en"		"{1}"
+		"cze"		"{1}"
+	}
+	"Menu games start"
+	{
+		"en"		"Play game*"
+		"cze"		"Začít hru*"
+	}
+	"Menu games redonly"
+	{
+		"en"		"Red Only"
+		"cze"		"Pouze červení"
+	}
+//------------------------------------------------------------------------------------------------
+// Fences menu
+	"Menu fences title"
+	{
+		"en"		"Choose laser fence:"
+		"cze"		"Vyberte laserový plot:"
+	}
+	"Menu fences rectangle"
+	{
+		"en"		"Rectangle"
+		"cze"		"Obdelník"
+	}
+	"Menu fences rectangle off"
+	{
+		"en"		"Turn off rectangle"
+		"cze"		"Vypnout obdelník"
+	}
+	"Menu fences confirm"
+	{
+		"en"		"Confirm fence"
+		"cze"		"Potvrdit plot"
+	}
+	"Fences player crossed"
+	{
+		"#format"	"{1:s}"
+		"en"		"Player {1} crossed laser fence !"
+		"cze"		"Hráč {1} překročil laserovou hranici !"
+	}
+//------------------------------------------------------------------------------------------------
+// Game start errors
+	"StartGame Error Another game in progress"
+	{
+		"en"		"Another game in progress!"
+		"cze"		"Již hra běží!"
+	}
+	"StartGame Error Bad team ratio"
+	{
+		"en"		"Bad teams ratio!"
+		"cze"		"Špatný poměr teamů!"
+	}
+	"StartGame Error Alive only"
+	{
+		"en"		"Only alive player can start game!"
+		"cze"		"Jako mrtvý nemůžeš spouštět hry!"
+	}
+//------------------------------------------------------------------------------------------------
+// Games list
+	"Games List header" // header line of games list (command !list)
+	{
+		"en"		"{highlight}List of games:"
+		"cze"		"{highlight}Seznam her:"
+	}
+	"Games List line" // format of line in games list ({1} = n, {2} = game name)
+	{
+		"#format"	"{1:d},{2:s}"
+		"en"		"{highlight}{1}){default} {2}"
+		"cze"		"{highlight}{1}){default} {2}"
+	}
+}

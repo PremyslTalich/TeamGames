@@ -1,0 +1,55 @@
+// ------------------------------------------------------------------------------------------------
+// Default "RedTeam":			"DC143C"
+// Default "BlueTeam":			"1E90FF"
+// Default "Color-prefix": 		"{lime}"
+// Default "Color-default": 	"F5F5F5"
+// Default "Color-settings": 	""
+// Default "Color-highlight": 	"{lime}"
+// Default "Color-highlight2": 	"{lime}"
+//
+// How to set tg color codes:
+// "" - Default engine color
+// "" - Lightgreen engine color
+// "" - Green engine color
+// "" - Olive engine color
+// "RRGGBB" - Hex RGB color code
+// morecolors.inc codes (including {} brackets)
+//
+// ------------------------------------------------------------------------------------------------
+//
+// !!! Moduls and core use these phrases and if they are not set correctly, modules and core would write messages wrong !!!
+//
+// You can NOT use color codes in phrases for menus.
+//
+// ------------------------------------------------------------------------------------------------
+"Phrases"
+{
+	"TGColor-redteam" // Red team color - {redteam}
+	{
+		"en"		"DC143C"
+	}
+	"TGColor-blueteam" // Blue team color - {blueteam}
+	{
+		"en"		"1E90FF"
+	}
+	"TGColor-prefix" // Plugin prefix color - {prefix}
+	{
+		"en"		"{lime}"
+	}
+	"TGColor-default" // Default chat color (color used for text after plugin prefix) - {default}
+	{
+		"en"		"F5F5F5"
+	}
+	"TGColor-settings" // Game settings (example: "Knife fight{settings} - 35HP") chat color - {settings}
+	{
+		"en"		""
+	}
+	"TGColor-highlight" // Highlight (not used by core, use it if you want more colors in chat) chat color - {highlight}
+	{
+		"en"		"{lime}"
+	}
+	"TGColor-highlight2" // Second highlight (not used by core, use it if you want more colors in chat) chat color - {highlight2}
+	{
+		"en"		"{vintage}"
+	}
+}
