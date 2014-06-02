@@ -272,4 +272,21 @@
 		"en"		"{highlight}{1}){default} {2}"
 		"cze"		"{highlight}{1}){default} {2}"
 	}
+//------------------------------------------------------------------------------------------------
+// Rebel
+	"Rebel-AliveTOnly"
+	{
+		"en"	"Only alive prisoners can use this command!"
+		"cze"	"Pouze živý vězni mohou použít tento příkaz!"
+	}
+	"Rebel-NoGame"
+	{
+		"en"	"You can't use this command during game!"
+		"cze"	"Během hry nelze tento pžíkaz použít!"
+	}
+	"Rebel-Become"
+	{
+		"en"	"Player {highlight}{1}{default} become a rebel!"
+		"cze"	"Hráč {highlight}{1}{default} se stal rebelem!"
+	}
 }

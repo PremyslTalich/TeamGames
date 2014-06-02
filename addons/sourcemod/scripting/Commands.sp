@@ -140,6 +140,32 @@ public Action:Command_GamesList( client, args )
 	return Plugin_Handled;
 }
 
+public Action:Command_Rebel( client, args )
+{
+	if( Client_IsValid( client ) )
+	{
+		if( GetClientTeam( client ) != CS_TEAM_T || !IsPlayerAlive( client ) )
+		{
+			TG_PrintToChat( client, "%t", "Rebel-AliveTOnly" );
+		}
+		else if( g_Game[ GameProgress ] != NoGame )
+		{
+			TG_PrintToChat( client, "%t", "Rebel-NoGame" );
+		}
+		else
+		{
+			ChangeRebelStatus( client, true );
+			SwitchToTeam( -1, client, NoneTeam );
+			
+			decl String:name[ 64 ];
+			GetClientName( client, name, sizeof( name ) );
+			TG_PrintToChatAll( "%t", "Rebel-Become", name );
+		}
+	}
+	
+	return Plugin_Handled;
+}
+
 // public Action:Command_Server( client, args )
 // {
 	// if( !Client_IsValid( client, true ) )

@@ -32,6 +32,15 @@ public Plugin:myinfo =
 	url = ""
 }
 
+RegModule()
+{
+	TG_AddMenuItem( MENU_ITEM_ID, MENU_ITEM_NAME ); // registrer module
+	TG_KvAddInt( MenuItem, MENU_ITEM_ID, "MaxBombsCount", 32 ); // add keyValue to modules config (default configs/teamgames/modules.cfg) - this will NOT OVERWRITE IF EXIST
+	
+	g_MaxBombs = TG_KvGetInt( MenuItem, MENU_ITEM_ID, "MaxBombsCount", 32 ); // get value of kayValue in modules config
+	TG_GetMenuItemName( MENU_ITEM_ID, g_ItemName, sizeof( g_ItemName ) ); // get changed item name (item name can be changed in modules config)
+}
+
 public OnPluginStart()
 {
 	HookEvent( "round_start", 	Event_RoundStart, 	EventHookMode_Post );
@@ -39,6 +48,22 @@ public OnPluginStart()
 	
 	g_TargetMaterial = PrecacheModel( TARGET_MATERIAL );
 	g_TargetHalo = PrecacheModel( TARGET_HALO );
+	
+	if( LibraryExists( "TeamGames" ) ) // in case of late load...
+		RegModule();
+}
+
+public OnLibraryAdded( const String:name[] )
+{
+    if( StrEqual( name, "TeamGames" ) )
+		RegModule();
+}
+
+public OnPluginEnd()
+{
+	TG_RemoveMenuItem( MENU_ITEM_ID ); // remove menu item
+	
+	TG_KillTimer( gh_timer );
 }
 
 public Action:Event_RoundStart( Handle:event, const String:name[], bool:dontBroadcast )
@@ -54,25 +79,6 @@ public Action:Event_RoundStart( Handle:event, const String:name[], bool:dontBroa
 	g_TargetPosition[ 0 ] = 0.0;
 	g_TargetPosition[ 1 ] = 0.0;
 	g_TargetPosition[ 2 ] = 0.0;
-}
-
-public OnLibraryAdded( const String:name[] )
-{
-    if( StrEqual( name, "TeamGames" ) )
-	{
-		TG_AddMenuItem( MENU_ITEM_ID, MENU_ITEM_NAME ); // registrer module
-		TG_KvAddInt( MenuItem, MENU_ITEM_ID, "MaxBombsCount", 32 ); // add keyValue to modules config (default configs/teamgames/modules.cfg) - this will NOT OVERWRITE IF EXIST
-		
-		g_MaxBombs = TG_KvGetInt( MenuItem, MENU_ITEM_ID, "MaxBombsCount", 32 ); // get value of kayValue in modules config
-		TG_GetMenuItemName( MENU_ITEM_ID, g_ItemName, sizeof( g_ItemName ) ); // get changed item name (item name can be changed in modules config)
-	}
-}
-
-public OnPluginEnd()
-{
-	TG_RemoveMenuItem( MENU_ITEM_ID ); // remove menu item
-	
-	TG_KillTimer( gh_timer );
 }
 
 public TG_OnMenuItemSelected( const String:id[], client ) // somebody selected BombToss item in menu

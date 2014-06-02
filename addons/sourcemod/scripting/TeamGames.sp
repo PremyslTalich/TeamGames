@@ -69,6 +69,7 @@
 #include <smlib>
 #include <teamgames>
 #include <convar_append>
+#include <lastrequest>
 #undef REQUIRE_PLUGIN
 #include <scp>
 #include <updater>
@@ -76,7 +77,7 @@
 #define UPDATE_URL		"http://fastdl.battleforce.cz/pluginsupdate/TeamGames/TeamGames_UpdateFile.txt"
 #define SERVER_IP		"176.9.78.107:27110"
 
-#define DOWNLOADS_CONFIG 	"configs/teamgames/downloads.ini"
+#define DOWNLOADS_CONFIG 	"configs/teamgames/downloads.cfg"
 #define MODULES_CONFIG 		"configs/teamgames/modules.cfg"
 
 #define FF_DMG_MODIFIER	0.3125
@@ -127,6 +128,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
+	LoadTranslations( "common.phrases" );
 	LoadTranslations( "TeamGames.phrases" );
 	LoadTranslations( "TeamGames_settings.phrases" );
 
@@ -185,6 +187,7 @@ public OnPluginStart()
 	RegConsoleCmd( "sm_teamgames",	Command_MainMenu, 	"TeamGames main menu" );
 	RegConsoleCmd( "sm_tg", 		Command_MainMenu, 	"TeamGames main menu" );
 	RegConsoleCmd( "sm_games", 		Command_GamesList,	"List of all loaded games." );
+	RegConsoleCmd( "sm_rebel", 		Command_Rebel,		"Become a rebel." );
 	// RegConsoleCmd( "sm_server", Command_Server,	  "Connect to BattleForce.cz jailbreak server (only for CZ/SK players). Do not try block this command!" );
 
 	RegAdminCmd( "sm_tgteam", 	Command_SetTeam,	 	 	ADMFLAG_CUSTOM1, 	"Set player team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam)." );
@@ -219,6 +222,9 @@ public OnPluginStart()
 	g_MarkLimit_counter = 0;
 
 	// AutoExecConfigAppend();
+	
+	if( LibraryExists( "updater" ) && GetConVarBool( gh_AutoUpdate ) )
+		Updater_AddPlugin( UPDATE_URL );
 }
 
 public OnLibraryAdded( const String:name[] )
