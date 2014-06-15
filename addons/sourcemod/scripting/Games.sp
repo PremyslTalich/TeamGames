@@ -4,7 +4,7 @@ new String:g_GamePrepare[ 6 ][ PLATFORM_MAX_PATH ];
 new String:g_GameEnd[ 3 ][ PLATFORM_MAX_PATH ];
 new String:g_GameStart[ PLATFORM_MAX_PATH ];
 
-GamesMenu( client )
+GamesMenu( client, TG_GameType:type = _All )
 {
 	if( GetCountAllGames() > 0 )
 	{
@@ -20,12 +20,15 @@ GamesMenu( client )
 			if( !g_GameList[ i ][ Used ] )
 				continue;
 			
+			if( g_GameList[ i ][ GameType ] != type && type != _All )
+				continue;
+			
 			if( strlen( g_GameList[ i ][ RequiredFlag ] ) != 0 && !TG_ClientHasAdminFlag( client, g_GameList[ i ][ RequiredFlag ] ) )
 				continue;
 			
 			AddSeperatorToMenu( menu, g_GameList[ i ][ Separator ], -1 );
 			
-			if( g_GameList[ i ][ GameType ] == RedOnly )
+			if( g_GameList[ i ][ GameType ] == RedOnly && type != RedOnly )
 			{
 				Format( name, sizeof( name ), "%s (%T)", g_GameList[ i ][ Name ], "Menu games redonly", client );
 			}
@@ -122,4 +125,14 @@ UnLoadAllModules()
 	TG_LogMessage( "Modules", "All modules unloaded" );
 	
 	return 0;
+}
+
+TG_GameType:GetGameTypeByName( String:typestr[] )
+{
+	if( StrEqual( typestr, "FiftyFifty", false ) )
+		return FiftyFifty;
+	else if( StrEqual( typestr, "RedOnly", false ) )
+		return RedOnly;
+	else
+		return _All;
 }

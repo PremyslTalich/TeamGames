@@ -759,8 +759,10 @@ public Native_StopGame( Handle:plugin, numParams )
 
 	for( new i = 1; i <= MaxClients; i++ )
 	{
-		if( TG_IsTeamRedOrBlue( TG_GetPlayerTeam( i ) ) )
-			SetEntityMoveType( i, MoveType:MOVETYPE_ISOMETRIC );
+		if( !TG_IsPlayerRedOrBlue( i ) )
+			continue;
+		
+		SetEntityMoveType( i, MoveType:MOVETYPE_ISOMETRIC );
 		
 		if( weapons )
 			PlayerEquipmentLoad( i );

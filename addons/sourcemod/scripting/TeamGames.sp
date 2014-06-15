@@ -69,10 +69,10 @@
 #include <smlib>
 #include <teamgames>
 #include <convar_append>
-#include <lastrequest>
 #undef REQUIRE_PLUGIN
 #include <scp>
 #include <updater>
+#include <lastrequest>
 
 #define UPDATE_URL		"http://fastdl.battleforce.cz/pluginsupdate/TeamGames/TeamGames_UpdateFile.txt"
 #define SERVER_IP		"176.9.78.107:27110"
@@ -102,6 +102,7 @@ new Handle:Forward_OnGameStart = INVALID_HANDLE;
 new Handle:Forward_OnGameStartError = INVALID_HANDLE;
 new Handle:Forward_OnGameEnd = INVALID_HANDLE;
 new Handle:Forward_OnLastInTeamDie = INVALID_HANDLE;
+new Handle:Forward_OnMenuDisplay = INVALID_HANDLE;
 new Handle:Forward_OnMenuItemDisplay = INVALID_HANDLE;
 new Handle:Forward_OnMenuItemSelected = INVALID_HANDLE;
 new Handle:Forward_OnUnknownFilePrefixLoaded = INVALID_HANDLE;
@@ -130,7 +131,7 @@ public OnPluginStart()
 {
 	LoadTranslations( "common.phrases" );
 	LoadTranslations( "TeamGames.phrases" );
-	LoadTranslations( "TeamGames_settings.phrases" );
+	LoadTranslations( "TeamGames.settings.phrases" );
 
 	Forward_OnPlayerDamage = 	 		CreateGlobalForward( "TG_OnPlayerDamage", 				ET_Hook, 	Param_CellByRef, 	Param_Cell, 		Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef );
 	Forward_OnPlayerDeath = 	 		CreateGlobalForward( "TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_String, 	Param_Cell, 	Param_Cell );
@@ -146,6 +147,7 @@ public OnPluginStart()
 	Forward_OnGameStartError = 			CreateGlobalForward( "TG_OnGameStartError",				ET_Ignore, 	Param_String,		Param_Cell, 		Param_Cell, 		Param_String );
 	Forward_OnLastInTeamDie = 	 		CreateGlobalForward( "TG_OnLastInTeamDie", 				ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell );
 	Forward_OnGameEnd = 	 			CreateGlobalForward( "TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell );
+	Forward_OnMenuDisplay =  			CreateGlobalForward( "TG_OnMenuDisplay",				ET_Event, 	Param_Cell );
 	Forward_OnMenuItemDisplay = 		CreateGlobalForward( "TG_OnMenuItemDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_CellByRef, 	Param_String );
 	Forward_OnMenuItemSelected = 		CreateGlobalForward( "TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell );
 	Forward_OnUnknownFilePrefixLoaded =	CreateGlobalForward( "TG_OnUnknownFilePrefixLoaded", 	ET_Ignore, 	Param_String,		Param_String,		Param_CellByRef );
@@ -157,7 +159,7 @@ public OnPluginStart()
 	gh_MenuFlag = 				CreateConVar( "tg_menu_adminflag_allow",	"generic", 		"Allow to use locked !tg menu via admin flag. Leave blank for disallow acces locked !tg menu via admin flag." );
 
 	gh_RoundLimit = 			CreateConVar( "tg_game_roundlimit", 		"-1", 			"How many games could be played in one round. (-1 = no limit)" );
-	gh_MoveSurvivors = 			CreateConVar( "tg_game_movesurvivors",		"2",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)" );
+	gh_MoveSurvivors = 			CreateConVar( "tg_game_movesurvivors",		"0",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)" );
 	gh_SaveWeapons = 			CreateConVar( "tg_game_saveweapons",		"2",			"Should survivors recieve striped weapons, health and armor in game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)" );
 
 	gh_ChangeTeamDelay =		CreateConVar( "tg_team_changedelay",		"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0 );
@@ -176,8 +178,8 @@ public OnPluginStart()
 
 	gh_FenceHeight = 			CreateConVar( "tg_fence_height",			"72.0",			"Height of fence. (Player can jump over fence)", _, true, 12.0, true, 1024.0 );
 	gh_FenceNotify = 			CreateConVar( "tg_fence_notify",			"2",			"Notify in chat that player crossed laser fence?\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)" );
-	gh_FencePunishLength = 		CreateConVar( "tg_fence_punishlength",		"1.0",			"Time in seconds to punish (color and freeze) player who crossed laser fence.", _, true, 0.0, true, 600.0 );
-	gh_FenceFreeze = 			CreateConVar( "tg_fence_freeze",			"1",			"Freeze player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)" );
+	gh_FencePunishLength = 		CreateConVar( "tg_fence_punishlength",		"0.75",			"Time in seconds to punish (color and freeze) player who crossed laser fence.", _, true, 0.0, true, 600.0 );
+	gh_FenceFreeze = 			CreateConVar( "tg_fence_freeze",			"2",			"Freeze player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)" );
 	gh_FenceColor = 			CreateConVar( "tg_fence_color",				"1",			"Color player who crossed laser fence?\n\t0 = no\n\t1 = yes\n\t = only when game is in progress)" );
 
 	gh_ForceAutoKick = 			CreateConVar( "tg_cvar_autokick",			"1",			"Force set convar \"mp_autokick 0\" every map start? (1 = true, 0 = false)" );

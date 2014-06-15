@@ -250,6 +250,14 @@ MainMenu( client )
 	if( g_MenuItemListEnd < 1 )
 		return;
 	
+	new Action:result = Plugin_Continue;
+	Call_StartForward( Forward_OnMenuDisplay );
+	Call_PushCell( client );
+	Call_Finish( result );
+	
+	if( result != Plugin_Continue )
+		return;
+	
 	new Handle:menu = CreateMenu( MainMenu_Handler );
 	decl String:TransMsg[ 256 ], String:MenuItemName[ 64 ];
 	
@@ -279,6 +287,30 @@ MainMenu( client )
 				AddMenuItem( menu, "Core_GamesMenu", TransMsg, ITEMDRAW_DISABLED );
 			else
 				AddMenuItem( menu, "Core_GamesMenu", TransMsg );
+			
+			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
+		}
+		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_GamesMenu-FiftyFifty", false ) )
+		{
+			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
+			
+			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu games-FiftyFifty", client );
+			if( g_Game[ GameProgress ] != NoGame || GetCountAllGames() < 1 || g_RoundLimit == 0 || !IsGameTypeAvailable( FiftyFifty ) )
+				AddMenuItem( menu, "Core_GamesMenu-FiftyFifty", TransMsg, ITEMDRAW_DISABLED );
+			else
+				AddMenuItem( menu, "Core_GamesMenu-FiftyFifty", TransMsg );
+			
+			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
+		}
+		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_GamesMenu-RedOnly", false ) )
+		{
+			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
+			
+			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu games-RedOnly", client );
+			if( g_Game[ GameProgress ] != NoGame || GetCountAllGames() < 1 || g_RoundLimit == 0 || !IsGameTypeAvailable( RedOnly ) )
+				AddMenuItem( menu, "Core_GamesMenu-RedOnly", TransMsg, ITEMDRAW_DISABLED );
+			else
+				AddMenuItem( menu, "Core_GamesMenu-RedOnly", TransMsg );
 			
 			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
 		}
@@ -340,7 +372,7 @@ MainMenu( client )
 				
 				if( status == Disabled )
 					continue;
-				
+					
 				AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
 				
 				if( status == Active )
@@ -401,8 +433,15 @@ public MainMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
 		
 		if( StrEqual( info, "Core_TeamsMenu" ) )
 			TeamsMenu( client );
-		else if( StrEqual( info, "Core_GamesMenu" ) )
-			GamesMenu( client );
+		else if( StrStartWith( info, "Core_GamesMenu" ) )
+		{
+			new i = FindCharInString( info, '-'  );
+			
+			if( i != -1 )
+				GamesMenu( client, GetGameTypeByName( info[ i + 1 ] ) );
+			else
+				GamesMenu( client );
+		}
 		else if( StrEqual( info, "Core_FencesMenu" ) )
 			FencesMenu( client );
 		else if( StrEqual( info, "Core_StopGame" ) )

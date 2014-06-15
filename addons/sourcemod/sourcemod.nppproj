@@ -1,0 +1,57 @@
+<project author="darkbull" blog="http://darkbull.net">
+  <node name="sourcemod" isDir="True" isExpand="True">
+    <node name="configs" isDir="True" isExpand="False">
+      <node name="downloads.cfg" isDir="False" isExpand="False" />
+      <node name="modules.cfg" isDir="False" isExpand="False" />
+    </node>
+    <node name="plugins" isDir="True" isExpand="False">
+      <node name="TeamGames.smx" isDir="False" isExpand="False" />
+      <node name="TG_BombToss.smx" isDir="False" isExpand="False" />
+      <node name="TG_DeagleHSOnly.smx" isDir="False" isExpand="False" />
+      <node name="TG_DeagleReloadBattle.smx" isDir="False" isExpand="False" />
+      <node name="TG_DeagleZoomBattle.smx" isDir="False" isExpand="False" />
+      <node name="TG_DrunkenRambo.smx" isDir="False" isExpand="False" />
+      <node name="TG_Grenades.smx" isDir="False" isExpand="False" />
+      <node name="TG_HotPotato.smx" isDir="False" isExpand="False" />
+      <node name="TG_KnifeFight.smx" isDir="False" isExpand="False" />
+      <node name="TG_Machines.smx" isDir="False" isExpand="False" />
+      <node name="TG_NoZoom.smx" isDir="False" isExpand="False" />
+      <node name="TG_StoreModule.smx" isDir="False" isExpand="False" />
+    </node>
+    <node name="scripting" isDir="True" isExpand="True">
+      <node name="includes" isDir="True" isExpand="False" />
+      <node name="modules" isDir="True" isExpand="False">
+        <node name="opravit" isDir="True" isExpand="False">
+          <node name="TG_DodgeBall.sp" isDir="False" isExpand="False" />
+        </node>
+        <node name="TG_BombToss.sp" isDir="False" isExpand="False" />
+        <node name="TG_DeagleHSOnly.sp" isDir="False" isExpand="False" />
+        <node name="TG_DeagleReloadBattle.sp" isDir="False" isExpand="False" />
+        <node name="TG_DeagleZoomBattle.sp" isDir="False" isExpand="False" />
+        <node name="TG_DrunkenRambo.sp" isDir="False" isExpand="False" />
+        <node name="TG_Grenades.sp" isDir="False" isExpand="False" />
+        <node name="TG_HotPotato.sp" isDir="False" isExpand="False" />
+        <node name="TG_KnifeFight.sp" isDir="False" isExpand="False" />
+        <node name="TG_Machines.sp" isDir="False" isExpand="False" />
+        <node name="TG_NoZoom.sp" isDir="False" isExpand="False" />
+        <node name="TG_StoreModule.sp" isDir="False" isExpand="False" />
+      </node>
+      <node name="_compile_.bat" isDir="False" isExpand="False" />
+      <node name="Api.sp" isDir="False" isExpand="False" />
+      <node name="Commands.sp" isDir="False" isExpand="False" />
+      <node name="ConfigFiles.sp" isDir="False" isExpand="False" />
+      <node name="Games.sp" isDir="False" isExpand="False" />
+      <node name="Chat.sp" isDir="False" isExpand="False" />
+      <node name="LaserFences.sp" isDir="False" isExpand="False" />
+      <node name="Marks.sp" isDir="False" isExpand="False" />
+      <node name="ModuleData.sp" isDir="False" isExpand="False" />
+      <node name="PlayerData.sp" isDir="False" isExpand="False" />
+      <node name="TeamGames.sp" isDir="False" isExpand="False" />
+      <node name="Teams.sp" isDir="False" isExpand="False" />
+    </node>
+    <node name="translations" isDir="True" isExpand="False">
+      <node name="TeamGames.phrases.txt" isDir="False" isExpand="False" />
+      <node name="TeamGames_settings.phrases.txt" isDir="False" isExpand="False" />
+    </node>
+  </node>
+</project>

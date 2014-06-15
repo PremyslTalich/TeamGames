@@ -1,0 +1,58 @@
+<NotepadPlus>
+    <Project name="TeamGames">
+        <Folder name="configs">
+            <File name="addons\sourcemod\configs\downloads.cfg" />
+            <File name="addons\sourcemod\configs\modules.cfg" />
+        </Folder>
+        <Folder name="plugins">
+            <File name="addons\sourcemod\plugins\TeamGames.smx" />
+            <File name="addons\sourcemod\plugins\TG_BombToss.smx" />
+            <File name="addons\sourcemod\plugins\TG_DeagleHSOnly.smx" />
+            <File name="addons\sourcemod\plugins\TG_DeagleReloadBattle.smx" />
+            <File name="addons\sourcemod\plugins\TG_DeagleZoomBattle.smx" />
+            <File name="addons\sourcemod\plugins\TG_DrunkenRambo.smx" />
+            <File name="addons\sourcemod\plugins\TG_Grenades.smx" />
+            <File name="addons\sourcemod\plugins\TG_HotPotato.smx" />
+            <File name="addons\sourcemod\plugins\TG_KnifeFight.smx" />
+            <File name="addons\sourcemod\plugins\TG_Machines.smx" />
+            <File name="addons\sourcemod\plugins\TG_NoZoom.smx" />
+            <File name="addons\sourcemod\plugins\TG_StoreModule.smx" />
+        </Folder>
+        <Folder name="scripting">
+            <Folder name="includes" />
+            <Folder name="modules">
+                <Folder name="opravit">
+                    <File name="addons\sourcemod\scripting\modules\opravit\TG_DodgeBall.sp" />
+                </Folder>
+                <File name="addons\sourcemod\scripting\modules\TG_BombToss.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_DeagleHSOnly.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_DeagleReloadBattle.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_DeagleZoomBattle.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_DrunkenRambo.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_Grenades.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_HotPotato.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_KnifeFight.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_Machines.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_NoZoom.sp" />
+                <File name="addons\sourcemod\scripting\modules\TG_StoreModule.sp" />
+            </Folder>
+            <File name="addons\sourcemod\scripting\Api.sp" />
+            <File name="addons\sourcemod\scripting\asd.txt" />
+            <File name="addons\sourcemod\scripting\Chat.sp" />
+            <File name="addons\sourcemod\scripting\Commands.sp" />
+            <File name="addons\sourcemod\scripting\ConfigFiles.sp" />
+            <File name="addons\sourcemod\scripting\Games.sp" />
+            <File name="addons\sourcemod\scripting\LaserFences.sp" />
+            <File name="addons\sourcemod\scripting\Marks.sp" />
+            <File name="addons\sourcemod\scripting\ModuleData.sp" />
+            <File name="addons\sourcemod\scripting\PlayerData.sp" />
+            <File name="addons\sourcemod\scripting\TeamGames.sp" />
+            <File name="addons\sourcemod\scripting\Teams.sp" />
+            <File name="addons\sourcemod\scripting\_compile_.bat" />
+        </Folder>
+        <Folder name="translations">
+            <File name="addons\sourcemod\translations\TeamGames.phrases.txt" />
+            <File name="addons\sourcemod\translations\TeamGames_settings.phrases.txt" />
+        </Folder>
+    </Project>
+</NotepadPlus>

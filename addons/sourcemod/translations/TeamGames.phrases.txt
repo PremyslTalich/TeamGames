@@ -143,6 +143,16 @@
 		"en"		"Choose game"
 		"cze"		"Vybrat hru"
 	}
+	"Menu games-FiftyFifty"
+	{
+		"en"		"Choose game (Fifty fifty)"
+		"cze"		"Vybrat hru (Fifty fifty)"
+	}
+	"Menu games-RedOnly"
+	{
+		"en"		"Choose game (Red only)"
+		"cze"		"Vybrat hru (Pouze červení)"
+	}
 	"Menu fences"
 	{
 		"en"		"Laser fences"
@@ -286,6 +296,7 @@
 	}
 	"Rebel-Become"
 	{
+		"#format"	"{1:s}"
 		"en"	"Player {highlight}{1}{default} become a rebel!"
 		"cze"	"Hráč {highlight}{1}{default} se stal rebelem!"
 	}
