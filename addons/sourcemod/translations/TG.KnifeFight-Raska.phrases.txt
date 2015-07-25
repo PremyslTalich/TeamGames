@@ -1,0 +1,18 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"en"		"KnifeFight"
+		"cze"		"KnifeFight"
+	}
+	"GameName-RedOnly"
+	{
+		"en"		"KnifeFight"
+		"cze"		"KnifeFight"
+	}
+	"ChooseHP"
+	{
+		"en"		"choose HP level"
+		"cze"		"vyberte počet HP"
+	}
+}

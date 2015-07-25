@@ -1,241 +1,279 @@
 #include <sourcemod>
 #include <smlib>
+#include <menu-stocks>
 #include <teamgames>
 
-#define DEFAULT_GAME_NAME	"Hot Potato"
-#define GAME_ID				"HotPotato-Raska"
+#define GAME_ID	"HotPotato"
 
 public Plugin:myinfo =
 {
-	name = "TG_HotPotato",
+	name = "[TG] HotPotato",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
 }
 
-enum VictimInfo
+enum GameInfo
 {
 	BombEntity,
 	VictimEntity,
 	Float:VictimSpeed,
-	String:VictimColor[ 24 ],
-	String:VictimColorPre[ 24 ]
+	bool:ToLastMan,
+	Handle:SlapTimer
 }
-new g_victim[ VictimInfo ];
+new g_game[GameInfo];
 
-new Handle:gh_SlapTimer = INVALID_HANDLE;
-new bool:g_ToLastMan = false;
-new String:g_GameName[ 64 ];
+new Handle:g_hHeathColor, g_bHealthColor;
 
 public OnPluginStart()
 {
-	HookEvent( "bomb_pickup",  Event_BombPickUp, EventHookMode_Post );
+	LoadTranslations("TG.HotPotato-Raska.phrases");
+	
+	g_hHeathColor = CreateConVar("tghp_enablecolor", "1", "Color players in shades of red according to their health level.");
+	
+	HookEvent("bomb_pickup",  Event_BombPickUp, EventHookMode_Post);
+	
+	ResetGame();
+	
+	AutoExecConfig(true, "plugin.TeamGames.TG_HotPotato");
 }
 
-public OnLibraryAdded( const String:name[] )
+public OnLibraryAdded(const String:sName[])
 {
-    if( StrEqual( name, "TeamGames" ) )
-	{
-		TG_RegGame( GAME_ID, DEFAULT_GAME_NAME, RedOnly );
-		TG_KvAddFloat( Game, GAME_ID, "BomberSpeed", 1.1 );
-		
-		g_victim[ VictimSpeed ] = TG_KvGetFloat( Game, GAME_ID, "BomberSpeed", 1.1 );
-		TG_GetGameName( GAME_ID, g_GameName, sizeof( g_GameName ) );
-	}
+	if (StrEqual(sName, "TeamGames") && !TG_IsModuleReged(TG_Game, GAME_ID))
+		TG_RegGame(GAME_ID, TG_RedOnly, "%t", "GameName");
 }
 
 public OnPluginEnd()
 {
-	TG_UnRegGame( GAME_ID );
+	TG_RemoveGame(GAME_ID);
 }
 
-public Action:TG_OnGameSelected( const String:id[], client )
+public OnConfigsExecuted()
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	g_bHealthColor = GetConVarBool(g_hHeathColor);
+}
+
+public Action:TG_OnGameSelected(const String:id[], iClient)
+{
+	if (!StrEqual(id, GAME_ID, true))
 		return Plugin_Continue;
 	
-	ModuleSetTypeGameMenu( client );
+	ModuleSetTypeGameMenu(iClient);
 	
 	return Plugin_Continue;
 }
 
-public TG_OnGamePrepare( const String:id[], client, const String:CustomName[], Handle:DataPack )
+public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	if (!StrEqual(id, GAME_ID, true))
 		return;
 
-	new user = TG_GetRandomClient( RedTeam );
+	new user = TG_GetRandomClient(TG_RedTeam);
 	
-	if( Client_IsIngame( user ) )
-	{
-		MakeClientVictim( user );
+	if (Client_IsIngame(user)) {
+		Client_RemoveAllWeapons(user);
+		g_game[BombEntity] = Client_GiveWeapon(user, "weapon_c4", true);
 		
-		g_victim[ BombEntity ] = Weapon_CreateForOwner( user, "weapon_c4" );
+		MakeClientVictim(user);
+	} else {
+		TG_StopGame(TG_NoneTeam);
 	}
-	else
-		TG_StopGame( NoneTeam, true, true );
+}
+
+public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+{
+	if (!StrEqual(id, GAME_ID, true))
+		return;
+	
+	if (!Client_IsIngame(g_game[VictimEntity]))
+		TG_StopGame(TG_NoneTeam);
+	
+	g_game[SlapTimer] = CreateTimer(0.2, Timer_SlapClient, _, TIMER_REPEAT);
 	
 	return;
 }
 
-public TG_OnGameStart( const String:id[], client, const String:CustomName[], Handle:DataPack )
+public Action:Timer_SlapClient(Handle:hTimer)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
-	
-	if( !Client_IsIngame( g_victim[ VictimEntity ] ) )
-		TG_StopGame( NoneTeam, true, true );
-	
-	gh_SlapTimer = CreateTimer( 0.2, Timer_SlapClient, _, TIMER_REPEAT );
-	
-	return;
-}
-
-public Action:Timer_SlapClient( Handle:timer, Handle:DataPack )
-{
-	if( !Client_IsIngame( g_victim[ VictimEntity ] ) )
+	if (!Client_IsIngame(g_game[VictimEntity]))
 		return Plugin_Continue;
 	
-	new OldHealth = GetClientHealth( g_victim[ VictimEntity ] );
-	new NewHealth = OldHealth - 1;
+	new iClient = g_game[VictimEntity];
 	
-	if( NewHealth <= 0 )
-	{
-		Client_RemoveAllWeapons( g_victim[ VictimEntity ], "", true );
-		ForcePlayerSuicide( g_victim[ VictimEntity ] );
-	}
-	else
-	{
-		SetEntityHealth( g_victim[ VictimEntity ], NewHealth );
-	}
+	if (g_game[SlapTimer] == INVALID_HANDLE)
+		return Plugin_Stop;
 	
-	return Plugin_Continue;
-}
-
-public Action:Event_BombPickUp( Handle:event, const String:name[], bool:dontBroadcast )
-{
-	new client = GetClientOfUserId( GetEventInt( event, "userid" ) );
+	new iOldHealth = GetClientHealth(iClient);
+	new iNewHealth = iOldHealth - 2;
 	
-	if( TG_GetPlayerTeam( client ) == RedTeam && TG_IsCurrentGameID( GAME_ID ) )
-	{
-		TG_SetPlayerTeam( -1, g_victim[ VictimEntity ], RedTeam );
-		SetEntPropFloat( g_victim[ VictimEntity ], Prop_Data, "m_flLaggedMovementValue", 1.0 );
+	if (iNewHealth <= 0) {
+		Client_RemoveAllWeapons(iClient);
+		ForcePlayerSuicide(iClient);
+	} else {
+		SetEntityHealth(iClient, iNewHealth);
 		
-		MakeClientVictim( client );
+		if (g_bHealthColor) {
+			if (iNewHealth > 90) {
+				SetEntityRenderColor(iClient, 255, 255, 255, 0);
+			} else if (iNewHealth > 10) {
+				new iColor = RoundToNearest((iNewHealth - 10) * 3.1875);
+				SetEntityRenderColor(iClient, 255, iColor, iColor, 0);
+			} else {
+				SetEntityRenderColor(iClient, 255, 0, 0, 0);
+			}
+		}
 	}
 	
 	return Plugin_Continue;
 }
 
-public Action:TG_OnLaserFenceCrossed( client, Float:FreezeTime )
+public Action:Event_BombPickUp(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if( g_victim[ VictimEntity ] == client )
+	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+	
+	if (TG_IsCurrentGameID(GAME_ID) && TG_GetPlayerTeam(iClient) == TG_RedTeam) {
+		RemoveClientVictim(g_game[VictimEntity]);
+		MakeClientVictim(iClient);
+		
+		new weapon = Client_GetWeapon(iClient, "weapon_c4");
+		SetEntPropEnt(iClient, Prop_Data, "m_hActiveWeapon", weapon);
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action:TG_OnLaserFenceCrossed(iClient, Float:FreezeTime)
+{
+	if (g_game[VictimEntity] == iClient)
 		return Plugin_Handled;
 	
 	return Plugin_Continue;
 }
 
-public TG_OnPlayerDeath( attacker, TG_Team:attackerTeam, victim, TG_Team:victimTeam, TG_Team:team, weapon, bool:headshot, TG_GameProgress:GameProgress ) //
+public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
-	if( !TG_IsCurrentGameID( GAME_ID ) )
+	if (!StrEqual(id, GAME_ID, true))
 		return;
 	
-	if( victim != g_victim[ VictimEntity ] )
+	if (Client_IsIngame(iClient)) {
+		SetEntPropFloat(iClient, Prop_Data, "m_flLaggedMovementValue", 1.0);
+		SetEntityRenderColor(iClient, 255, 255, 255, 0);
+	}
+	
+	
+	if (iClient != g_game[VictimEntity])
 		return;
 	
-	if( g_ToLastMan && TG_GetTeamCount( RedTeam ) >= 2 )
-	{
-		new user = TG_GetRandomClient( RedTeam );
+	RemoveClientVictim(iClient);
+	
+	if (g_game[ToLastMan] && TG_GetTeamCount(TG_RedTeam) > 1 && IsValidEntity(g_game[BombEntity])) {
+		new user = TG_GetRandomClient(TG_RedTeam);
 		
-		if( Client_IsIngame( user ) )
-		{
-			MakeClientVictim( user );
-			g_victim[ BombEntity ] = Weapon_CreateForOwner( user, "weapon_c4" );
+		if (Client_IsIngame(user)) {
+			Client_RemoveAllWeapons(user);
+			g_game[BombEntity] = Client_GiveWeapon(user, "weapon_c4", true);
+		
+			MakeClientVictim(user);
+		} else {
+			TG_StopGame(TG_NoneTeam);
 		}
-		else
-			TG_StopGame( NoneTeam );
+	} else {
+		g_game[SlapTimer] = INVALID_HANDLE;
+		
+		new Handle:hWinners = CreateArray();
+		for (new i = 1; i <= MaxClients; i++) {
+			if (TG_GetPlayerTeam(i) == TG_RedTeam) {
+				PushArrayCell(hWinners, i);
+			}
+		}
+		
+		TG_StopGame(TG_RedTeam, hWinners);
 	}
-	else
-	{
-		TG_KillTimer( gh_SlapTimer );
-		TG_StopGame( NoneTeam );
-	}
+}
+
+public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount)
+{
+	if (!StrEqual(id, GAME_ID, true))
+		return;
+	
+	ResetGame();
 	
 	return;
 }
 
-public TG_OnGameEnd( const String:id[], TG_Team:team, winners[], winnersCount )
+ModuleSetTypeGameMenu(iClient)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	new Handle:menu = CreateMenu(ModuleSetTypeGameMenu_Handler);
+
+	SetMenuTitle(menu, "%T", "Menu-Title", iClient, "GameName");
+	AddMenuItemFormat(menu, "Menu-OneDeath", _, "%T", "Menu-OneDeath", iClient);
+	AddMenuItemFormat(menu, "Menu-LastManStanding", _, "%T", "Menu-LastManStanding", iClient);
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, iClient, 30);
+}
+
+public ModuleSetTypeGameMenu_Handler(Handle:menu, MenuAction:iAction, iClient, iKey)
+{
+	if (iAction == MenuAction_Select) {
+		decl String:info[TG_MODULE_ID_LENGTH], String:GameSettings[TG_GAME_SETTINGS_LENGTH];
+		
+		GetMenuItem(menu, iKey, info, sizeof(info));
+		Format(GameSettings, sizeof(GameSettings), "%t", info);
+		
+		if (StrEqual(info, "Menu-OneDeath")) {
+			g_game[ToLastMan] = false;
+		} else {
+			g_game[ToLastMan] = true;
+		}
+		
+		TG_ShowPlayerSelectMenu(iClient, TG_RedTeam, SelectPlayerHandeler, "%T", "Menu-ChooseFirstPotato", iClient);
+	}
+}
+
+public SelectPlayerHandeler(activator, iClient, bool:IsRandom)
+{
+	if (Client_IsIngame(iClient)) {
+		new Handle:hDataPack = CreateDataPack();
+		WritePackCell(hDataPack, iClient);
+		
+		TG_StartGame(activator, GAME_ID, "", hDataPack, _, _, false);
+	}
+}
+
+MakeClientVictim(iClient)
+{
+	if (g_game[VictimEntity] == iClient)
 		return;
 	
-	if( Client_IsIngame( g_victim[ VictimEntity ] ) )
-		DispatchKeyValue( g_victim[ VictimEntity ], "rendercolor", g_victim[ VictimColorPre ] );
+	g_game[VictimEntity] = iClient;	
+	SetEntPropFloat(g_game[VictimEntity], Prop_Data, "m_flLaggedMovementValue", g_game[VictimSpeed]);
 	
-	g_victim[ VictimEntity ] = 0;
-	TG_KillTimer( gh_SlapTimer );
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
-			continue;
-		
-		SetEntPropFloat( i, Prop_Data, "m_flLaggedMovementValue", 1.0 );
+	if (GetPlayerWeaponSlot(iClient, 4) != g_game[BombEntity]) {
+		new Float:pos[3];
+		GetClientAbsOrigin(iClient, pos);
 	}
 	
-	return;
+	TG_LogGameMessage(GAME_ID, _, "Player %N has hot potato.", iClient);
 }
 
-ModuleSetTypeGameMenu( client )
+RemoveClientVictim(iClient)
 {
-	new Handle:menu = CreateMenu( ModuleSetTypeGameMenu_Handler );
-
-	SetMenuTitle( menu, "Hot Potato - vyberte typ hry:" );
-	AddMenuItem( menu, "OneDeath", "Pouze jedna mrtvola" );
-	AddMenuItem( menu, "LastManStanding", "Do posledního muže" );
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
+	g_game[VictimEntity] = 0;
+	
+	if (Client_IsIngame(iClient))
+		SetEntPropFloat(iClient, Prop_Data, "m_flLaggedMovementValue", 1.0);
 }
 
-public ModuleSetTypeGameMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
+ResetGame()
 {
-	if( action == MenuAction_Cancel && param2 == MenuCancel_ExitBack )
-	{
-		TG_ShowGamesMenu( client );
-	}
-	else if( action == MenuAction_Select )
-	{
-		decl String:info[ 64 ], String:CustomName[ 64 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
-		
-		if( StrEqual( info, "OneDeath" ) )
-		{
-			g_ToLastMan = false;
-			Format( CustomName, sizeof( CustomName ), "%s{settings} - Pouze jedna mrtvola", g_GameName );
-		}
-		else if( StrEqual( info, "LastManStanding" ) )
-		{
-			g_ToLastMan = true;
-			Format( CustomName, sizeof( CustomName ), "%s{settings} - Do posledního muže", g_GameName );
-		}
-		
-		TG_StartGame( client, GAME_ID, CustomName );
-	}
-}
-
-MakeClientVictim( client )
-{
-	if( Client_IsIngame( g_victim[ VictimEntity ] ) )
-	{
-		DispatchKeyValue( g_victim[ VictimEntity ], "rendercolor", g_victim[ VictimColorPre ] );
-		SetEntPropFloat( g_victim[ VictimEntity ], Prop_Data, "m_flLaggedMovementValue", 1.0 );
-	}
+	if (IsValidEntity(g_game[BombEntity]))
+		RemoveEdict(g_game[BombEntity]);
 	
-	g_victim[ VictimEntity ] = client;
-	new offset = GetEntSendPropOffs( client, "m_clrRender", true );
-	Format( g_victim[ VictimColorPre ], 24, "%d %d %d", GetEntData( client, offset, 1 ), GetEntData( client, offset + 1, 1 ), GetEntData( client, offset + 2, 1 ) );
-	
-	SetEntPropFloat( g_victim[ VictimEntity ], Prop_Data, "m_flLaggedMovementValue", g_victim[ VictimSpeed ] );
-	DispatchKeyValue( g_victim[ VictimEntity ], "rendercolor", g_victim[ VictimColor ] );
+	g_game[BombEntity] = -1;
+	g_game[VictimEntity] = -1;
+	g_game[VictimSpeed] = 1.1;
+	g_game[ToLastMan] = false;
+	g_game[SlapTimer] = INVALID_HANDLE;
 }

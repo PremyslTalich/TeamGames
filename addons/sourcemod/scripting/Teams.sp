@@ -1,320 +1,310 @@
-// ConVars
-new Handle:gh_TeamDiff = INVALID_HANDLE;
-new Handle:gh_MoveRebels = INVALID_HANDLE, bool:g_MoveRebels = true;
-new Handle:gh_NotifyPlayerTeam = INVALID_HANDLE, g_NotifyPlayerTeam = 1, Handle:gh_NotifyTimer = INVALID_HANDLE;
-new Handle:gh_ChangeTeamDelay = INVALID_HANDLE, Float:g_ChangeTeamDelay;
-new Handle:gh_MoveSurvivors = INVALID_HANDLE;
-
-new String:g_TeamSkin[ 3 ][ PLATFORM_MAX_PATH ];
-
-new bool:g_TeamsLock = false;
-
-new g_BlickColorRed[ 3 ] = { 255, 255, 0 };
-new g_BlickColorGreen[ 3 ] = { 255, 0, 0 };
-new g_BlickColorBlue[ 3 ] = { 255, 0, 255 };
+new String:g_sTeamSkin[3][PLATFORM_MAX_PATH];
+new bool:g_bTeamsLock = false;
+new g_iBlickColor[3][4] = {{255, 255, 255, 90}, {255, 0, 0, 150}, {0, 0, 255, 150}};
+new String:g_sRebelSound[PLATFORM_MAX_PATH];
 
 enum OverlayStruct
 {
-	String:OverlayName[ PLATFORM_MAX_PATH ]
+	String:OverlayName[PLATFORM_MAX_PATH]
 }
-new g_Overlay[ 3 ][ OverlayStruct ];
+new g_Overlay[3][OverlayStruct];
 
-public Action:Timer_HintTeam( Handle:timer )
+public Action:Timer_HintTeam(Handle:hTimer)
 {		
-	if( g_NotifyPlayerTeam == 0 || g_NotifyPlayerTeam == 4 )
-	{
-		TG_KillTimer( timer );
-		return Plugin_Handled;		
+	if (g_iNotifyPlayerTeam == 0 || g_iNotifyPlayerTeam == 4) {
+		if (hTimer != INVALID_HANDLE) {
+			KillTimer(hTimer);
+			hTimer = INVALID_HANDLE;
+		}
+		return Plugin_Handled;
 	}
 	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !Client_IsIngame( i ) )
+	for (new i = 1; i <= MaxClients; i++) {
+		if (!Client_IsIngame(i))
 			continue;
 		
-		NotifyPlayerTeam( i, g_PlayerData[ i ][ Team ] );
+		NotifyPlayerTeam(i, g_PlayerData[i][Team]);
 	}
 	
 	return Plugin_Handled;
 }
 
-public Action:Timer_SwitchAble( Handle:timer, any:client )
+public Action:Timer_SwitchAble(Handle:hTimer, any:iClient)
 {		
-	g_PlayerData[ client ][ AbleToSwitch ] = true;	
+	g_PlayerData[iClient][AbleToSwitch] = true;	
 	return Plugin_Handled;
 }
 
-TeamsMenu( client )
+TeamsMenu(iClient)
 {
-	new Handle:menu = CreateMenu( TeamsMenu_Handler );
-	new String:TransMsg[ 256 ];
+	new Handle:hMenu = CreateMenu(TeamsMenu_Handler);
 	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu teams title", client );
-	SetMenuTitle( menu, TransMsg );
+	SetMenuTitle(hMenu, "%T", "MenuTeams-Title", iClient);
 	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu teams move to red", client );
-	AddMenuItem( menu, "red", TransMsg );
+	AddMenuItemFormat(hMenu, "red", _, "%T", "MenuTeams-RedTeam", iClient);
+	AddMenuItemFormat(hMenu, "blue", _, "%T", "MenuTeams-BlueTeam", iClient);
+	AddMenuItemFormat(hMenu, "none", _, "%T", "MenuTeams-NoneTeam", iClient);
+	AddMenuItem(hMenu, "spacer", "spacer", ITEMDRAW_SPACER);
+	AddMenuItemFormat(hMenu, "AllNone", _, "%T", "MenuTeams-NoneTeamAll", iClient);
 	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu teams move to blue", client );
-	AddMenuItem( menu, "blue", TransMsg );
-	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu teams move to none", client );
-	AddMenuItem( menu, "none", TransMsg );
-	
-	AddMenuItem( menu, "spacer", "spacer", ITEMDRAW_SPACER );
-	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu teams move all to none", client );
-	AddMenuItem( menu, "AllNone", TransMsg );
-	
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
+	SetMenuExitBackButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
 }
 
-public TeamsMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
+public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 {
-	if( action == MenuAction_Select )
-	{
-		decl String:info[ 32 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
+	if (iAction == MenuAction_Select) {
+		decl String:sKey[32];
+		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
 		
-		if( StrEqual( info, "AllNone" ) )
-		{
+		if (StrEqual(sKey, "AllNone")) {
 			ClearTeams();
-			TeamsMenu( client );
+			TeamsMenu(iClient);
 		}
 		
-		new target = GetClientAimTarget( client, false );
-		if( target > 0 )
-		{
+		new target = GetClientAimTarget(iClient);
+		if (target > 0) {
 			#if defined DEBUG
-			LogMessage( "[TG DEBUG] Switch player %N to team %d (%s).", target, _:TG_GetTeamFromString( info ), info );
+			LogMessage("[TG DEBUG] Switch player %N to iTeam %d (%s).", target, _:TG_GetTeamFromString(sKey), sKey);
 			#endif
 			
-			SwitchToTeam( client, target, TG_GetTeamFromString( info ) );
+			new TG_Team:iTeam = TG_GetTeamFromString(sKey);
+			SwitchToTeam(iClient, target, iTeam);
 		}
 		
-		TeamsMenu( client );
-	}
-	else if( action == MenuAction_Cancel && param2 == MenuCancel_ExitBack )
-	{
-		MainMenu( client );
+		TeamsMenu(iClient);
+	} else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack) {
+		MainMenu(iClient);
 	}
 }
 
-SwitchToTeam( any:activator, any:client, TG_Team:team )
+SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 {
-	if( team == ErrorTeam )
+	if (iTeam == TG_ErrorTeam)
 		return 5;
 	
-	if( g_TeamsLock && activator >= 0 )
+	if (g_bTeamsLock && iActivator >= 0)
 		return 1;
 	
-	if( !Client_IsIngame( client ) || GetClientTeam( client ) == CS_TEAM_CT || g_PlayerData[ client ][ Team ] == team || !TG_IsTeamValid( team ) )
+	if (!Client_IsIngame(iClient) || GetClientTeam(iClient) == CS_TEAM_CT || g_PlayerData[iClient][Team] == iTeam || !TG_IsTeamValid(iTeam))
 		return 4;
 	
-	if( activator >= 0 && !g_PlayerData[ client ][ AbleToSwitch ] )
+	if (iActivator >= 0 && !g_PlayerData[iClient][AbleToSwitch])
 		return 2;
 	
-	new Action:result = Plugin_Continue;
-	Call_StartForward( Forward_OnPlayerTeam );
-	Call_PushCell( client );
-	Call_PushCell( activator );
-	Call_PushCell( g_PlayerData[ client ][ Team ] );
-	Call_PushCell( team );
-	Call_Finish( result );
-	if( result != Plugin_Continue )
+	new TG_Team:iOldTeam = g_PlayerData[iClient][Team];
+	
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnPlayerTeam);
+	Call_PushCell(iClient);
+	Call_PushCell(iActivator);
+	Call_PushCell(g_PlayerData[iClient][Team]);
+	Call_PushCell(iTeam);
+	Call_Finish(iResult);
+	if (iResult != Plugin_Continue)
 		return 3;
 		
-	decl String:ActivatorName[ 64 ], String:ClientName[ 64 ], String:GameName[ 64 ];
-	GetClientName( client, ClientName, sizeof( ClientName ) );
+	decl String:sActivatorName[64], String:sClientName[64], String:sGameName[TG_MODULE_NAME_LENGTH];
+	GetClientName(iClient, sClientName, sizeof(sClientName));
 	
-	if( Client_IsIngame( activator ) )
-		GetClientName( activator, ActivatorName, sizeof( ActivatorName ) );
+	if (Client_IsIngame(iActivator))
+		GetClientName(iActivator, sActivatorName, sizeof(sActivatorName));
 	
-	if( !StrEqual( g_Game[ GameID ], "Core_NoGame" ) )
-		Format( GameName, 64, "\t[%s]", g_Game[ GameID ] );
+	if (!StrEqual(g_Game[GameID], "Core_NoGame"))
+		Format(sGameName, TG_MODULE_NAME_LENGTH, "\t[%s]", g_Game[GameID]);
 	
-	if( g_PlayerData[ client ][ Team ] == NoneTeam )
-		GetClientModel( client, g_PlayerData[ client ][ DefaultModel ], PLATFORM_MAX_PATH );
+	if (iOldTeam == TG_NoneTeam)
+		GetClientModel(iClient, g_PlayerData[iClient][DefaultModel], PLATFORM_MAX_PATH);
 	
-	g_PlayerData[ client ][ Team ] = team;
+	g_PlayerData[iClient][Team] = iTeam;
 	
-	if( g_ChangeTeamDelay != 0.0 )
-	{
-		g_PlayerData[ client ][ AbleToSwitch ] = false;
-		CreateTimer( g_ChangeTeamDelay, Timer_SwitchAble, client );
+	if (g_fChangeTeamDelay != 0.0) {
+		g_PlayerData[iClient][AbleToSwitch] = false;
+		CreateTimer(g_fChangeTeamDelay, Timer_SwitchAble, iClient);
 	}
 	
-	Blick( client, team );
-	NotifyPlayerTeam( client, team, false );
+	Blick(iClient, iTeam);
+	NotifyPlayerTeam(iClient, iTeam, false);
 	
-	if( GetConVarInt( gh_TeamDiff ) == 0 )
-		ColorPlayer( client, team );
-	else if( GetConVarInt( gh_TeamDiff ) == 1 )
-		ModelPlayer( client, team );
+	if (g_iTeamDiff == 0)
+		ColorPlayer(iClient, iTeam);
+	else if (g_iTeamDiff == 1)
+		ModelPlayer(iClient, iTeam);
 	
-	if( Client_IsIngame( activator ) )
-	{
-		if( team == NoneTeam )
-			TG_PrintToChatAll( "%t", "Player moved to None team", ClientName );
-		else if( team == RedTeam )
-			TG_PrintToChatAll( "%t", "Player moved to Red team", ActivatorName, ClientName );
-		else if( team == BlueTeam )
-			TG_PrintToChatAll( "%t", "Player moved to Blue team", ActivatorName, ClientName );
-	}
-	else if( activator == -1 && g_Game[ GameProgress ] != NoGame )
-	{
-		if( team == RedTeam )
-			TG_PrintToChatAll( "%t", "Player moved to Red team by module", g_GameList[ GetGameIndex( g_Game[ GameID ] ) ][ Name ], ClientName );
-		else if( team == BlueTeam )
-			TG_PrintToChatAll( "%t", "Player moved to Blue team by module", g_GameList[ GetGameIndex( g_Game[ GameID ] ) ][ Name ], ClientName );
+	if (Client_IsIngame(iActivator)) {
+		if (iTeam == TG_NoneTeam)
+			CPrintToChatAll("%t", "PlayerMove-NoneTeam", sClientName);
+		else if (iTeam == TG_RedTeam)
+			CPrintToChatAll("%t", "PlayerMove-RedTeam", sActivatorName, sClientName);
+		else if (iTeam == TG_BlueTeam)
+			CPrintToChatAll("%t", "PlayerMove-BlueTeam", sActivatorName, sClientName);
+	} else if (iActivator == -1 && g_Game[GameProgress] != TG_NoGame) {
+		if (iTeam == TG_RedTeam)
+			CPrintToChatAll("%t", "PlayerMove-RedTeam-Game", g_GameList[GetGameIndex(g_Game[GameID])][DefaultName], sClientName);
+		else if (iTeam == TG_BlueTeam)
+			CPrintToChatAll("%t", "PlayerMove-BlueTeam-Game", g_GameList[GetGameIndex(g_Game[GameID])][DefaultName], sClientName);
 	}
 	
-	if( g_LogCvar )
-	{
-		if( Client_IsIngame( activator ) )
-			TG_LogRoundMessage( "SetPlayerTeam", "\"%L\" moved \"%L\" to \"team %d\"", activator, client, _:team );
-		else
-		{
-			if( g_Game[ GameProgress ] != NoGame )
-				TG_LogGameMessage( g_Game[ GameID ], "SetPlayerTeam", "\"%L\" was moved to \"team %d\"", client, _:team );
+	if (g_bLogCvar) {
+		if (Client_IsIngame(iActivator)) {
+			TG_LogRoundMessage("SetPlayerTeam", "\"%L\" moved \"%L\" to \"iTeam %d\"", iActivator, iClient, _:iTeam);
+		} else {
+			if (g_Game[GameProgress] != TG_NoGame)
+				TG_LogGameMessage(g_Game[GameID], "SetPlayerTeam", "\"%L\" was moved to \"iTeam %d\"", iClient, _:iTeam);
 			else
-				TG_LogGameMessage( "Core_NoGame", "SetPlayerTeam", "\"%L\" was moved to \"team %d\"", client, _:team );
+				TG_LogGameMessage("Core_NoGame", "SetPlayerTeam", "\"%L\" was moved to \"iTeam %d\"", iClient, _:iTeam);
 		}
+	}
+	
+	if (g_Game[GameProgress] != TG_NoGame && iTeam == TG_NoneTeam) {
+		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (iTeam %d) (reason = 'ChangeTGTeam')", iClient, _:iOldTeam);
+		
+		Call_StartForward(Forward_OnPlayerLeaveGame);
+		Call_PushString(g_Game[GameID]);
+		Call_PushCell(iClient);
+		Call_PushCell(iOldTeam);
+		Call_PushCell(TG_PlayerTrigger:TG_ChangeTGTeam);
+		Call_Finish();
+	}
+	
+	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
+		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (iTeam %d) (reason = 'ChangeTGTeam')", iClient, _:iOldTeam);
+
+		Call_StartForward(Forward_OnTeamEmpty);
+		Call_PushString(g_Game[GameID]);
+		Call_PushCell(iClient);
+		Call_PushCell(iOldTeam);
+		Call_PushCell(TG_PlayerTrigger:TG_ChangeTGTeam);
+		Call_Finish();
 	}
 	
 	#if defined DEBUG
-	LogMessage( "[TG DEBUG] Player %N switched to team %d.", client, _:team );
+	LogMessage("[TG DEBUG] Player %N switched to iTeam %d.", iClient, _:iTeam);
 	#endif
 	
 	return 0;
 }
 
-ModelPlayer( client, TG_Team:team )
+ModelPlayer(iClient, TG_Team:iTeam)
 {
-	if( team == NoneTeam )
-	{
-		SetEntityModel( client, g_PlayerData[ client ][ DefaultModel ] );
-	}
-	else if( team == RedTeam || team == BlueTeam )
-	{
-		if( StrEqual( g_TeamSkin[ team ], "" ) || !IsModelPrecached( g_TeamSkin[ team ] ) )
+	if (iTeam == TG_NoneTeam) {
+		SetEntityModel(iClient, g_PlayerData[iClient][DefaultModel]);
+	} else if (iTeam == TG_RedTeam || iTeam == TG_BlueTeam) {
+		if (StrEqual(g_sTeamSkin[iTeam], "") || !IsModelPrecached(g_sTeamSkin[iTeam]))
 			return 1;
 		
-		if( !FileExists( g_TeamSkin[ team ], false ) && !FileExists( g_TeamSkin[ team ], true ) )
+		if (!FileExists(g_sTeamSkin[iTeam], false) && !FileExists(g_sTeamSkin[iTeam], true))
 			return 2;
 		
-		SetEntityModel( client, g_TeamSkin[ team ] );
+		SetEntityModel(iClient, g_sTeamSkin[iTeam]);
 	}
 	
 	return 0;
 }
 
-ColorPlayer( client, TG_Team:team )
+ColorPlayer(iClient, TG_Team:iTeam)
 {
-	if( team == NoneTeam )
-		DispatchKeyValue( client, "rendercolor", "255 255 255" );
-	else if( team == RedTeam )
-		DispatchKeyValue( client, "rendercolor", "255 0 0" );
-	else if( team == BlueTeam )
-		DispatchKeyValue( client, "rendercolor", "0 0 255" );
+	if (iTeam == TG_NoneTeam)
+		DispatchKeyValue(iClient, "rendercolor", "255 255 255");
+	else if (iTeam == TG_RedTeam)
+		DispatchKeyValue(iClient, "rendercolor", "255 0 0");
+	else if (iTeam == TG_BlueTeam)
+		DispatchKeyValue(iClient, "rendercolor", "0 0 255");
 	
 	return 0;
 }
 
-Blick( client, TG_Team:team )
+Blick(iClient, TG_Team:iTeam)
 {
-	if( !TG_IsTeamValid( team ) )
+	if (!TG_IsTeamValid(iTeam))
 		return 1;
 	
-	new Handle:hFadeClient = StartMessageOne( "Fade", client );
-	BfWriteShort( hFadeClient, 90 ); // upraveno - 30 -> 90
-	BfWriteShort( hFadeClient, 130 ); // upraveno - 70 -> 130
-	BfWriteShort( hFadeClient, ( FFADE_PURGE | FFADE_IN | FFADE_STAYOUT ) );
-	BfWriteByte( hFadeClient, g_BlickColorRed[ _:team ] );
-	BfWriteByte( hFadeClient, g_BlickColorGreen[ _:team ] );
-	BfWriteByte( hFadeClient, g_BlickColorBlue[ _:team ] );
+	new Handle:hFade = StartMessageOne("Fade", iClient);
 	
-	if( team == NoneTeam )
-		BfWriteByte( hFadeClient, 90 ); // 50 -> 90
+	if (GetUserMessageType() == UM_Protobuf)
+	{
+		PbSetInt(hFade, "duration", 90);
+		PbSetInt(hFade, "hold_time", 130);
+		PbSetInt(hFade, "flags", (FFADE_PURGE | FFADE_IN | FFADE_STAYOUT));
+		PbSetColor(hFade, "clr", g_iBlickColor[_:iTeam]);
+	}
 	else
-		BfWriteByte( hFadeClient, 150 ); // 120 -> 150
+	{
+		BfWriteShort(hFade, 90);
+		BfWriteShort(hFade, 130);
+		BfWriteShort(hFade, (FFADE_PURGE | FFADE_IN | FFADE_STAYOUT));
+		BfWriteByte(hFade, g_iBlickColor[_:iTeam][0]);
+		BfWriteByte(hFade, g_iBlickColor[_:iTeam][1]);
+		BfWriteByte(hFade, g_iBlickColor[_:iTeam][2]);
+		BfWriteByte(hFade, g_iBlickColor[_:iTeam][3]);
+	}
 	
 	EndMessage();
 	
-	EmitSoundToClient( client, "buttons/blip2.wav", _, SNDCHAN_AUTO );
+	EmitSoundToClientAny(iClient, "buttons/blip2.wav");
 	
 	return 0;
 }
 
-NotifyPlayerTeam( client, TG_Team:team, bool:IgnoreNoneTeam = true )
+NotifyPlayerTeam(iClient, TG_Team:iTeam, bool:bIgnoreNoneTeam = true)
 {
-	if( g_NotifyPlayerTeam == 0 )
+	if (g_iNotifyPlayerTeam == 0)
 		return 1;
 	
-	if( !TG_IsTeamValid( team ) )
+	if (!TG_IsTeamValid(iTeam))
 		return 2;
 	
-	if( IgnoreNoneTeam && team == NoneTeam )
+	if (bIgnoreNoneTeam && iTeam == TG_NoneTeam)
 		return 3;
 	
-	decl String:msg[ 256 ];
+	decl String:sMsg[256];
 	
-	if( team == NoneTeam )
-		Format( msg, sizeof( msg ), "%t", "Hint None team" );
-	else if( team == RedTeam )
-		Format( msg, sizeof( msg ), "%t", "Hint Red team" );
-	else if( team == BlueTeam )
-		Format( msg, sizeof( msg ), "%t", "Hint Blue team" );
+	if (iTeam == TG_NoneTeam)
+		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-NoneTeam", iClient);
+	else if (iTeam == TG_RedTeam)
+		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-RedTeam", iClient);
+	else if (iTeam == TG_BlueTeam)
+		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-BlueTeam", iClient);
 	
-	if( g_NotifyPlayerTeam == 1 )
-	{
-		Client_PrintKeyHintText( client, msg );
-	}
-	else if( g_NotifyPlayerTeam == 2 )
-	{
-		Client_PrintHintText( client, msg );
-	}
-	else if( g_NotifyPlayerTeam == 3 )
-	{
-		new Handle:hndl = CreateHudSynchronizer();
+	if (g_iNotifyPlayerTeam == 1) {
+		PrintKeyHintText(iClient, sMsg);
+	} else if (g_iNotifyPlayerTeam == 2) {
+		PrintHintText(iClient, sMsg);
+	} else if (g_iNotifyPlayerTeam == 3) {
+		new Handle:hHudSynchronizer = CreateHudSynchronizer();
 
-		if( hndl != INVALID_HANDLE )
-		{
-			if( team == NoneTeam )
-				SetHudTextParams( -1.0, 0.85, 5.0, 200, 200, 200, 255 );
-			else if( team == RedTeam )
-				SetHudTextParams( -1.0, 0.85, 5.0, 255, 0, 0, 255 );
-			else if( team == BlueTeam )
-				SetHudTextParams( -1.0, 0.85, 5.0, 0, 0, 255, 255 );
+		if (hHudSynchronizer != INVALID_HANDLE) {
+			if (iTeam == TG_NoneTeam)
+				SetHudTextParams(-1.0, 0.85, 5.0, 200, 200, 200, 255);
+			else if (iTeam == TG_RedTeam)
+				SetHudTextParams(-1.0, 0.85, 5.0, 255, 0, 0, 255);
+			else if (iTeam == TG_BlueTeam)
+				SetHudTextParams(-1.0, 0.85, 5.0, 0, 0, 255, 255);
 			
-			ShowSyncHudText( client, hndl, msg );
-			CloseHandle( hndl );
+			ShowSyncHudText(iClient, hHudSynchronizer, sMsg);
+			CloseHandle(hHudSynchronizer);
 		}
-	}
-	else if( g_NotifyPlayerTeam == 4 )
-	{
-		if( team == NoneTeam )
-			ClientCommand( client, "r_screenoverlay \"\"" );
-		else if( TG_IsTeamRedOrBlue( team ) )
-			ClientCommand( client, "r_screenoverlay \"%s\"", g_Overlay[ team ][ OverlayName ] );
+	} else if (g_iNotifyPlayerTeam == 4) {
+		if (iTeam == TG_NoneTeam)
+			ClientCommand(iClient, "r_screenoverlay \"\"");
+		else if (TG_IsTeamRedOrBlue(iTeam))
+			ClientCommand(iClient, "r_screenoverlay \"%s\"", g_Overlay[iTeam][OverlayName]);
 	}
 	
 	return 0;
 }
 
-ClearTeam( TG_Team:team )
+ClearTeam(TG_Team:iTeam)
 {
-	if( !TG_IsTeamRedOrBlue( team ) )
+	if (!TG_IsTeamRedOrBlue(iTeam))
 		return -1;
 	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !Client_IsIngame( i ) )
+	for (new i = 1; i <= MaxClients; i++) {
+		if (!Client_IsIngame(i))
 			continue;
 		
-		if( g_PlayerData[ i ][ Team ] == team )
-			SwitchToTeam( -1, i, NoneTeam );
+		if (g_PlayerData[i][Team] == iTeam)
+			SwitchToTeam(-1, i, TG_NoneTeam);
 	}
 	
 	return 0;
@@ -322,6 +312,83 @@ ClearTeam( TG_Team:team )
 
 ClearTeams()
 {
-	ClearTeam( RedTeam );
-	ClearTeam( BlueTeam );
+	ClearTeam(TG_RedTeam);
+	ClearTeam(TG_BlueTeam);
+}
+
+bool:MakeRebel(iClient)
+{
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnPlayerRebel);
+	Call_PushCell(iClient);
+	Call_PushCell(TG_GetPlayerTeam(iClient));
+	Call_Finish(iResult);
+	if (iResult != Plugin_Continue)
+		return false;
+	
+	if (g_Game[GameProgress] == TG_InPreparation || g_Game[GameProgress] == TG_InProgress)
+		PlayerEquipmentLoad(iClient);
+	
+	new TG_Team:iOldTeam = TG_GetPlayerTeam(iClient);
+	ChangeRebelStatus(iClient, true);
+	SwitchToTeam(-1, iClient, TG_NoneTeam);
+	
+	decl String:sName[TG_MODULE_NAME_LENGTH];
+	GetClientName(iClient, sName, sizeof(sName));
+	CPrintToChatAll("%t", "Rebel-Become", sName);
+	
+	if (g_sRebelSound[0] != '\0' && IsSoundPrecached(g_sRebelSound))
+		EmitSoundToAllAny(g_sRebelSound);
+	
+	if (g_Game[GameProgress] != TG_NoGame) {
+		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (iTeam %d) (reason = 'Rebel')", iClient, _:iOldTeam);
+		
+		Call_StartForward(Forward_OnPlayerLeaveGame);
+		Call_PushString(g_Game[GameID]);
+		Call_PushCell(iClient);
+		Call_PushCell(g_PlayerData[iClient][Team]);
+		Call_PushCell(TG_PlayerTrigger:TG_Rebel);
+		Call_Finish();
+	}
+	
+	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
+		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (iTeam %d) (reason = 'Rebel')", iClient, _:iOldTeam);
+
+		Call_StartForward(Forward_OnTeamEmpty);
+		Call_PushString(g_Game[GameID]);
+		Call_PushCell(iClient);
+		Call_PushCell(iOldTeam);
+		Call_PushCell(TG_PlayerTrigger:TG_Rebel);
+		Call_Finish();
+	}
+	
+	return true;
+}
+
+stock bool:PrintKeyHintText(client, const String:format[], any:...)
+{
+	new Handle:userMessage = StartMessageOne("KeyHintText", client);
+	
+	if (userMessage == INVALID_HANDLE) {
+		return false;
+	}
+
+	decl String:buffer[1024];
+
+	SetGlobalTransTarget(client);
+	VFormat(buffer, sizeof(buffer), format, 3);
+	
+	if (GetUserMessageType() == UM_Protobuf)
+	{
+		PbAddString(userMessage, "hints", buffer);
+	}
+	else
+	{
+		BfWriteByte(userMessage, 1); 
+		BfWriteString(userMessage, buffer); 
+	}
+	
+	EndMessage();
+	
+	return true;
 }

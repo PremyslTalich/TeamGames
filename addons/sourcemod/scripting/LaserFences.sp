@@ -1,475 +1,539 @@
-// ConVars
-new Handle:gh_FenceHeight = INVALID_HANDLE, Float:g_FenceHeight = 71.0;
-new Handle:gh_FenceNotify = INVALID_HANDLE, g_FenceNotify = 2;
-new Handle:gh_FencePunishLength = INVALID_HANDLE, Float:g_FencePunishLength = 1.0;
-new Handle:gh_FenceColor = INVALID_HANDLE, g_FenceColor = 1;
-new Handle:gh_FenceFreeze = INVALID_HANDLE, g_FenceFreeze = 1;
+#define FENCE_PRECACHE_HALO "materials/sprites/glow01.vmt"
+#define FENCE_PRE_COLOR {0, 255, 0, 255}
 
-#define FENCE_MATERIAL "materials/sprites/laserbeam.vmt"
-#define FENCE_HALO "materials/sprites/glow01.vmt"
-#define LASER_COLOR { 255, 0, 0, 255 }
+new g_iFenceColor[4];
+new Float:g_fFenceWidth;
+new String:g_sFenceMaterial[PLATFORM_MAX_PATH];
+new String:g_sFenceCornerModel[PLATFORM_MAX_PATH];
 
-new g_FenceMaterial = -1;
-new g_FenceHalo = -1;
+new g_iFenceMaterialPrecache = -1;
+new g_iFenceHalo = -1;
 
-new Float:g_FenceRectangleA[ 3 ], Float:g_FenceRectangleB[ 3 ], Float:g_FenceRectangleC[ 3 ], Float:g_FenceRectangleD[ 3 ];
-new bool:g_FenceRectangle = false;
+new bool:g_bFencesMenuMapVisibility;
 
-FencesMenu( client )
+new Float:g_fFenceRectangleA[3], Float:g_fFenceRectangleB[3], Float:g_fFenceRectangleC[3], Float:g_fFenceRectangleD[3];
+new bool:g_bFenceRectangle = false;
+
+FencesMenu(iClient)
 {
-	new Handle:menu = CreateMenu( FencesMenu_Handler );
-	decl String:TransMsg[ 256 ];
+	new Float:fPos[3];
+	GetClientAbsOrigin(iClient, fPos);
 	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu fences title", client );
-	SetMenuTitle( menu, TransMsg );
+	new Handle:hDataPack = CreateDataPack();
+	WritePackCell(hDataPack, iClient);
+	WritePackFloat(hDataPack, fPos[0]);
+	WritePackFloat(hDataPack, fPos[1]);
+	WritePackFloat(hDataPack, fPos[2]);
 	
-	if( !g_FenceRectangle )
-	{
-		Format( TransMsg, sizeof( TransMsg ), "%T", "Menu fences rectangle", client );
-		AddMenuItem( menu, "FENCE_RECTANGLE", TransMsg );
-	}
-	else
-	{
-		Format( TransMsg, sizeof( TransMsg ), "%T", "Menu fences rectangle off", client );
-		AddMenuItem( menu, "FENCE_RECTANGLE_OFF", TransMsg );
-	}
+	new Handle:hTimer = CreateTimer(0.1, Timer_FenceRectanglePre, hDataPack, TIMER_REPEAT);
 	
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
+	new Handle:hSubMenu = CreateMenu(FencesMenu_Rectangle_Handler);
+	decl String:sTransMsg[256];			
+	Format(sTransMsg, sizeof(sTransMsg), "%T", "MenuFences-Confirm", iClient);
+	SetMenuTitle(hSubMenu, sTransMsg);
+	AddMenuItem(hSubMenu, "FENCES_MENU_CONFIRM", sTransMsg);
+	PushMenuCell(hSubMenu, "-DATAPACK-", _:hDataPack);
+	PushMenuCell(hSubMenu, "-TIMER-", _:hTimer);
+	SetMenuExitBackButton(hSubMenu, true);
+	DisplayMenu(hSubMenu, iClient, MENU_TIME_FOREVER);
 }
 
-public FencesMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
+public Action:Timer_FenceRectanglePre(Handle:hTimer, Handle:hDataPack) // Rectangle pre draw
 {
-	if( action == MenuAction_Select )
-	{
-		decl String:info[ 32 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
-		
-		if( StrEqual( info, "FENCE_RECTANGLE" ) )
-		{
-			new Float:pos[ 3 ];
-			GetClientAbsOrigin( client, pos );
-			
-			new Handle:datapack = CreateDataPack();
-			WritePackCell( datapack, client );
-			WritePackFloat( datapack, pos[ 0 ] );
-			WritePackFloat( datapack, pos[ 1 ] );
-			WritePackFloat( datapack, pos[ 2 ] );
-			
-			new Handle:timer = CreateTimer( 0.1, Timer_FenceRectanglePre, datapack, TIMER_REPEAT );
-			
-			new Handle:submenu = CreateMenu( FencesMenu_Rectangle_Handler );
-			decl String:TransMsg[ 256 ];			
-			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu fences confirm", client );
-			SetMenuTitle( submenu, TransMsg );
-			AddMenuItem( submenu, "FENCES_MENU_CONFIRM", TransMsg );
-			TG_PushMenuCell( submenu, "-DATAPACK-", _:datapack );
-			TG_PushMenuCell( submenu, "-TIMER-", _:timer );
-			SetMenuExitBackButton( submenu, true );
-			DisplayMenu( submenu, client, MENU_TIME_FOREVER );
-		}
-		else if( StrEqual( info, "FENCE_RECTANGLE_OFF" ) )
-		{
-			DestroyFence();
-			FencesMenu( client );
-		}
-	}
-	else if( action == MenuAction_Cancel && param2 == MenuCancel_ExitBack )
-	{
-		MainMenu( client );
-	}
-}
-
-public Action:Timer_FenceRectanglePre( Handle:timer, Handle:DataPack ) // Rectangle pre draw
-{
-	decl Float:a[ 3 ], Float:b[ 3 ], Float:c[ 3 ], Float:d[ 3 ];
-	new client;
+	decl Float:fA[3], Float:fC[3];
+	new iClient;
 	
-	ResetPack( DataPack );
-	client = ReadPackCell( DataPack );
-	a[ 0 ] = ReadPackFloat( DataPack );
-	a[ 1 ] = ReadPackFloat( DataPack );
-	a[ 2 ] = ReadPackFloat( DataPack ) + 12.0;
+	ResetPack(hDataPack);
+	iClient = ReadPackCell(hDataPack);
+	fA[0] = ReadPackFloat(hDataPack);
+	fA[1] = ReadPackFloat(hDataPack);
+	fA[2] = ReadPackFloat(hDataPack) + 12.0;
 	
-	GetClientAbsOrigin( client, c );
+	GetClientAbsOrigin(iClient, fC);
 	
-	b[ 2 ] = a[ 2 ];
-	d[ 2 ] = a[ 2 ];
-	c[ 2 ] = a[ 2 ];
+	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
 	
-	b[ 0 ] = c[ 0 ];
-	b[ 1 ] = a[ 1 ];
-	
-	d[ 0 ] = a[ 0 ];
-	d[ 1 ] = c[ 1 ];
-	
-	TE_SetupBeamPoints( a, b, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( b, c, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( c, d, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( d, a, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	a[ 2 ] += 18.0;
-	
-	if( g_FenceHeight < a[ 2 ] )
+	fA[2] += 18.0;
+	if (g_fFenceHeight < fA[2])
 		return Plugin_Continue;
 	
-	b[ 2 ] += 18.0;
-	d[ 2 ] += 18.0;
-	c[ 2 ] += 18.0;
-	TE_SetupBeamPoints( a, b, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( b, c, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( c, d, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( d, a, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	a[ 2 ] += 18.0;
+	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
 	
-	if( g_FenceHeight < a[ 2 ] )
+	fA[2] += 18.0;	
+	if (g_fFenceHeight < fA[2])
 		return Plugin_Continue;
 	
-	b[ 2 ] += 18.0;
-	d[ 2 ] += 18.0;
-	c[ 2 ] += 18.0;
-	TE_SetupBeamPoints( a, b, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( b, c, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( c, d, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( d, a, g_FenceMaterial, g_FenceHalo, 2, 1, 0.11, 1.0, 1.0, 0, 0.0, { 0, 255, 0, 255 }, 1 );
-	TE_SendToAll();
+	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
 	
 	return Plugin_Continue;
 }
 
-public Action:Timer_FenceRectangle( Handle:timer )
+public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey) // Rectangle hMenu handler
 {
-	if( !g_FenceRectangle )
-		KillTimer( timer );
-	
-	decl Float:a[ 3 ];
-	decl Float:b[ 3 ];
-	decl Float:c[ 3 ];
-	decl Float:d[ 3 ];
-	
-	a = g_FenceRectangleA;
-	b = g_FenceRectangleB;
-	c = g_FenceRectangleC;
-	d = g_FenceRectangleD;
-	
-	TE_SetupBeamPoints( a, b, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();                                               
-	TE_SetupBeamPoints( b, c, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();                                               
-	TE_SetupBeamPoints( c, d, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();                                               
-	TE_SetupBeamPoints( d, a, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();	
-	a[ 2 ] += 18.0;
-	
-	if( g_FenceHeight < a[ 2 ] )
-		return Plugin_Continue;
-	
-	b[ 2 ] += 18.0;
-	d[ 2 ] += 18.0;
-	c[ 2 ] += 18.0;
-	TE_SetupBeamPoints( a, b, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();                                               
-	TE_SetupBeamPoints( b, c, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();                                               
-	TE_SetupBeamPoints( c, d, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();                                               
-	TE_SetupBeamPoints( d, a, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();	
-	a[ 2 ] += 18.0;
-	
-	if( g_FenceHeight < a[ 2 ] )
-		return Plugin_Continue;
-	
-	b[ 2 ] += 18.0;
-	d[ 2 ] += 18.0;
-	c[ 2 ] += 18.0;
-	TE_SetupBeamPoints( a, b, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( b, c, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( c, d, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();
-	TE_SetupBeamPoints( d, a, g_FenceMaterial, g_FenceHalo, 2, 1, 1.1, 1.0, 1.0, 0, 0.0, LASER_COLOR, 1 );
-	TE_SendToAll();
-	
-	return Plugin_Continue;
-}
-
-public FencesMenu_Rectangle_Handler( Handle:menu, MenuAction:action, client, param2 ) // Rectangle menu handler
-{
-	if( action == MenuAction_Select )
-	{
-		decl String:info[ 32 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
+	if (iAction == MenuAction_Select) {
+		decl String:sKey[32];
+		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
 		
-		if( StrEqual( info, "FENCES_MENU_CONFIRM" ) )
-		{
-			new Float:a[ 3 ], Float:c[ 3 ], Handle:DataPack = INVALID_HANDLE;
-			DataPack = Handle:TG_GetMenuCell( menu, "-DATAPACK-" );
-			ResetPack( DataPack );
-			client = ReadPackCell( DataPack );
-			a[ 0 ] = ReadPackFloat( DataPack );
-			a[ 1 ] = ReadPackFloat( DataPack );
-			a[ 2 ] = ReadPackFloat( DataPack );
+		if (StrEqual(sKey, "FENCES_MENU_CONFIRM")) {
+			new Float:fA[3], Float:fC[3], Handle:hDataPack = INVALID_HANDLE;
+			hDataPack = Handle:GetMenuCell(hMenu, "-DATAPACK-");
+			ResetPack(hDataPack);
+			iClient = ReadPackCell(hDataPack);
+			fA[0] = ReadPackFloat(hDataPack);
+			fA[1] = ReadPackFloat(hDataPack);
+			fA[2] = ReadPackFloat(hDataPack);
 			
-			GetClientAbsOrigin( client, c );
+			GetClientAbsOrigin(iClient, fC);			
+			CreateFence(fA, fC);
 			
-			CreateFence( a, c );
-			
-			MainMenu( client );
+			MainMenu(iClient);
 		}
 		
-		CloseHandle( Handle:TG_GetMenuCell( menu, "-DATAPACK-" ) );
-		CloseHandle( Handle:TG_GetMenuCell( menu, "-TIMER-" ) );
-	}
-	else if( action == MenuAction_Cancel )
-	{
-		if( param2 == MenuCancel_Disconnected || param2 == MenuCancel_Interrupted || param2 == MenuCancel_Exit || param2 == MenuCancel_ExitBack )
-		{
-			CloseHandle( Handle:TG_GetMenuCell( menu, "-DATAPACK-" ) );
-			CloseHandle( Handle:TG_GetMenuCell( menu, "-TIMER-" ) );
-			FencesMenu( client );
+		CloseHandle(Handle:GetMenuCell(hMenu, "-DATAPACK-"));
+		CloseHandle(Handle:GetMenuCell(hMenu, "-TIMER-"));
+	} else if (iAction == MenuAction_Cancel) {
+		if (iKey == MenuCancel_Disconnected || iKey == MenuCancel_Interrupted || iKey == MenuCancel_Exit || iKey == MenuCancel_ExitBack) {
+			CloseHandle(Handle:GetMenuCell(hMenu, "-DATAPACK-"));
+			CloseHandle(Handle:GetMenuCell(hMenu, "-TIMER-"));
+			MainMenu(iClient);
 		}
 	}
 }
 
-CreateFence( Float:a[ 3 ], Float:c[ 3 ] )
+CreateFence(Float:fA[3], Float:fC[3])
 {
+	if (g_iFenceType == 0) {
+		return;
+	}
 	DestroyFence();
 	
-	new Action:result = Plugin_Continue;
-	Call_StartForward( Forward_OnLaserFenceCreatePre );
-	Call_PushArray( a, 3 );
-	Call_PushArray( c, 3 );
-	Call_Finish( result );
-	if( result != Plugin_Continue )
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnLaserFenceCreatePre);
+	Call_PushArray(fA, 3);
+	Call_PushArray(fC, 3);
+	Call_Finish(iResult);
+	if (iResult != Plugin_Continue)
 		return;
 	
-	CreateFencePoints( a, c );
-	CreateBrushTrigger( g_FenceRectangleA, g_FenceRectangleC );
-	g_FenceRectangle = true;
-	CreateTimer( 1.0, Timer_FenceRectangle, _, TIMER_REPEAT );
+	CreateFencePoints(fA, fC);
+	CreateBrushTrigger();
+	CreateFenceCornerModels();
+	g_bFenceRectangle = true;
+	
+	if (g_iFenceType == 1) {
+		fA[2] += 12.0; fC[2] += 12.0;
+		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_1_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
+		
+		fA[2] += 18.0; fC[2] += 18.0;
+		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_2_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
+		
+		fA[2] += 18.0; fC[2] += 18.0;
+		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_3_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
+	} else if (g_iFenceType == 2) {
+		fA[2] += 12.0; fC[2] += 12.0;
+		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_1_", g_sFenceMaterial, g_fFenceWidth);
+		
+		fA[2] += 18.0; fC[2] += 18.0;
+		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_2_", g_sFenceMaterial, g_fFenceWidth);
+		
+		fA[2] += 18.0; fC[2] += 18.0;
+		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_3_", g_sFenceMaterial, g_fFenceWidth);
+	}	
 }
 
 DestroyFence()
 {
-	if( g_FenceRectangle )
-	{
-		Call_StartForward( Forward_OnLaserFenceDestroyed );
-		Call_PushArray( g_FenceRectangleA, 3 );
-		Call_PushArray( g_FenceRectangleC, 3 );
+	if (g_bFenceRectangle) {
+		Call_StartForward(Forward_OnLaserFenceDestroyed);
+		Call_PushArray(g_fFenceRectangleA, 3);
+		Call_PushArray(g_fFenceRectangleC, 3);
 		Call_Finish();
 	}
 	
-	g_FenceRectangle = false;
-	DestroyBrushTrigger();
+	g_bFenceRectangle = false;
+	DestroyBrushTriggerAndBeamRope();
 }
 
-CreateFencePoints( Float:a[ 3 ], Float:c[ 3 ] )
+CreateFencePoints(Float:fA[3], Float:fC[3])
 {
-	g_FenceRectangleA = a;
-	g_FenceRectangleC = c;
+	g_fFenceRectangleA = fA;
+	g_fFenceRectangleC = fC;
 	
-	if( c[ 0 ] <= a[ 0 ] && c[ 1 ] <= a[ 1 ] )// 3
-	{
-		g_FenceRectangleA = c;
-		g_FenceRectangleC = a;
-	}
-	else if( a[ 0 ] >= c[ 0 ] && a[ 1 ] <= c[ 1 ] ) // 2
-	{
-		g_FenceRectangleA[ 0 ] = c[ 0 ];
-		g_FenceRectangleC[ 0 ] = a[ 0 ];
-	}
-	else if( a[ 0 ] <= c[ 0 ] && a[ 1 ] >= c[ 1 ] ) // 4
-	{
-		g_FenceRectangleA[ 1 ] = c[ 1 ];
-		g_FenceRectangleC[ 1 ] = a[ 1 ];
+	if (fC[0] <= fA[0] && fC[1] <= fA[1]) {
+		g_fFenceRectangleA = fC;
+		g_fFenceRectangleC = fA;
+	} else if (fA[0] >= fC[0] && fA[1] <= fC[1]) {
+		g_fFenceRectangleA[0] = fC[0];
+		g_fFenceRectangleC[0] = fA[0];
+	} else if (fA[0] <= fC[0] && fA[1] >= fC[1]) {
+		g_fFenceRectangleA[1] = fC[1];
+		g_fFenceRectangleC[1] = fA[1];
 	}
 	
-	g_FenceRectangleB[ 0 ] = g_FenceRectangleC[ 0 ];
-	g_FenceRectangleB[ 1 ] = g_FenceRectangleA[ 1 ];
-	g_FenceRectangleD[ 0 ] = g_FenceRectangleA[ 0 ];
-	g_FenceRectangleD[ 1 ] = g_FenceRectangleC[ 1 ];
+	g_fFenceRectangleB[0] = g_fFenceRectangleC[0];
+	g_fFenceRectangleB[1] = g_fFenceRectangleA[1];
+	g_fFenceRectangleD[0] = g_fFenceRectangleA[0];
+	g_fFenceRectangleD[1] = g_fFenceRectangleC[1];
 	
-	g_FenceRectangleA[ 2 ] += 12.0;
-	g_FenceRectangleB[ 2 ] = g_FenceRectangleA[ 2 ];
-	g_FenceRectangleD[ 2 ] = g_FenceRectangleA[ 2 ];
-	g_FenceRectangleC[ 2 ] = g_FenceRectangleA[ 2 ];
+	g_fFenceRectangleA[2] += 12.0;
+	g_fFenceRectangleB[2] = g_fFenceRectangleA[2];
+	g_fFenceRectangleD[2] = g_fFenceRectangleA[2];
+	g_fFenceRectangleC[2] = g_fFenceRectangleA[2];
 }
 
-CreateBrushTrigger( Float:a[ 3 ], Float:c[ 3 ] )
+CreateBrushTrigger()
 {
-	new Float:start[ 3 ], Float:end[ 3 ];
-	start = a;
-	end = c;
-	start[ 2 ] -= 12.0;
-	end[ 2 ] = start[ 2 ];
+	new Float:fStart[3], Float:fEnd[3];
+	fStart = g_fFenceRectangleA;
+	fEnd = g_fFenceRectangleC;
+	fStart[2] -= 12.0;
+	fEnd[2] -= 12.0;
 	
-	start[ 0 ] += 15.0;
-	start[ 1 ] += 15.0;
+	fStart[0] += 15.0;
+	fStart[1] += 15.0;
 	
-	end[ 0 ] -= 15.0;
-	end[ 1 ] -= 15.0;
+	fEnd[0] -= 15.0;
+	fEnd[1] -= 15.0;
 	
-	new Float:vec[ 3 ];
-	MakeVectorFromPoints( start, end, vec );
+	new Float:fVec[3];
+	MakeVectorFromPoints(fStart, fEnd, fVec);
 	
-	new Float:origin[ 3 ];
-	origin[ 0 ] = ( start[ 0 ] + end[ 0 ] ) / 2;
-	origin[ 1 ] = ( start[ 1 ] + end[ 1 ] ) / 2;
-	origin[ 2 ] = start[ 2 ];
+	new Float:fOrigin[3];
+	fOrigin[0] = (fStart[0] + fEnd[0]) / 2;
+	fOrigin[1] = (fStart[1] + fEnd[1]) / 2;
+	fOrigin[2] = fStart[2];
 	
-	new Float:minbounds[ 3 ], Float:maxbounds[ 3 ];
-	minbounds[ 0 ] = -1 * ( vec[ 0 ] / 2 );
-	maxbounds[ 0 ] = vec[ 0 ] / 2;
-	minbounds[ 1 ] = -1 * ( vec[ 1 ] / 2 );
-	maxbounds[ 1 ] = vec[ 1 ] / 2;
-	minbounds[ 2 ] = 0.0;
-	maxbounds[ 2 ] = 128.0;
+	new Float:fMinBounds[3], Float:fMaxBounds[3];
+	fMinBounds[0] = -1 * (fVec[0] / 2);
+	fMaxBounds[0] = fVec[0] / 2;
+	fMinBounds[1] = -1 * (fVec[1] / 2);
+	fMaxBounds[1] = fVec[1] / 2;
+	fMinBounds[2] = 0.0;
+	fMaxBounds[2] = 128.0;
 	
-	new entindex = CreateEntityByName("trigger_multiple");
+	new iEntity = CreateEntityByName("trigger_multiple");
 	
-	DispatchKeyValue( entindex, "spawnflags", "64" );
-	DispatchKeyValue( entindex, "targetname", "TG_RectangleLaserFense" );
-	DispatchKeyValue( entindex, "wait", "0" );
+	DispatchKeyValue(iEntity, "spawnflags", "64");
+	DispatchKeyValue(iEntity, "targetname", "TG_LaserFence");
+	DispatchKeyValue(iEntity, "wait", "0");
 	
-	DispatchSpawn( entindex );
-	ActivateEntity( entindex );
-	SetEntProp( entindex, Prop_Data, "m_spawnflags", 64 );
+	DispatchSpawn(iEntity);
+	ActivateEntity(iEntity);
+	SetEntProp(iEntity, Prop_Data, "m_spawnflags", 64);
 	
-	TeleportEntity( entindex, origin, NULL_VECTOR, NULL_VECTOR );
+	TeleportEntity(iEntity, fOrigin, NULL_VECTOR, NULL_VECTOR);
 	
-	SetEntityModel( entindex, "models/props/cs_office/vending_machine.mdl" );
+	SetEntityModel(iEntity, "models/props/cs_office/trash_can.mdl");
 	
-	SetEntPropVector( entindex, Prop_Send, "m_vecMins", minbounds );
-	SetEntPropVector( entindex, Prop_Send, "m_vecMaxs", maxbounds );
+	SetEntPropVector(iEntity, Prop_Send, "m_vecMins", fMinBounds);
+	SetEntPropVector(iEntity, Prop_Send, "m_vecMaxs", fMaxBounds);
 	
-	SetEntProp( entindex, Prop_Send, "m_nSolidType", 2 );
+	SetEntProp(iEntity, Prop_Send, "m_nSolidType", 2);
 	
-	new enteffects = GetEntProp( entindex, Prop_Send, "m_fEffects" );
-	enteffects |= 32;
-	SetEntProp( entindex, Prop_Send, "m_fEffects", enteffects );
+	new iEntityEffect = GetEntProp(iEntity, Prop_Send, "m_fEffects");
+	iEntityEffect |= 32;
+	SetEntProp(iEntity, Prop_Send, "m_fEffects", iEntityEffect);
 	
-	HookSingleEntityOutput( entindex, "OnEndTouch", Hook_LaserFenceOnEndTouch );
+	HookSingleEntityOutput(iEntity, "OnEndTouch", Hook_LaserFenceOnEndTouch);
 }
 
-public Hook_LaserFenceOnEndTouch( const String:output[], caller, activator, Float:delay )
+CreateFenceCornerModels()
 {
-	if( !Client_IsIngame( activator ) || GetClientTeam( activator ) == CS_TEAM_CT || !TG_IsTeamRedOrBlue( g_PlayerData[ activator ][ Team ] ) )
+	CreateCornerModel(g_fFenceRectangleA);
+	CreateCornerModel(g_fFenceRectangleB);
+	CreateCornerModel(g_fFenceRectangleC);
+	CreateCornerModel(g_fFenceRectangleD);
+}
+
+CreateCornerModel(Float:fPos[3])
+{
+	if (!IsModelPrecached(g_sFenceCornerModel))
 		return;
 	
-	decl String:TriggerName[ 256 ];
-	GetEntPropString( caller, Prop_Data, "m_iName", TriggerName, sizeof( TriggerName ) );
+	new Float:fOrigin[3];
+	fOrigin = fPos;
+	fOrigin[2] -= 12.0;
 	
-	if( !StrEqual( TriggerName, "TG_RectangleLaserFense", true ) )
+	new iEntity = CreateEntityByName("prop_dynamic_override");
+	
+	if (!IsValidEntity(iEntity))
 		return;
 	
-	new Float:pos[ 3 ];
-	GetClientAbsOrigin( activator, pos );
-	
-	if( pos[ 2 ] < g_FenceRectangleA[ 2 ] + ( g_FenceHeight - 12.0 ) )
-		FencePunishPlayer( activator );
+	DispatchKeyValue(iEntity, "targetname", "__TG_LaserFenceCorner__");
+	DispatchKeyValue(iEntity, "model", g_sFenceCornerModel);
+	DispatchSpawn(iEntity);
+	TeleportEntity(iEntity, fOrigin, NULL_VECTOR, NULL_VECTOR);
+	SetEntityModel(iEntity, g_sFenceCornerModel);
+	SetEntityMoveType(iEntity, MOVETYPE_NONE);
 }
 
-DestroyBrushTrigger()
+public Hook_LaserFenceOnEndTouch(const String:sOutput[], iCaller, iActivator, Float:fDelay)
 {
-	new EntCount = GetMaxEntities();
-	decl String:ClassName[ 256 ], String:TriggerName[ 256 ];
-	for( new i = MaxClients; i < EntCount; i++ )
-	{
-		if( IsValidEntity( i ) && IsValidEdict( i ) )
-		{
-			GetEdictClassname( i, ClassName, sizeof( ClassName ) );
+	if (!Client_IsIngame(iActivator) || GetClientTeam(iActivator) != CS_TEAM_T || !TG_IsTeamRedOrBlue(g_PlayerData[iActivator][Team]))
+		return;
+	
+	new Float:fPos[3];
+	GetClientAbsOrigin(iActivator, fPos);
+	
+	if (fPos[2] < g_fFenceRectangleA[2] + (g_fFenceHeight - 12.0))
+		FencePunishPlayer(iActivator);
+}
+
+DestroyBrushTriggerAndBeamRope()
+{
+	new iEntityCount = GetMaxEntities();
+	decl String:sClassName[256], String:sTargetName[256];
+	for (new i = MaxClients; i < iEntityCount; i++) {
+		if (!IsValidEntity(i))
+			continue;
+		
+		GetEdictClassname(i, sClassName, sizeof(sClassName));		
+		if (StrEqual(sClassName, "trigger_multiple") || StrEqual(sClassName, "prop_dynamic") || StrEqual(sClassName, "move_rope") || StrEqual(sClassName, "keyframe_rope") || StrEqual(sClassName, "env_beam")) {
+			GetEntPropString(i, Prop_Data, "m_iName", sTargetName, sizeof(sTargetName));
 			
-			if( StrEqual( ClassName, "trigger_multiple", true ) )
-			{
-				GetEntPropString( i, Prop_Data, "m_iName", TriggerName, sizeof( TriggerName ) );
-				
-				if( StrEqual( TriggerName, "TG_RectangleLaserFense", true ) )
-				{
-					UnhookSingleEntityOutput( i, "OnEndTouch", Hook_LaserFenceOnEndTouch );
-					AcceptEntityInput( i, "Kill" );
-				}
+			if (StrEqual(sTargetName, "TG_LaserFence")) {
+				UnhookSingleEntityOutput(i, "OnEndTouch", Hook_LaserFenceOnEndTouch);
+				AcceptEntityInput(i, "Kill");
+			} else if (StrEqual(sTargetName, "__TG_LaserFenceCorner__")) {
+				RemoveEdict(i);
+			} else if (StrContains(sTargetName, "__TG_FenceBeamRope_") == 0) {
+				RemoveEdict(i);
 			}
 		}
 	}
 }
 
-FencePunishPlayer( client, bool:CallForward = true )
+FencePunishPlayer(iClient, bool:CallForward = true)
 {
-	new Float:time = g_FencePunishLength;
+	new Float:fTime = g_fFencePunishLength;
 	
-	if( CallForward )
-	{
-		new Action:result = Plugin_Continue;
-		Call_StartForward( Forward_OnLaserFenceCrossed );
-		Call_PushCell( client );
-		Call_PushFloatRef( time );
-		Call_Finish( result );
+	if (CallForward) {
+		new Action:iResult = Plugin_Continue;
+		Call_StartForward(Forward_OnLaserFenceCrossed);
+		Call_PushCell(iClient);
+		Call_PushFloatRef(fTime);
+		Call_Finish(iResult);
 		
-		if( result == Plugin_Handled || result == Plugin_Stop )
+		if (iResult == Plugin_Handled || iResult == Plugin_Stop)
 			return;
 	}
 	
-	if( g_FenceNotify == 1 || ( g_FenceNotify == 2 && g_Game[ GameProgress ] != NoGame ) )
-	{
-		decl String:ClientName[ 64 ];
-		GetClientName( client, ClientName, sizeof( ClientName ) );
-		TG_PrintToChatAll( "%t" , "Fences player crossed", ClientName );
+	if (g_iFenceNotify == 1 || (g_iFenceNotify == 2 && g_Game[GameProgress] != TG_NoGame)) {
+		decl String:sClientName[64];
+		GetClientName(iClient, sClientName, sizeof(sClientName));
+		CPrintToChatAll("%t" , "Fences-PlayerCross", sClientName);
 	}
 	
-	if( g_FencePunishLength == 0.0 || ( g_FenceColor == 0 && g_FenceFreeze == 0 ) )
+	if (g_fFencePunishLength == 0.0 || (g_iFencePunishColorSettings == 0 && g_iFenceFreeze == 0))
 		return;
 	
-	if( g_FenceColor == 1 || ( g_FenceColor == 2 && g_Game[ GameProgress ] != NoGame ) )
-	{
-		new Handle:DataPack = CreateDataPack();
-		WritePackCell( DataPack, client );
-		WritePackCell( DataPack, GetEntData( client, GetEntSendPropOffs( client, "m_clrRender", true ), 1 ) );
-		WritePackCell( DataPack, GetEntData( client, GetEntSendPropOffs( client, "m_clrRender", true ) + 1, 1 ) );
-		WritePackCell( DataPack, GetEntData( client, GetEntSendPropOffs( client, "m_clrRender", true ) + 2, 1 ) );
-		WritePackCell( DataPack, GetEntData( client, GetEntSendPropOffs( client, "m_clrRender", true ) + 3, 1 ) );
-		SetEntityRenderColor( client, 0, 255, 0, 0 );
-		CreateTimer( time, Timer_FenceColorOff, DataPack, 0 );
+	if (!g_PlayerData[iClient][AbleToFencePunishColor])
+		return;
+	
+	if (g_iFencePunishColorSettings == 1 || (g_iFencePunishColorSettings == 2 && g_Game[GameProgress] != TG_NoGame)) {
+		g_PlayerData[iClient][AbleToFencePunishColor] = false;
+		
+		new Handle:hDataPack = CreateDataPack();
+		WritePackCell(hDataPack, iClient);
+		WritePackCell(hDataPack, GetEntData(iClient, GetEntSendPropOffs(iClient, "m_clrRender", true), 1));
+		WritePackCell(hDataPack, GetEntData(iClient, GetEntSendPropOffs(iClient, "m_clrRender", true) + 1, 1));
+		WritePackCell(hDataPack, GetEntData(iClient, GetEntSendPropOffs(iClient, "m_clrRender", true) + 2, 1));
+		WritePackCell(hDataPack, GetEntData(iClient, GetEntSendPropOffs(iClient, "m_clrRender", true) + 3, 1));
+		SetEntityRenderColor(iClient, g_iFencePunishColor[0], g_iFencePunishColor[1], g_iFencePunishColor[2], 255);
+		CreateTimer(fTime, Timer_FenceColorOff, hDataPack, 0);
 	}
 	
-	if( g_FenceFreeze == 1 || ( g_FenceFreeze == 2 && g_Game[ GameProgress ] != NoGame ) )
-	{
-		SetEntityMoveType( client, MOVETYPE_NONE );
-		CreateTimer( time, Timer_FenceFreezeOff, client );
+	if (g_iFenceFreeze == 1 || (g_iFenceFreeze == 2 && g_Game[GameProgress] != TG_NoGame)) {
+		SetEntityMoveType(iClient, MOVETYPE_NONE);
+		CreateTimer(fTime, Timer_FenceFreezeOff, iClient);
 	}
 	
 	return;
 }
 
-public Action:Timer_FenceColorOff( Handle:timer, Handle:DataPack )
+public Action:Timer_FenceColorOff(Handle:hTimer, Handle:hDataPack)
 {
-	ResetPack( DataPack );
-	new client = ReadPackCell( DataPack );
-	new red = ReadPackCell( DataPack );
-	new green = ReadPackCell( DataPack );
-	new blue = ReadPackCell( DataPack );
-	new alpha = ReadPackCell( DataPack );
-	CloseHandle( DataPack );
+	ResetPack(hDataPack);
+	new iClient = ReadPackCell(hDataPack);
+	new iRed = ReadPackCell(hDataPack);
+	new iGreen = ReadPackCell(hDataPack);
+	new iBlue = ReadPackCell(hDataPack);
+	new iAlpha = ReadPackCell(hDataPack);
+	CloseHandle(hDataPack);
 	
-	SetEntityRenderColor( client, red, green, blue, alpha );
+	SetEntityRenderColor(iClient, iRed, iGreen, iBlue, iAlpha);
+	g_PlayerData[iClient][AbleToFencePunishColor] = true;
 	
 	return Plugin_Continue;
 }
-public Action:Timer_FenceFreezeOff( Handle:timer, any:client )
+public Action:Timer_FenceFreezeOff(Handle:hTimer, any:iClient)
 {
-	SetEntityMoveType( client, MOVETYPE_ISOMETRIC );
+	SetEntityMoveType(iClient, MOVETYPE_ISOMETRIC);	
+	return Plugin_Continue;
+}
+
+TempEnt_Square(Float:fA[3], Float:fC[3], Float:fLife, iColor[4], Float:fWidth, iModel, iHalo)
+{
+	new Float:b[3];
+	new Float:d[3];
+	b = fA; b[1] = fC[1];
+	d = fA; d[0] = fC[0];
+	fC[2] = fA[2];
 	
+	TE_SetupBeamPoints(fA, b, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SendToAll();                                               
+	TE_SetupBeamPoints(b, fC, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SendToAll();                                               
+	TE_SetupBeamPoints(fC, d, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SendToAll();                                               
+	TE_SetupBeamPoints(d, fA, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SendToAll();
+}
+
+SpawnBeamSquare(Float:fA[3], Float:fC[3], const String:sNodePrefix[], const String:sBeamMaterial[] = "sprites/laserbeam.vmt", Float:fWidth = 2.0, iRGBA[4] = {255, 255, 255, 255})
+{
+	new Float:fBeams[4][3];
+	
+	fBeams[0] = fA;
+	fBeams[1] = fA;
+	fBeams[2] = fC;
+	fBeams[3] = fA;
+	
+	fBeams[1][1] = fC[1];
+	fBeams[2][2] = fA[2];
+	fBeams[3][0] = fC[0];
+	
+	SpawnBeamChain(fBeams, 4, sNodePrefix, sBeamMaterial, fWidth, iRGBA, true);
+}
+
+SpawnBeamChain(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const String:sBeamMaterial[] = "sprites/laserbeam.vmt", Float:fWidth = 2.0, iRGBA[4] = {255, 255, 255, 255}, bool:bLastNodeToFirst = false)
+{
+	if (iNodeCount < 2)
+		return 0;
+	
+	decl String:sMaterial[PLATFORM_MAX_PATH];
+	FormatEx(sMaterial, sizeof(sMaterial), "materials/%s", sBeamMaterial);
+	
+	if (!IsModelPrecached(sMaterial)) {
+		return 0;
+	}
+	
+	new iEntity, i;
+	decl String:sNodeName[64], String:sNextNodeName[64];
+	
+	for (; i < iNodeCount; i++) {
+		iEntity = CreateEntityByName("env_beam");
+		
+		if (!IsValidEntity(iEntity))
+			return i;
+		
+		Format(sNodeName, sizeof(sNodeName), "%s%d", sNodePrefix, i);
+		
+		if (iNodeCount > i + 1) {
+			Format(sNextNodeName, sizeof(sNextNodeName), "%s%d", sNodePrefix, i + 1);
+		} else {
+			if (bLastNodeToFirst)
+				Format(sNextNodeName, sizeof(sNextNodeName), "%s0", sNodePrefix);
+			else
+				strcopy(sNextNodeName, sizeof(sNextNodeName), "");
+		}
+		
+		DispatchKeyValue(iEntity, "targetname", sNodeName);
+		DispatchKeyValue(iEntity, "texture", sMaterial);
+		DispatchKeyValueFormat(iEntity, "BoltWidth", "%f", fWidth);
+		DispatchKeyValue(iEntity, "life", "0");
+		DispatchKeyValueFormat(iEntity, "rendercolor", "%d %d %d", iRGBA[0], iRGBA[1], iRGBA[2]);
+		DispatchKeyValueFormat(iEntity, "renderamt", "%d", iRGBA[3]);
+		DispatchKeyValue(iEntity, "TextureScroll", "0");
+		DispatchKeyValue(iEntity, "LightningStart", sNodeName);
+		DispatchKeyValue(iEntity, "LightningEnd", sNextNodeName);
+		DispatchSpawn(iEntity);
+		TeleportEntity(iEntity, fNodes[i], NULL_VECTOR, NULL_VECTOR);
+		
+		CreateTimer(0.1, Timer_ActivateEntity, iEntity);
+	}
+	
+	return i;
+}
+
+SpawnRopeSquare(Float:fA[3], Float:fC[3], const String:sNodePrefix[], const String:sRopeMaterial[] = "cable/rope.vmt", Float:fWidth = 2.0, iSlack = 0)
+{
+	new Float:fRopes[4][3];
+	
+	fRopes[0] = fA;
+	fRopes[1] = fA;
+	fRopes[2] = fC;
+	fRopes[3] = fA;
+	
+	fRopes[1][1] = fC[1];
+	fRopes[2][2] = fA[2];
+	fRopes[3][0] = fC[0];
+	
+	SpawnRope(fRopes, 4, sNodePrefix, sRopeMaterial, fWidth, iSlack, true);
+}
+
+SpawnRope(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const String:sRopeMaterial[] = "cable/rope.vmt", Float:fWidth = 2.0, iSlack = 0, bool:bLastNodeToFirst = false)
+{
+	if (iNodeCount < 2)
+		return 0;
+	
+	decl String:sPrecachedMaterial[PLATFORM_MAX_PATH];
+	FormatEx(sPrecachedMaterial, sizeof(sPrecachedMaterial), "materials/%s", sRopeMaterial);
+	
+	if (!IsModelPrecached(sPrecachedMaterial))
+		return 0;
+	
+	new iEntity, i;
+	decl String:sNodeName[64], String:sNextNodeName[64];
+		
+	for (; i < iNodeCount; i++) {
+		if (i == 0) {
+			iEntity = CreateEntityByName("move_rope");
+		} else {
+			iEntity = CreateEntityByName("keyframe_rope");			
+		}
+				
+		if (!IsValidEntity(iEntity))
+			return i;
+		
+		Format(sNodeName, sizeof(sNodeName), "%s%d", sNodePrefix, i);
+		
+		if (iNodeCount > i + 1) {
+			Format(sNextNodeName, sizeof(sNextNodeName), "%s%d", sNodePrefix, i + 1);
+		} else {
+			if (bLastNodeToFirst) {
+				Format(sNextNodeName, sizeof(sNextNodeName), "%s0", sNodePrefix);
+			} else {
+				strcopy(sNextNodeName, sizeof(sNextNodeName), "");			
+			}			
+		}
+		
+		DispatchKeyValue(iEntity, "targetname", sNodeName);
+		DispatchKeyValue(iEntity, "NextKey", sNextNodeName);
+		DispatchKeyValue(iEntity, "RopeMaterial", sRopeMaterial);
+		DispatchKeyValueFormat(iEntity, "Width", "%f", fWidth);
+		DispatchKeyValueFormat(iEntity, "Slack", "%d", iSlack);
+		DispatchKeyValue(iEntity, "Type", "0");
+		DispatchKeyValue(iEntity, "TextureScale", "1");
+		DispatchKeyValue(iEntity, "Subdiv", "2");
+		DispatchKeyValue(iEntity, "PositionInterpolator", "2");
+		DispatchKeyValue(iEntity, "MoveSpeed", "0");
+		DispatchKeyValue(iEntity, "Dangling", "0");
+		DispatchKeyValue(iEntity, "Collide", "0");
+		DispatchKeyValue(iEntity, "Breakable", "0");
+		DispatchKeyValue(iEntity, "Barbed", "0");
+		DispatchSpawn(iEntity);
+		TeleportEntity(iEntity, fNodes[i], NULL_VECTOR, NULL_VECTOR);
+		
+		CreateTimer(0.1, Timer_ActivateEntity, iEntity);
+	}
+	
+	return i;
+}
+
+public Action:Timer_ActivateEntity(Handle:hTimer, any:iEntity)
+{
+	ActivateEntity(iEntity);
+	AcceptEntityInput(iEntity, "TurnOn"); 
 	return Plugin_Continue;
 }

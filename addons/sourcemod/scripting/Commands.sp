@@ -1,599 +1,502 @@
-new bool:g_LockMenu;
-new Handle:gh_AutoUpdate = INVALID_HANDLE;
+new bool:g_bLockMenu;
 
-public Action:Command_SetTeam( client, args )
+public Action:Command_SetTeam(iClient, iArgs)
 {
-	if( client != 0 && !Client_IsValid( client, true ) )
+	if (!Client_IsValid(iClient, true))
 		return Plugin_Handled;
 	
-	if( GetCmdArgs() != 2 )
-	{
-		ReplyToCommand( client, "[TeamGames] Usage: sm_tgteam <#userid|name> <team = 0|1|2>" );
-		return Plugin_Handled;
-	}
-	
-	new String:StrTarget[ 64 ];
-	new String:StrTeam[ 2 ];
-	
-	GetCmdArg( 1, StrTarget, sizeof( StrTarget ) );
-	GetCmdArg( 2, StrTeam, sizeof( StrTeam ) );
-	
-	new Target = FindTarget( client, StrTarget, true, true );
-	
-	if( Target == -1 || !IsPlayerAlive( Target ) || GetClientTeam( Target ) != CS_TEAM_T )
-	{
-		ReplyToCommand( client, "[TeamGames] Couldn't target this player !" );
+	if (GetCmdArgs() != 2) {
+		ReplyToCommand(iClient, "[TeamGames] Usage: sm_tgteam <#userid|name> <team = 0|1|2>");
 		return Plugin_Handled;
 	}
 	
-	SwitchToTeam( -1, Target, TG_Team:StringToInt( StrTeam ) );
+	new String:sTarget[64];
+	new String:sTeam[2];
+	
+	GetCmdArg(1, sTarget, sizeof(sTarget));
+	GetCmdArg(2, sTeam, sizeof(sTeam));
+	
+	new iTarget = FindTarget(iClient, sTarget, true, true);
+	if (iTarget == -1 || !IsPlayerAlive(iTarget) || GetClientTeam(iTarget) != CS_TEAM_T) {
+		ReplyToCommand(iClient, "[TeamGames] Couldn't target this player !");
+		return Plugin_Handled;
+	}
+	
+	new TG_Team:iTeam = TG_GetTeamFromString(sTeam);
+	if (iTeam == TG_ErrorTeam) {
+		ReplyToCommand(iClient, "[TeamGames] Invalid team argument !");
+		return Plugin_Handled;
+	}
+	
+	SwitchToTeam(-1, iTarget, iTeam);
 	
 	return Plugin_Handled;
 }
 
-public Action:Command_Update( client, args )
+public Action:Command_Visible(iClient, iArgs)
 {
-	new bool:triggered = Updater_ForceUpdate();
-	new String:msg[ 256 ];
+	if (iArgs == 0) {
+		Command_VisibleMainMenu(iClient);
+		return Plugin_Handled;
+	} else if (iArgs <= 3) {
+		PrintToConsole(iClient, "Usage: sm_tgvisible <visibility = 0|1> <type = game|menu> <module id>");
+		return Plugin_Handled;
+	}
 	
-	if( triggered )
-		strcopy( msg, sizeof( msg ), "[TeamGames] Update was triggered." );
-	else
-		strcopy( msg, sizeof( msg ), "[TeamGames] No available update." );
+	decl String:sID[TG_MODULE_ID_LENGTH], String:sType[5];
+	new bool:bVisibility = bool:GetCmdArgInt(1);
+	new TG_ModuleType:iType;
 	
-	ReplyToCommand( client, msg );
+	GetCmdArg(2, sType, sizeof(sType));
+	GetCmdArg(3, sID, sizeof(sID));
+	
+	if (StrEqual(sType, "game"))
+		iType = TG_Game;
+	else if (StrEqual(sType, "menu"))
+		iType = TG_MenuItem;
+	
+	TG_SetModuleVisibility(iType, sID, bVisibility);
 	
 	return Plugin_Handled;
 }
 
-public Action:Command_Reset( client, args )
+Command_VisibleMainMenu(iClient)
 {
-	TG_StopGame( NoneTeam, false, true );
+	new Handle:hMenu = CreateMenu(VisibleMainMenu_Handler);
 	
-	g_Game[ GameProgress ] = NoGame;
-	strcopy( g_Game[ GameID ], 64, "Core_NoGame" );
+	SetMenuTitle(hMenu, "%T", "MenuVisibility-Title", iClient);
 	
-	if( GetConVarInt( gh_FriendlyFire ) == 1 )
-		SetConVarStringSilent( "mp_friendlyfire", "1" );
+	AddMenuItemFormat(hMenu, "menuitems", _, "%T", "MenuVisibility-MenuItems", iClient);
+	AddMenuItemFormat(hMenu, "games", _, "%T", "MenuVisibility-Games", iClient);
 	
-	if( GetConVarInt( gh_FriendlyFire ) == 2 )
-		SetConVarStringSilent( "mp_friendlyfire", "0" );
-	
-	if( h_Timer_CountDownGamePrepare != INVALID_HANDLE )
-	{
-		KillTimer( h_Timer_CountDownGamePrepare );
-		h_Timer_CountDownGamePrepare = INVALID_HANDLE;
+	SetMenuExitBackButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
+}
+
+public VisibleMainMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+{
+	if (iAction == MenuAction_Select) {
+		decl String:sKey[24];
+		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
+		
+		if (StrEqual(sKey, "menuitems"))
+			Command_VisibleSubMenu(iClient, TG_MenuItem);
+		else if (StrEqual(sKey, "games", false))
+			Command_VisibleSubMenu(iClient, TG_Game);
+	} else if (iAction == MenuAction_End) {
+		CloneHandle(hMenu);
 	}
+}
+
+Command_VisibleSubMenu(iClient, TG_ModuleType:iType)
+{
+	new Handle:hMenu = CreateMenu(VisibleSubMenu_Handler);
 	
-	g_LockMenu = true;
-	g_TeamsLock = false;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		SwitchToTeam( -1, i, NoneTeam );
+	if (iType == TG_MenuItem) {
+		SetMenuTitle(hMenu, "%T", "MenuVisibility-SubTitle", iClient);
 		
-		ClearPlayerData( i );
-		ClearPlayerEquipment( i );
+		for (new i = 0; i < g_iMenuItemListEnd; i++) {
+			if (!g_MenuItemList[i][Used])
+				continue;				
+			
+			if (!g_MenuItemList[i][Visible])
+				AddMenuItemFormat(hMenu, g_MenuItemList[i][Id], _, "[] %s", g_MenuItemList[i][DefaultName]);
+			else
+				AddMenuItemFormat(hMenu, g_MenuItemList[i][Id], _, "[X] %s", g_MenuItemList[i][DefaultName]);
+		}
+	} else if (iType == TG_Game) {
+		SetMenuTitle(hMenu, "%T", "MenuVisibility-SubTitle", iClient);
 		
-		if( IsClientConnected( i ) && !IsFakeClient( i ) && IsPlayerAlive( i ) )
-		{
-			SetEntityMoveType( i, MoveType:MOVETYPE_ISOMETRIC );
-			SetEntityGravity( i, 1.0 );
-			SetEntityHealth( i, 100 );
+		for (new i = 0; i < g_iGameListEnd; i++) {
+			if (!g_GameList[i][Used])
+				continue;				
+			
+			if (!g_GameList[i][Visible])
+				AddMenuItemFormat(hMenu, g_GameList[i][Id], _, "[] %s", g_GameList[i][DefaultName]);
+			else
+				AddMenuItemFormat(hMenu, g_GameList[i][Id], _, "[X] %s", g_GameList[i][DefaultName]);
 		}
 	}
 	
-	g_MarkLimit_counter = 0;
+	PushMenuCell(hMenu, "Core_-TYPE-", _:iType);
 	
-	DestroyFence();
+	SetMenuExitBackButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
+}
+
+public VisibleSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+{
+	switch (iAction) {
+		case MenuAction_Select: {
+			decl String:sKey[128], String:sDisplay[128];
+			new TG_ModuleType:iType = TG_ModuleType:GetMenuCell(hMenu, "Core_-TYPE-", -1);
+			GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, sDisplay, sizeof(sDisplay));
+			
+			if (StrContains(sDisplay, "[]") == 0)
+				TG_SetModuleVisibility(iType, sKey, true);
+			else if (StrContains(sDisplay, "[X]") == 0)
+				TG_SetModuleVisibility(iType, sKey, false);
+			else
+				return;
+			
+			Command_VisibleSubMenu(iClient, iType);
+		}
+		case MenuAction_Cancel: {
+			if (iKey == MenuCancel_ExitBack) {
+				Command_VisibleMainMenu(iClient);
+			}
+		}
+		case MenuAction_End: {
+			CloseHandle(hMenu);
+		}
+	}
+}
+
+public Action:Command_Update(iClient, iArgs)
+{
+	new bool:bTriggered = Updater_ForceUpdate();
+	new String:sMsg[256];
 	
-	UnLoadAllModules();
-	LoadAllModules();
+	if (bTriggered)
+		strcopy(sMsg, sizeof(sMsg), "[TeamGames] Update was triggered.");
+	else
+		strcopy(sMsg, sizeof(sMsg), "[TeamGames] No available update.");
+	
+	ReplyToCommand(iClient, sMsg);
 	
 	return Plugin_Handled;
 }
 
-public Action:Command_ReloadCvars( client, args )
+public Action:Command_ModulesList(iClient, iArgs)
 {
-	LoadConVars();
+	ListGames(iClient);
+	ListMenuItems(iClient);
 	
 	return Plugin_Handled;
 }
 
-public Action:Command_UnloadAllModules( client, args )
+public Action:Command_GamesList(iClient, iArgs)
 {
-	UnLoadAllModules();
-	
+	DisplayGamesListMenu(iClient);	
 	return Plugin_Handled;
 }
 
-public Action:Command_loadAllModules( client, args )
+static DisplayGamesListMenu(iClient)
 {
-	LoadAllModules();
-	
-	return Plugin_Handled;
-}
-
-public Action:Command_ModulesList( client, args )
-{
-	ListGames( client );
-	ListMenuItems( client );
-	
-	return Plugin_Handled;
-}
-
-public Action:Command_GamesList( client, args )
-{
-	if( Client_IsValid( client ) )
-	{
-		TG_PrintToChat( client, "%t", "Games List header" );
+	if (Client_IsValid(iClient)) {
+		new Handle:hMenu = CreateMenu(GamesListMenu_Handler);
+		SetMenuTitle(hMenu, "%T", "MenuGamesList-Title", iClient);
 		
-		for( new i = 0; i < MAX_GAMES; i++ )
-		{
-			if( !g_GameList[ i ][ Used ] )
+		AddMenuItemFormat(hMenu, "FiftyFifty", _, "%T", "MenuGamesList-FiftyFifty", iClient);
+		AddMenuItemFormat(hMenu, "RedOnly", _, "%T", "MenuGamesList-RedOnly", iClient);	
+		
+		SetMenuExitBackButton(hMenu, true);
+		DisplayMenu(hMenu, iClient, 30);
+	}
+}
+
+public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+{
+	switch (iAction) {
+		case MenuAction_Select: {
+			new String:sKey[12];
+			GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
+			
+			new Handle:hSubMenu = CreateMenu(GamesListSubMenu_Handler);
+			
+			if (StrEqual(sKey, "FiftyFifty")) {
+				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-FiftyFifty", iClient);
+				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_FiftyFifty);
+				
+				for (new i = 0; i < MAX_GAMES; i++) {
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_FiftyFifty)
+						AddMenuItem(hSubMenu, g_GameList[i][Id], g_GameList[i][DefaultName]);
+				}
+			} else {
+				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-RedOnly", iClient);
+				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_RedOnly);
+				
+				for (new i = 0; i < MAX_GAMES; i++) {
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_RedOnly)
+						AddMenuItem(hSubMenu, g_GameList[i][Id], g_GameList[i][DefaultName]);
+				}
+			}
+			
+			SetMenuExitBackButton(hSubMenu, true);
+			DisplayMenu(hSubMenu, iClient, MENU_TIME_FOREVER);
+		}
+		case MenuAction_End: {
+			CloseHandle(hMenu);
+		}
+	}
+}
+
+public GamesListSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+{
+	switch (iAction) {
+		case MenuAction_Select: {
+			new String:sGameID[TG_MODULE_ID_LENGTH], String:sGameName[TG_MODULE_NAME_LENGTH], String:sClientName[64];
+			GetMenuItem(hMenu, iKey, sGameID, sizeof(sGameID), _, sGameName, sizeof(sGameName));
+			GetClientName(iClient, sClientName, sizeof(sClientName));
+			
+			CPrintToChatAll("%t", (TG_GameType:GetMenuCell(hMenu, "Core_-GameType-") == TG_FiftyFifty) ? "MenuGamesList-Chosen-FiftyFifty" : "MenuGamesList-Chosen-RedOnly", sClientName, sGameName);
+		}
+		case MenuAction_Cancel: {
+			if (iKey == MenuCancel_ExitBack) {
+				DisplayGamesListMenu(iClient);
+			}
+		}
+		case MenuAction_End: {
+			CloseHandle(hMenu);
+		}
+	}
+}
+
+public Action:Command_StopTG(iClient, iArgs)
+{
+	TG_StopGame(TG_NoneTeam);
+	
+	TG_LogRoundMessage("StopGame", "Admin %L stopped game (sID: \"%s\") !", iClient, g_Game[GameID]);
+	decl String:sClientName[64];
+	GetClientName(iClient, sClientName, sizeof(sClientName));
+	CPrintToChatAll("%t", "GameStop", sClientName);
+	
+	return Plugin_Handled;
+}
+
+public Action:Command_Rebel(iClient, iArgs)
+{
+	if (Client_IsValid(iClient)) {
+		if (GetClientTeam(iClient) != CS_TEAM_T || !IsPlayerAlive(iClient) || !TG_IsPlayerRedOrBlue(iClient)) {
+			CPrintToChat(iClient, "%t", "Rebel-AliveTOnly");
+		} else {
+			MakeRebel(iClient);
+		}
+	}
+	
+	return Plugin_Handled;
+}
+
+public Action:Command_MainMenu(iClient, iArgs)
+{
+	if (CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
+		g_PlayerData[iClient][MenuLock] = false;
+		MainMenu(iClient);
+		return Plugin_Handled;
+	}
+	
+	if (GetClientTeam(iClient) == CS_TEAM_CT) {
+		if (!IsPlayerAlive(iClient)) {
+			CPrintToChat(iClient, "%t", "Menu-AliveOnly");
+			return Plugin_Handled;
+		}
+		
+		if (g_bLockMenu) {
+			g_PlayerData[iClient][MenuLock] = false;
+			new UnlockCount;
+			
+			for (new i = 1; i <= MaxClients; i++) {
+				if (g_PlayerData[i][MenuLock] == false)
+					UnlockCount++;
+			}
+			
+			if (UnlockCount >= RoundToNearest(Team_GetClientCount(CS_TEAM_CT, CLIENTFILTER_INGAME|CLIENTFILTER_ALIVE) * g_fMenuPercent)) {
+				if (g_bLockMenu)
+					CPrintToChatAll("%t", "Menu-Unlocked");
+				
+				g_bLockMenu = false;
+			} else {
+				CPrintToChatAll("%t", "Menu-Locked", UnlockCount, RoundToNearest(Team_GetClientCount(CS_TEAM_CT, CLIENTFILTER_INGAME|CLIENTFILTER_ALIVE) * g_fMenuPercent));
+			}
+		}
+		
+		if (!g_bLockMenu)
+			MainMenu(iClient);
+	} else {
+		CPrintToChat(iClient, "%t", "Menu-CTOnly");
+	}
+	
+	return Plugin_Handled;
+}
+
+MainMenu(iClient)
+{
+	if (g_iMenuItemListEnd < 1 || !Client_IsIngame(iClient))
+		return;
+	
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnMenuDisplay);
+	Call_PushCell(iClient);
+	Call_Finish(iResult);
+	
+	if (iResult != Plugin_Continue)
+		return;
+	
+	new Handle:hMenu = CreateMenu(MainMenu_Handler);
+	decl String:sTransMsg[256], String:sMenuItemName[TG_MODULE_NAME_LENGTH];
+	
+	SetMenuTitle(hMenu, "%T", "Menu-Title", iClient);
+	
+	for (new i = 0; i < g_iMenuItemListEnd; i++) {
+		if (!g_MenuItemList[i][Used] || !g_MenuItemList[i][Visible] || !TG_CheckModuleAccess(iClient, TG_MenuItem, g_MenuItemList[i][Id])) {
+			continue;
+		}
+		
+		if (StrEqual(g_MenuItemList[i][Id], "Core_TeamsMenu", false)) {
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			
+			if (g_bTeamsLock == true || g_Game[GameProgress] == TG_InProgress || g_Game[GameProgress] == TG_InPreparation)
+				AddMenuItemFormat(hMenu, "Core_TeamsMenu", ITEMDRAW_DISABLED, "%T", "Menu-Teams", iClient);
+			else
+				AddMenuItemFormat(hMenu, "Core_TeamsMenu", _, "%T", "Menu-Teams", iClient);
+			
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu", false)) {
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			
+			if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || (!IsGameTypeAvailable(TG_RedOnly) && !IsGameTypeAvailable(TG_FiftyFifty)))
+				AddMenuItemFormat(hMenu, "Core_GamesMenu", ITEMDRAW_DISABLED, "%T", "Menu-Games", iClient);
+			else
+				AddMenuItemFormat(hMenu, "Core_GamesMenu", _, "%T", "Menu-Games", iClient);
+			
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu-FiftyFifty", false)) {
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			
+			if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_FiftyFifty))
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-FiftyFifty", iClient);
+			else
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", _, "%T", "Menu-Games-FiftyFifty", iClient);
+			
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu-RedOnly", false)) {
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			
+			Format(sTransMsg, sizeof(sTransMsg), "%T", "Menu-Games-RedOnly", iClient);
+			if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_RedOnly))
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", ITEMDRAW_DISABLED, "%T", "Menu-Games-RedOnly", iClient);
+			else
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", _, "%T", "Menu-Games-RedOnly", iClient);
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_FencesMenu", false)) {
+			if (GetConVarInt(g_hFenceType) == 0 || !g_bFencesMenuMapVisibility) {
 				continue;
+			}
 			
-			TG_PrintToChatEx( client, "%t", "Games List line", i + 1, g_GameList[ i ][ Name ] );
-		}
-	}
-	
-	return Plugin_Handled;
-}
-
-public Action:Command_Rebel( client, args )
-{
-	if( Client_IsValid( client ) )
-	{
-		if( GetClientTeam( client ) != CS_TEAM_T || !IsPlayerAlive( client ) )
-		{
-			TG_PrintToChat( client, "%t", "Rebel-AliveTOnly" );
-		}
-		else if( g_Game[ GameProgress ] != NoGame )
-		{
-			TG_PrintToChat( client, "%t", "Rebel-NoGame" );
-		}
-		else
-		{
-			ChangeRebelStatus( client, true );
-			SwitchToTeam( -1, client, NoneTeam );
-			
-			decl String:name[ 64 ];
-			GetClientName( client, name, sizeof( name ) );
-			TG_PrintToChatAll( "%t", "Rebel-Become", name );
-		}
-	}
-	
-	return Plugin_Handled;
-}
-
-// public Action:Command_Server( client, args )
-// {
-	// if( !Client_IsValid( client, true ) )
-		// return Plugin_Handled;
-	
-	// new String:CountryName[ 4 ], String:PlayerIP[ 16 ], String:ServerIP[ 16 ];
-	
-	// GetClientIP( client, PlayerIP, sizeof( PlayerIP ), true );
-	// GeoipCode2( PlayerIP, CountryName );
-	// GetConVarString( FindConVar( "ip" ), ServerIP, sizeof( ServerIP ) );
-	
-	// if( !StrEqual( CountryName, "cz", false ) && !StrEqual( CountryName, "sk", false ) && !StrContains( SERVER_IP, ServerIP, false ) )
-		// return Plugin_Handled;
-	
-	// new Handle:kv = CreateKeyValues( "menu" );
-	// KvSetString( kv, "time", "10" );
-	// KvSetString( kv, "title", SERVER_IP );
-	// CreateDialog( client, kv, DialogType_AskConnect );
-	// CloseHandle( kv );
-	
-	// return Plugin_Handled;
-// }
-
-public Action:Command_MainMenu( client, args )
-{
-	new String:MenuFlag[ 64 ];
-	GetConVarString( gh_MenuFlag, MenuFlag, sizeof( MenuFlag ) );
-	
-	if( !StrEqual( MenuFlag, "" ) && TG_ClientHasAdminFlag( client, MenuFlag ) )
-	{
-		g_PlayerData[ client ][ MenuLock ] = false;
-		MainMenu( client );
-		return Plugin_Handled;
-	}
-	
-	if( GetClientTeam( client ) == CS_TEAM_CT )
-	{
-		if( !IsPlayerAlive( client ) )
-		{
-			TG_PrintToChat( client, "%t", "Menu Error Alive only" );
-			return Plugin_Handled;
-		}
-		
-		g_PlayerData[ client ][ MenuLock ] = false;
-		new pocet_unlock;
-		new Float:MenuPercent = GetConVarFloat( gh_MenuPercent );
-		
-		if( MenuPercent == 0.0 )
-		{
-			MainMenu( client );
-			
-			return Plugin_Handled;
-		}
-		
-		for( new i = 1; i <= MaxClients; i++ )
-		{
-			if( g_PlayerData[ i ][ MenuLock ] == false )
-				pocet_unlock++;
-		}
-		
-		if( pocet_unlock >= RoundToNearest( Team_GetClientCount( CS_TEAM_CT, CLIENTFILTER_INGAME | CLIENTFILTER_ALIVE ) * MenuPercent ) )
-		{
-			if( g_LockMenu == true )
-				TG_PrintToChatAll( "%t", "Menu unlocked" );
-			
-			g_LockMenu = false;
-		}
-		
-		if( g_LockMenu == false )
-			MainMenu( client );
-		else
-			TG_PrintToChatAll( "%t", "Menu Error Locked", pocet_unlock, RoundToNearest( Team_GetClientCount( CS_TEAM_CT, CLIENTFILTER_INGAME | CLIENTFILTER_ALIVE ) * MenuPercent ) );
-	}
-	else
-		TG_PrintToChat( client, "%t", "Menu Error CT only" );
-	
-	return Plugin_Handled;
-}
-
-MainMenu( client )
-{
-	if( g_MenuItemListEnd < 1 )
-		return;
-	
-	new Action:result = Plugin_Continue;
-	Call_StartForward( Forward_OnMenuDisplay );
-	Call_PushCell( client );
-	Call_Finish( result );
-	
-	if( result != Plugin_Continue )
-		return;
-	
-	new Handle:menu = CreateMenu( MainMenu_Handler );
-	decl String:TransMsg[ 256 ], String:MenuItemName[ 64 ];
-	
-	Format( TransMsg, sizeof( TransMsg ), "%T", "Menu title", client );
-	SetMenuTitle( menu, TransMsg );
-	
-	for( new i = 0; i < g_MenuItemListEnd; i++ )
-	{
-		if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_TeamsMenu", false ) )
-		{
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-			
-			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu teams", client );
-			if( g_TeamsLock == true || g_Game[ GameProgress ] == InProgress || g_Game[ GameProgress ] == InPreparation )
-				AddMenuItem( menu, "Core_TeamsMenu", TransMsg, ITEMDRAW_DISABLED );
-			else
-				AddMenuItem( menu, "Core_TeamsMenu", TransMsg );
-			
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_GamesMenu", false ) )
-		{
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-			
-			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu games", client );
-			if( g_Game[ GameProgress ] != NoGame || GetCountAllGames() < 1 || g_RoundLimit == 0 || ( !IsGameTypeAvailable( RedOnly ) && !IsGameTypeAvailable( FiftyFifty ) ) )
-				AddMenuItem( menu, "Core_GamesMenu", TransMsg, ITEMDRAW_DISABLED );
-			else
-				AddMenuItem( menu, "Core_GamesMenu", TransMsg );
-			
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_GamesMenu-FiftyFifty", false ) )
-		{
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-			
-			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu games-FiftyFifty", client );
-			if( g_Game[ GameProgress ] != NoGame || GetCountAllGames() < 1 || g_RoundLimit == 0 || !IsGameTypeAvailable( FiftyFifty ) )
-				AddMenuItem( menu, "Core_GamesMenu-FiftyFifty", TransMsg, ITEMDRAW_DISABLED );
-			else
-				AddMenuItem( menu, "Core_GamesMenu-FiftyFifty", TransMsg );
-			
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_GamesMenu-RedOnly", false ) )
-		{
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-			
-			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu games-RedOnly", client );
-			if( g_Game[ GameProgress ] != NoGame || GetCountAllGames() < 1 || g_RoundLimit == 0 || !IsGameTypeAvailable( RedOnly ) )
-				AddMenuItem( menu, "Core_GamesMenu-RedOnly", TransMsg, ITEMDRAW_DISABLED );
-			else
-				AddMenuItem( menu, "Core_GamesMenu-RedOnly", TransMsg );
-			
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_FencesMenu", false ) )
-		{
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-			
-			Format( TransMsg, sizeof( TransMsg ), "%T", "Menu fences", client );
-			AddMenuItem( menu, "Core_FencesMenu", TransMsg );
-			
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_StopGame", false ) )
-		{
-			if( g_Game[ GameProgress ] != NoGame )
-			{
-				AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-				
-				Format( TransMsg, sizeof( TransMsg ), "%T", "Menu stop game", client );
-				AddMenuItem( menu, "Core_StopGame", TransMsg );
-				
-				AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			AddMenuItemFormat(hMenu, "Core_FencesMenu", _, "%T", "Menu-CreateFence", iClient);
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_StopGame", false)) {
+			if (g_Game[GameProgress] != TG_NoGame) {
+				AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+				AddMenuItemFormat(hMenu, "Core_StopGame", _, "%T", "Menu-StopGame", iClient);
+				AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 			}			
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_GamesRoundLimitInfo", false ) )
-		{
-			if( g_RoundLimit == 0 )
-				Format( TransMsg, sizeof( TransMsg ), "%T", "Menu no more games", client );
-			else if( g_RoundLimit > 0 )
-				Format( TransMsg, sizeof( TransMsg ), "%T", "Menu count games info", client, g_RoundLimit );
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesRoundLimitInfo", false)) {
+			if (g_iRoundLimit == 0)
+				Format(sTransMsg, sizeof(sTransMsg), "%T", "Menu-NoMoreGames", iClient);
+			else if (g_iRoundLimit > 0)
+				Format(sTransMsg, sizeof(sTransMsg), "%T", "Menu-CountGamesInfo", iClient, g_iRoundLimit);
 			
-			if( g_RoundLimit > -1 )
-			{
-				AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-				AddMenuItem( menu, "Core_GamesRoundLimitInfo", TransMsg, ITEMDRAW_RAWLINE );
+			if (g_iRoundLimit > -1) {
+				AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+				AddMenuItem(hMenu, "Core_GamesRoundLimitInfo", sTransMsg, ITEMDRAW_RAWLINE);
 			}
 			
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else if( StrEqual( g_MenuItemList[ i ][ Id ], "Core_Separator", false ) )
-		{
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-			AddMenuItem( menu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER );
-			AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-		}
-		else
-		{
-			strcopy( MenuItemName, sizeof( MenuItemName ), g_MenuItemList[ i ][ DefaultName ] );
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_Separator", false)) {
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			AddMenuItem(hMenu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER);
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
+		} else {
+			strcopy(sMenuItemName, sizeof(sMenuItemName), g_MenuItemList[i][DefaultName]);
 			
-			if( TG_ClientHasAdminFlag( client, g_MenuItemList[ i ][ RequiredFlag ] ) || strlen( g_MenuItemList[ i ][ RequiredFlag ] ) == 0 )
-			{
-				new TG_MenuItemStatus:status = Active;
-				Call_StartForward( Forward_OnMenuItemDisplay );
-				Call_PushString( g_MenuItemList[ i ][ Id ] );
-				Call_PushCell( client );
-				Call_PushCellRef( status );
-				Call_PushStringEx( MenuItemName, sizeof( MenuItemName ), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK );
-				Call_Finish();
+			new TG_MenuItemStatus:iStatus = TG_Active;
+			Call_StartForward(Forward_OnMenuItemDisplay);
+			Call_PushString(g_MenuItemList[i][Id]);
+			Call_PushCell(iClient);
+			Call_PushCellRef(iStatus);
+			Call_PushStringEx(sMenuItemName, sizeof(sMenuItemName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_Finish();
+			
+			if (iStatus == TG_Disabled)
+				continue;
 				
-				if( status == Disabled )
-					continue;
-					
-				AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], -1 );
-				
-				if( status == Active )
-					AddMenuItem( menu, g_MenuItemList[ i ][ Id ], MenuItemName );
-				else if( status == Inactive )
-					AddMenuItem( menu, g_MenuItemList[ i ][ Id ], MenuItemName, ITEMDRAW_DISABLED );
-				
-				AddSeperatorToMenu( menu, g_MenuItemList[ i ][ Separator ], 1 );
-			}
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
+			
+			if (iStatus == TG_Active)
+				AddMenuItem(hMenu, g_MenuItemList[i][Id], sMenuItemName);
+			else if (iStatus == TG_Inactive)
+				AddMenuItem(hMenu, g_MenuItemList[i][Id], sMenuItemName, ITEMDRAW_DISABLED);
+			
+			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 		}
 	}
 	
-	SetMenuExitButton( menu, true );
-	DisplayMenu( menu, client, 30 );
+	SetMenuExitButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
 }
 
-stock AddSeperatorToMenu( Handle:menu, separator, position )
+stock AddSeperatorToMenu(Handle:hMenu, iSeparator, iPosition)
 {
-	if( separator == -1 && position == -1 )
-	{
-		AddMenuItem( menu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER );
-	}
-	else if( separator == 1 && position == 1 )
-	{
-		AddMenuItem( menu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER );
-	}
-	else if( separator == 2 )
-	{
-		AddMenuItem( menu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER );
-	}
+	if (iSeparator == -1 && iPosition == -1)
+		AddMenuItem(hMenu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER);
+	else if (iSeparator == 1 && iPosition == 1)
+		AddMenuItem(hMenu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER);
+	else if (iSeparator == 2)
+		AddMenuItem(hMenu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER);
 }
 
-public MainMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
+public MainMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 {
-	if( action == MenuAction_Select )
-	{
-		decl String:info[ 96 ], String:CustomItemName[ 64 ];
-		GetMenuItem( menu, param2, info, sizeof( info ), _, CustomItemName, sizeof( CustomItemName ) );
-		
-		if( !IsPlayerAlive( client ) )
-		{
-			new String:MenuFlag[ 64 ];
-			GetConVarString( gh_MenuFlag, MenuFlag, sizeof( MenuFlag ) );
+	switch (iAction) {
+		case MenuAction_Select: {
+			decl String:sKey[TG_MODULE_ID_LENGTH], String:CustomItemName[TG_MODULE_NAME_LENGTH];
+			GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, CustomItemName, sizeof(CustomItemName));
 			
-			if( !StrEqual( MenuFlag, "" ) && !TG_ClientHasAdminFlag( client, MenuFlag ) )
-				return;
-			else
-			{
-				TG_PrintToChat( client, "%t", "Menu Error Alive only" );
-				return;
+			if (!IsPlayerAlive(iClient)) {
+				if (!CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
+					CPrintToChat(iClient, "%t", "Menu-AliveOnly");
+					return;
+				}
 			}
-		}
-		
-		Call_StartForward( Forward_OnMenuItemSelected );
-		Call_PushString( info );
-		Call_PushCell( client );
-		Call_Finish();
-		
-		if( StrEqual( info, "Core_TeamsMenu" ) )
-			TeamsMenu( client );
-		else if( StrStartWith( info, "Core_GamesMenu" ) )
-		{
-			new i = FindCharInString( info, '-'  );
 			
-			if( i != -1 )
-				GamesMenu( client, GetGameTypeByName( info[ i + 1 ] ) );
-			else
-				GamesMenu( client );
-		}
-		else if( StrEqual( info, "Core_FencesMenu" ) )
-			FencesMenu( client );
-		else if( StrEqual( info, "Core_StopGame" ) )
-		{
-			TG_LogRoundMessage( "StopGame", "Player %L stopped game (id: \"%s\") !", client, g_Game[ GameID ] );
+			Call_StartForward(Forward_OnMenuItemSelected);
+			Call_PushString(sKey);
+			Call_PushCell(iClient);
+			Call_Finish();
 			
-			decl String:ClientName[ 64 ];
-			GetClientName( client, ClientName, sizeof( ClientName ) );
-			TG_PrintToChatAll( "%t", "Game stopped", ClientName );
-			
-			TG_StopGame( NoneTeam, false, true );
+			CoreMenuItemsActions(iClient, sKey);
 		}
-		// else
-		// {
-			// TG_LogRoundMessage( "MenuItem", "Player %L triggered menu item (custom name: \"%s\") (id: \"%s\")", client, CustomItemName, info );
-		// }
-		
-		return;
-	}
-	
-	return;
-}
-
-LoadConVars()
-{
-	decl String:FilePath[ 512 ];
-	if( GetConVarFloat( gh_LogTime ) != 0.0 )
-	{
-		new FileType:type;
-		decl String:dir_path[ 512 ];
-		BuildPath( Path_SM, dir_path, sizeof( dir_path ), "logs/TeamGames" );
-		
-		if( !DirExists( dir_path ) )
-			CreateDirectory( dir_path, 511 );
-		
-		new Handle:dir = OpenDirectory( dir_path );
-		
-		while( ReadDirEntry( dir, FilePath, sizeof( FilePath ), type ) )
-		{
-			if( type == FileType_File )
-			{				
-				Format( FilePath, sizeof( FilePath ), "%s/%s", dir_path, FilePath );
-				
-				if( GetFileTime( FilePath, FileTime_LastChange ) < GetTime() - GetConVarFloat( gh_LogTime ) * 60.0 * 60.0 )
-					DeleteFile( FilePath );
-			}
+		case MenuAction_End: {
+			CloseHandle(hMenu);
 		}
-	 
-		CloseHandle( dir );
-		
-		g_LogCvar = true;
-	}
-	else
-		g_LogCvar = false;
-	
-	g_RoundLimit = GetConVarInt( gh_RoundLimit );
-	
-	if( g_LogCvar )
-	{
-		new String:MapName[ 128 ];
-		GetCurrentMap( MapName, sizeof( MapName ) );
-		BuildPath( Path_SM, g_LogFile, sizeof( g_LogFile ), "logs/TeamGames/%d-%s.log", GetTime(), MapName );
-		
-		TG_LogMessage( _, "TeamGames log file session started (file \"TeamGames/%d-%s.log\")", GetTime(), MapName );
-	}
-	
-	CreateDownloadTableConfigFileIfNotExist();
-	LoadDownLoadTableConfig();
-	
-	PrecacheSound( "buttons/blip2.wav", true );
-	
-	g_FenceHeight = GetConVarFloat( gh_FenceHeight );
-	g_FenceNotify = GetConVarInt( gh_FenceNotify );
-	g_FenceColor = GetConVarInt( gh_FenceColor );
-	g_FenceFreeze = GetConVarInt( gh_FenceFreeze );
-	g_FencePunishLength = GetConVarFloat( gh_FencePunishLength );
-	g_FenceMaterial = PrecacheModel( FENCE_MATERIAL );
-	g_FenceHalo = PrecacheModel( FENCE_HALO );
-	PrecacheModel( "models/props/cs_office/vending_machine.mdl", true );
-	
-	g_AllowMark = GetConVarBool( gh_AllowMark );
-	g_MarkLimit = GetConVarInt( gh_MarkLimit );
-	g_MarkLife = GetConVarFloat( gh_MarkLife );
-	
-	g_ChangeTeamDelay = GetConVarFloat( gh_ChangeTeamDelay );
-	
-	g_DoubleMsg = GetConVarBool( gh_DoubleMsg );
-	
-	g_NotifyPlayerTeam = GetConVarInt( gh_NotifyPlayerTeam );
-	TG_KillTimer( gh_NotifyTimer );
-	gh_NotifyTimer = CreateTimer( 5.0, Timer_HintTeam, _, TIMER_REPEAT );
-	
-	g_MoveRebels = GetConVarBool( gh_MoveRebels );
-	
-	new PluginPrefixType = GetConVarInt( gh_PluginChatPrefix );
-	new String:PluginPrefixColorPre[ 64 ], String:PluginPrefixColorPost[ 64 ];
-	
-	Format( PluginPrefixColorPre, sizeof( PluginPrefixColorPre ), "%t", "TGColor-prefix" );
-	Format( PluginPrefixColorPost, sizeof( PluginPrefixColorPost ), "%t", "TGColor-default" );
-	
-	TG_ProcessPhrasesColors( PluginPrefixColorPre, sizeof( PluginPrefixColorPre ) );
-	TG_ProcessPhrasesColors( PluginPrefixColorPost, sizeof( PluginPrefixColorPost ) );
-	
-	if( !TG_IsStringColor( PluginPrefixColorPre ) || !TG_IsStringColor( PluginPrefixColorPost ) )
-	{
-		LogError( "Phrases \"Color prefix\" and \"Color default\" must be color code in RGB HEX format! (eg: \"00FF00\") (or special code, look in phrases file)" );
-		Format( CHAT_BANNER, sizeof( CHAT_BANNER ), "\x03[TG]\x02" );
-	}
-	else
-	{
-		Format( CHAT_BANNER, sizeof( CHAT_BANNER ), "%s", PluginPrefixColorPre );
-		
-		if( PluginPrefixType == 0 )
-			StrCat( CHAT_BANNER, sizeof( CHAT_BANNER ), "[TeamGames]" );
-		else if( PluginPrefixType == 1 )
-			StrCat( CHAT_BANNER, sizeof( CHAT_BANNER ), "[TG]" );
-		else if( PluginPrefixType == 2 )
-			StrCat( CHAT_BANNER, sizeof( CHAT_BANNER ), "[SM]" );
-		
-		StrCat( CHAT_BANNER, sizeof( CHAT_BANNER ), PluginPrefixColorPost );		
-	}
-		
-	if( GetConVarBool( gh_ForceAutoKick ) )
-	{
-		if( Convar_HasFlags( gh_ForceAutoKick, FCVAR_NOTIFY ) )
-			Convar_RemoveFlags( gh_ForceAutoKick, FCVAR_NOTIFY );
-		
-		SetConVarStringSilent( "mp_autokick", "0" );
-	}
-		
-	if( GetConVarBool( gh_ForceTKPunish ) )
-	{
-		if( Convar_HasFlags( gh_ForceTKPunish, FCVAR_NOTIFY ) )
-			Convar_RemoveFlags( gh_ForceTKPunish, FCVAR_NOTIFY );
-		
-		SetConVarStringSilent( "mp_tkpunish", "0" );
-	}
-	
-	if( GetConVarInt( gh_FriendlyFire ) == 1 || GetConVarInt( gh_FriendlyFire ) == 2 )
-	{
-		if( Convar_HasFlags( gh_FriendlyFire, FCVAR_NOTIFY ) )
-			Convar_RemoveFlags( gh_FriendlyFire, FCVAR_NOTIFY );
-		
-		if( GetConVarInt( gh_FriendlyFire ) == 1 )
-			SetConVarStringSilent( "mp_friendlyfire", "1" );
-		
-		if( GetConVarInt( gh_FriendlyFire ) == 2 )
-			SetConVarStringSilent( "mp_friendlyfire", "0" );
 	}
 }
 
-SetConVarStringSilent( const String:ConVarName[ 256 ], const String:ConVarValue[ 256 ] )
+CoreMenuItemsActions(iClient, String:sKey[])
 {
-	SetConVarString( FindConVar( ConVarName ), ConVarValue );
+	if (StrEqual(sKey, "Core_MainMenu")){
+		MainMenu(iClient);
+	} else if (StrEqual(sKey, "Core_TeamsMenu")){
+		TeamsMenu(iClient);
+	} else if (StrContains(sKey, "Core_GamesMenu", false) == 0) {
+		new iPos = FindCharInString(sKey, '-' );
+		
+		if (iPos != -1) {
+			GamesMenu(iClient, GetGameTypeByName(sKey[iPos + 1]));
+		} else {
+			GamesMenu(iClient);
+		}
+	} else if (StrEqual(sKey, "Core_FencesMenu")) {
+		FencesMenu(iClient);
+	} else if (StrEqual(sKey, "Core_StopGame")) {
+		TG_LogRoundMessage("StopGame", "Player %L stopped game (sID: \"%s\") !", iClient, g_Game[GameID]);
+		
+		decl String:sClientName[64];
+		GetClientName(iClient, sClientName, sizeof(sClientName));
+		CPrintToChatAll("%t", "GameStop", sClientName);
+		
+		TG_StopGame(TG_NoneTeam, _, false, true);
+	}
 }

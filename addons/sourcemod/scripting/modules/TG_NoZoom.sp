@@ -1,237 +1,221 @@
 #include <sourcemod>
-#include <sdkhooks>
 #include <sdktools_trace>
 #include <smlib>
+#include <menu-stocks>
 #include <teamgames>
 
-#define DEFAULT_GAME_NAME	"NoZoom"
-#define GAME_ID				"NoZoom-Raska"
+#define GAME_ID_FIFTYFIFTY		"NoZoom-FiftyFifty"
+#define GAME_ID_REDONLY			"NoZoom-RedOnly"
 
-new String:g_GameName[ 64 ];
+new String:g_WeaponName[64];
+new EngineVersion:g_iEngVersion;
 
 public Plugin:myinfo =
 {
-	name = "TG_NoZoom",
+	name = "[TG] NoZoom",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.4",
 	url = ""
 }
 
 new g_BeamSprite = -1;
-new g_HaloSprite = -1;
-new String:g_WeaponName[ 64 ];
+new Float:g_fDrawLaser[MAXPLAYERS + 1][3];
 
 public OnMapStart()
 {
 	g_BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
-	g_HaloSprite = PrecacheModel("materials/sprites/glow01.vmt");
 }
 
-public OnLibraryAdded( const String:name[] )
+public OnPluginStart()
 {
-	if( !StrEqual( name, "TeamGames" ) )
-		return;
+	LoadTranslations("TG.NoZoom-Raska.phrases");	
+	g_iEngVersion = GetEngineVersion();
+}
 
-	TG_RegGame( GAME_ID, DEFAULT_GAME_NAME );
-	TG_GetGameName( GAME_ID, g_GameName, sizeof( g_GameName ) );
+public OnLibraryAdded(const String:sName[])
+{
+	if (StrEqual(sName, "TeamGames")) {
+		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY)) {
+			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
+		}
+		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY)) {
+			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
+		}
+	}
 }
 
 public OnPluginEnd()
 {
-	TG_UnRegGame( GAME_ID );
+	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
-public Action:TG_OnGameSelected( const String:id[], client )
+public TG_OnMenuGameDisplay(const String:id[], iClient, String:name[])
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return Plugin_Continue;
-	
-	ModulWeaponMenu( client );
-	
-	return Plugin_Continue;
-}
-
-public TG_OnGamePrepare( const String:id[] )
-{
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
-			continue;
-		
-		SetEntityHealth( i, 25 );
+	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", iClient);
+	} else if (StrEqual(id, GAME_ID_REDONLY)) {
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", iClient);
 	}
-	
-	HookEvent( "weapon_zoom", Event_WeaponZoom, EventHookMode_Post );
-	HookEvent( "bullet_impact", Event_BulletImpact, EventHookMode_Post );
-	
-	return;
 }
 
-public TG_OnGameStart( const String:id[], client, const String:CustomName[], Handle:DataPack )
+public Action:TG_OnGameSelected(const String:id[], iClient)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
-	
-	decl WeaponIndex;
-	decl String:WeaponName[ 64 ];
-	
-	ResetPack( DataPack );
-	ReadPackString( DataPack, WeaponName, sizeof( WeaponName ) );
-	
-	strcopy( g_WeaponName, sizeof( g_WeaponName ), WeaponName );
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
-			continue;
-		
-		GivePlayerItem( i, "weapon_knife" );
-		WeaponIndex = GivePlayerItem( i, WeaponName );
-		SetEntData( WeaponIndex, FindSendPropOffs( "CBaseCombatWeapon", "m_iClip1" ), 200, 4, true );
-		SDKHook( i, SDKHook_WeaponDrop, Hook_WeaponDrop );		
-	}
-	
-	return;
-}
-
-public Action:Hook_WeaponDrop( client, weapon )
-{
-	if( !TG_IsCurrentGameID( GAME_ID ) )
-		return Plugin_Continue;
-	
-	if( TG_IsPlayerRedOrBlue( client ) )
-	{
-		if( IsValidEdict( weapon ) )
-			AcceptEntityInput( weapon, "Kill" );
+	if (StrEqual(id, GAME_ID_FIFTYFIFTY) || StrEqual(id, GAME_ID_REDONLY)) {
+		SetWeaponMenu(iClient, id);
 	}
 	
 	return Plugin_Continue;
 }
 
-public Action:Event_WeaponZoom( Handle:event,const String:name[],bool:dontBroadcast )
+public TG_OnGamePrepare(const String:id[], client, const String:GameSettings[], Handle:DataPack)
 {
-	if( !TG_IsCurrentGameID( GAME_ID ) )
+	if (!StrEqual(id, GAME_ID_FIFTYFIFTY) && !StrEqual(id, GAME_ID_REDONLY))
+		return;
+	
+	for (new i = 1; i <= MaxClients; i++)
+	{
+		if (!TG_IsPlayerRedOrBlue(i))
+			continue;
+		
+		SetEntityHealth(i, 100);
+		g_fDrawLaser[i] = Float:{0.0, 0.0, 0.0};
+	}
+	
+	HookEvent("weapon_zoom", Event_WeaponZoom, EventHookMode_Post);
+	HookEvent("bullet_impact", Event_BulletImpact, EventHookMode_Post);
+}
+
+public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+{
+	if (!StrEqual(id, GAME_ID_FIFTYFIFTY) && !StrEqual(id, GAME_ID_REDONLY))
+		return;
+	
+	decl String:WeaponName[64];
+	
+	ResetPack(DataPack);
+	ReadPackString(DataPack, WeaponName, sizeof(WeaponName));
+	
+	strcopy(g_WeaponName, sizeof(g_WeaponName), WeaponName);
+	
+	for (new i = 1; i <= MaxClients; i++)
+	{
+		if (!TG_IsPlayerRedOrBlue(i))
+			continue;
+		
+		GivePlayerItem(i, "weapon_knife");
+		GivePlayerWeaponAndAmmo(i, g_WeaponName, 200, 200);
+	}
+}
+
+public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount, Handle:DataPack)
+{
+	if (StrEqual(id, GAME_ID_FIFTYFIFTY) || StrEqual(id, GAME_ID_REDONLY)) {
+		UnhookEvent("weapon_zoom", Event_WeaponZoom);
+		UnhookEvent("bullet_impact", Event_BulletImpact);
+	}
+}
+
+public Action:Event_WeaponZoom(Handle:event,const String:name[],bool:dontBroadcast)
+{
+	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
 
 
-	new client = GetClientOfUserId( GetEventInt( event, "userid" ) );
-	new String:weaponname[ 64 ];
+	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+	new String:weaponname[64];
 	
-	GetClientWeapon( client, weaponname, sizeof( weaponname ) );
+	GetClientWeapon(iClient, weaponname, sizeof(weaponname));
 	
-	if( StrEqual( weaponname, g_WeaponName, false ) && GetClientTeam( client ) == 2 )
+	if (StrEqual(weaponname, g_WeaponName, false) && GetClientTeam(iClient) == 2)
 	{
-		new weapon = GetPlayerWeaponSlot( client, 0 );
-		if( weapon != -1)
+		new weapon = GetPlayerWeaponSlot(iClient, 0);
+		if (weapon != -1)
 		{
-			RemovePlayerItem( client, weapon );
-			RemoveEdict( weapon );
+			RemovePlayerItem(iClient, weapon);
+			RemoveEdict(weapon);
 			
-			GivePlayerItem( client, g_WeaponName );
+			GivePlayerWeaponAndAmmo(iClient, g_WeaponName, 200, 200);
 		}
 	}
 
 	return Plugin_Continue;
 }
 
-public Action:Event_BulletImpact( Handle:event,const String:name[],bool:dontBroadcast )
+public Action:Event_BulletImpact(Handle:event,const String:name[],bool:dontBroadcast)
 {
-	if( !TG_IsCurrentGameID( GAME_ID ) )
-		return Plugin_Continue;
+	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	new clientid = GetClientOfUserId( GetEventInt( event, "userid" ) );
+	if ((TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && TG_IsPlayerRedOrBlue(iClient)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(iClient) == TG_RedTeam)) {
+		g_fDrawLaser[iClient][0] = GetEventFloat(event, "x");
+		g_fDrawLaser[iClient][1] = GetEventFloat(event, "y");
+		g_fDrawLaser[iClient][2] = GetEventFloat(event, "z");
 		
-	if( !TG_IsPlayerRedOrBlue( clientid ) )
-	{
-		new Float:pos[ 3 ];
-		new Float:pos_c[ 3 ];
-		new color[4];
-		
-		pos[ 0 ] = GetEventFloat( event, "x" );
-		pos[ 1 ] = GetEventFloat( event, "y" );
-		pos[ 2 ] = GetEventFloat( event, "z" );
-		
-		GetClientEyePosition( clientid, pos_c );
-		pos_c[ 2 ] -= 4;
-		
-		if( TG_GetPlayerTeam( clientid ) == RedTeam )
-		{
-			color = {220, 20, 60, 255};
-		}
-		else
-		{
-			color = {30, 144, 255, 255};
-		}
-		
-		TE_SetupBeamPoints( pos_c, pos, g_BeamSprite, g_HaloSprite, 0, 0, 0.5, 1.0, 1.0, 1024, 0.0, color, 10 );
-		TE_SendToAll();
+		RequestFrame(Frame_DrawLaser, iClient);
 	}
 	
 	return Plugin_Continue;
 }
 
-public bool:TraceEntityFilterPlayer(entity, mask, any:data)
+public Frame_DrawLaser(any:iClient)
 {
-  return data != entity;
-}
-
-public TG_OnLastInTeamDie( const String:id[], TG_Team:team )
-{
-	if( !StrEqual( id, GAME_ID, true ) )
+	if (g_fDrawLaser[iClient][0] == 0.0 && g_fDrawLaser[iClient][1] == 0.0 && g_fDrawLaser[iClient][2] == 0.0) {
 		return;
-	
-	TG_StopGame( TG_GetOppositeTeam( team ), true, true );
-	
-	return;
-}
-
-public TG_OnGameEnd( const String:id[], TG_Team:team, winners[], winnersCount )
-{
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		SDKUnhook( i, SDKHook_WeaponDrop, Hook_WeaponDrop );
 	}
 	
-	return;
+	new Float:fClientPos[3];
+	GetClientEyePosition(iClient, fClientPos);
+	fClientPos[2] -= 4;
+	
+	TE_SetupBeamPoints(fClientPos, g_fDrawLaser[iClient], g_BeamSprite, g_BeamSprite, 0, 0, 0.5, 1.0, 1.0, 1024, 0.0, (TG_GetPlayerTeam(iClient) == TG_RedTeam) ? {220, 20, 60, 255} : {30, 144, 255, 255}, 10);
+	TE_SendToAll();
+	
+	g_fDrawLaser[iClient][0] = 0.0;
+	g_fDrawLaser[iClient][1] = 0.0;
+	g_fDrawLaser[iClient][2] = 0.0;
 }
 
-ModulWeaponMenu( client )
+SetWeaponMenu(iClient, const String:sID[])
 {
-	new Handle:menu = CreateMenu( ModulWeaponMenu_Handler );
+	new Handle:hMenu = CreateMenu(SetWeaponMenu_Handler);
 
-	SetMenuTitle( menu, "NoZoom - vyberte zbraň:" );
-	AddMenuItem( menu, "weapon_awp", "AWP" );
-	AddMenuItem( menu, "weapon_scout", "Scout" );
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
-}
-
-public ModulWeaponMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
-{
-	if( action == MenuAction_Cancel && param2 == MenuCancel_ExitBack )
-	{
-		TG_ShowGamesMenu( client );
+	SetMenuTitle(hMenu, "%t", "ChooseWeapon");
+	PushMenuString(hMenu, "_GAME_ID_", sID);
+	
+	switch (g_iEngVersion) {
+		case Engine_CSS: {
+			AddMenuItem(hMenu, "weapon_awp", 	"AWP");
+			AddMenuItem(hMenu, "weapon_scout", "Scout");
+		}
+		case Engine_CSGO: {
+			AddMenuItem(hMenu, "weapon_awp", 	"AWP");
+			AddMenuItem(hMenu, "weapon_ssg08", "Scout");
+		}
 	}
-	else if( action == MenuAction_Select )
+	
+	SetMenuExitBackButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
+}
+
+public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+{
+	if (iAction == MenuAction_Select)
 	{
-		decl String:info[ 64 ], String:CustomName[ 64 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
+		new String:info[64], String:WeaponName[64], String:sID[TG_MODULE_ID_LENGTH];
+		GetMenuItem(hMenu, iKey, info, sizeof(info), _, WeaponName, 64);
 		
-		new Handle:pack = CreateDataPack();
-		WritePackString( pack, info );
+		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
+			return;
+		}
 		
-		if( StrEqual( info, "weapon_scout" ) )
-			Format( CustomName, sizeof( CustomName ), "%s{settings} - Scout", g_GameName );
-		else if( StrEqual( info, "weapon_awp" ) )
-			Format( CustomName, sizeof( CustomName ), "%s{settings} - AWP", g_GameName );
+		new Handle:hDataPack = CreateDataPack();
+		WritePackString(hDataPack, info);
 		
-		TG_StartGame( client, GAME_ID, CustomName, pack );
+		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
+			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, WeaponName, hDataPack, true);
+		} else {
+			TG_StartGame(iClient, GAME_ID_REDONLY, WeaponName, hDataPack, true);
+		}
 	}
 }

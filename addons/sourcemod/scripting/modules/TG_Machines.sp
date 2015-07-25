@@ -1,154 +1,156 @@
 #include <sourcemod>
-#include <sdkhooks>
 #include <smlib>
 #include <teamgames>
 
-#define DEFAULT_GAME_NAME	"Machines + 500 HP"
-#define GAME_ID				"Machines500HP-Raska"
+#define GAME_ID	"Machines500HP"
 
 public Plugin:myinfo =
 {
-	name = "TG_Machines + 500 HP",
+	name = "[TG] Machines + 500 HP",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
-}
+};
 
+new EngineVersion:g_iEngVersion;
 new g_BeamSprite = -1;
-new g_HaloSprite = -1;
-new g_TracerColor[ 3 ][ 4 ] =
-{
-	{   0,   0,   0,   0 },
-	{ 220,  20,  60, 255 },
-	{  30, 144, 255, 255 }
-}
+new Handle:g_hReffilAmmo;
+new Float:g_fDrawLaser[MAXPLAYERS + 1][3];
 
 public OnMapStart()
 {
-	g_BeamSprite = PrecacheModel( "materials/sprites/laserbeam.vmt" );
-	g_HaloSprite = PrecacheModel( "materials/sprites/glow01.vmt" );
+	g_BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
 }
 
-public OnLibraryAdded( const String:name[] )
+public OnPluginStart()
 {
-	if( !StrEqual( name, "TeamGames" ) )
-		return;
+	LoadTranslations("TG.Machines500HP-Raska.phrases");
+	g_iEngVersion = GetEngineVersion();
+}
 
-	TG_RegGame( GAME_ID, DEFAULT_GAME_NAME );
+public OnLibraryAdded(const String:sName[])
+{
+	if (StrEqual(sName, "TeamGames") && !TG_IsModuleReged(TG_Game, GAME_ID))
+		TG_RegGame(GAME_ID, TG_FiftyFifty, "%t", "GameName");
 }
 
 public OnPluginEnd()
 {
-	TG_UnRegGame( GAME_ID );
+	TG_RemoveGame(GAME_ID);
 }
 
-public Action:TG_OnGameSelected( const String:id[], client )
+public TG_OnMenuGameDisplay(const String:id[], iClient, String:name[])
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	if (StrEqual(id, GAME_ID))
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", iClient);
+}
+
+public Action:TG_OnGameSelected(const String:id[], iClient)
+{
+	if (!StrEqual(id, GAME_ID, true))
 		return Plugin_Continue;
 	
-	TG_StartGame( client, GAME_ID );
+	TG_StartGame(iClient, GAME_ID, _, _, true);
 	
 	return Plugin_Continue;
 }
 
-public TG_OnGamePrepare( const String:id[], client, const String:CustomName[], Handle:DataPack )
+public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	if (!StrEqual(id, GAME_ID, true))
 		return;
 	
-	for( new i = 1; i <= MaxClients; i++ )
+	HookEvent("bullet_impact", Event_BulletImpact);
+	
+	if (g_hReffilAmmo != INVALID_HANDLE) {
+		KillTimer(g_hReffilAmmo);
+	}
+	g_hReffilAmmo = CreateTimer(7.0, Timer_RefillAmmo, _, TIMER_REPEAT);
+	
+	for (new i = 1; i <= MaxClients; i++)
 	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
+		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 		
-		GivePlayerItem( i, "weapon_knife" );
-		SetEntityHealth( i, 500 );
+		switch (g_iEngVersion) {
+			case Engine_CSS: {
+				GivePlayerWeaponAndAmmo(i, "weapon_m249", _, 0);
+			}
+			case Engine_CSGO: {
+				GivePlayerWeaponAndAmmo(i, "weapon_negev", _, 0);
+			}
+		}
+		
+		SetEntityHealth(i, 500);
 	}
-	
-	HookEvent( "bullet_impact", Event_BulletImpact, EventHookMode_Post );
-	
-	return;
 }
 
-public TG_OnGameStart( const String:id[], client, const String:CustomName[], Handle:DataPack )
+public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount, Handle:DataPack)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
-			continue;
+	if (StrEqual(id, GAME_ID)) {
+		UnhookEvent("bullet_impact", Event_BulletImpact);
 		
-		Client_GiveWeaponAndAmmo( i, "weapon_m249", true, 900 );
-		SDKHook( i, SDKHook_WeaponDrop, Hook_WeaponDrop );
+		if (g_hReffilAmmo != INVALID_HANDLE) {
+			KillTimer(g_hReffilAmmo);
+		}
+		g_hReffilAmmo = INVALID_HANDLE;
 	}
-	
-	return;
 }
 
-public Action:Event_BulletImpact( Handle:event,const String:name[],bool:dontBroadcast )
+public Action:Timer_RefillAmmo(Handle:hTimer)
 {
-	if( !TG_IsCurrentGameID( GAME_ID ) )
-		return Plugin_Continue;
+	if (!TG_IsCurrentGameID(GAME_ID)) {
+		return Plugin_Stop;
+	}
 	
-	new client = GetClientOfUserId( GetEventInt( event, "userid" ) );
-	new TG_Team:team = TG_GetPlayerTeam( client );
-	
-	if( TG_IsTeamRedOrBlue( team ) )
-	{
-		new Float:pos[ 3 ];
-		new Float:pos_c[ 3 ];
-		
-		pos[ 0 ] = GetEventFloat( event, "y" );
-		pos[ 1 ] = GetEventFloat( event, "x" );
-		pos[ 2 ] = GetEventFloat( event, "z" );
-		
-		GetClientEyePosition( client, pos_c );
-		pos_c[ 2 ] -= 4;
-		
-		TE_SetupBeamPoints( pos_c, pos, g_BeamSprite, g_HaloSprite, 0, 0, 0.125, 1.0, 1.0, 1024, 0.0, g_TracerColor[ _:team ], 10 );
-		TE_SendToAll();
+	for (new i = 1; i <= MaxClients; i++) {
+		if (TG_IsPlayerRedOrBlue(i)) {
+			new String:sWeapon[64];
+			new iWeapon = Client_GetActiveWeaponName(i, sWeapon, sizeof(sWeapon));
+			
+			if (iWeapon != INVALID_ENT_REFERENCE) {
+				if (g_iEngVersion == Engine_CSS && StrEqual(sWeapon, "weapon_m249")) {
+					SetPlayerWeaponAmmo(i, iWeapon, _, 100);
+				} else if (g_iEngVersion == Engine_CSGO && StrEqual(sWeapon, "weapon_negev")) {
+					SetPlayerWeaponAmmo(i, iWeapon, _, 150);
+				}
+			}
+		}
 	}
 	
 	return Plugin_Continue;
 }
 
-public Action:Hook_WeaponDrop( client, weapon )
+public Action:Event_BulletImpact(Handle:event,const String:name[],bool:dontBroadcast)
 {
-	if( !TG_IsCurrentGameID( GAME_ID ) )
-		return Plugin_Continue;
+	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	if( TG_IsPlayerRedOrBlue( client ) )
-	{
-		if( IsValidEdict( weapon ) )
-			AcceptEntityInput( weapon, "Kill" );
+	if ((TG_IsCurrentGameID(GAME_ID) && TG_IsPlayerRedOrBlue(iClient))) {
+		g_fDrawLaser[iClient][0] = GetEventFloat(event, "x");
+		g_fDrawLaser[iClient][1] = GetEventFloat(event, "y");
+		g_fDrawLaser[iClient][2] = GetEventFloat(event, "z");
+		
+		RequestFrame(Frame_DrawLaser, iClient);
 	}
 	
 	return Plugin_Continue;
 }
 
-public TG_OnLastInTeamDie( const String:id[], TG_Team:team, client )
+public Frame_DrawLaser(any:iClient)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	if (g_fDrawLaser[iClient][0] == 0.0 && g_fDrawLaser[iClient][1] == 0.0 && g_fDrawLaser[iClient][2] == 0.0) {
 		return;
-	
-	TG_StopGame( TG_GetOppositeTeam( team ) );
-	
-	return;
-}
-
-public TG_OnGameEnd( const String:id[], TG_Team:team, winners[], winnersCount )
-{
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		SDKUnhook( i, SDKHook_WeaponDrop, Hook_WeaponDrop );
 	}
 	
-	return;
+	new Float:fClientPos[3];
+	GetClientEyePosition(iClient, fClientPos);
+	fClientPos[2] -= 4;
+	
+	TE_SetupBeamPoints(fClientPos, g_fDrawLaser[iClient], g_BeamSprite, g_BeamSprite, 0, 0, 0.125, 1.0, 1.0, 1024, 0.0, (TG_GetPlayerTeam(iClient) == TG_RedTeam) ? {220, 20, 60, 255} : {30, 144, 255, 255}, 10);
+	TE_SendToAll();
+	
+	g_fDrawLaser[iClient][0] = 0.0;
+	g_fDrawLaser[iClient][1] = 0.0;
+	g_fDrawLaser[iClient][2] = 0.0;
 }

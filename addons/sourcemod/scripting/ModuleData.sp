@@ -1,89 +1,109 @@
 #define MAX_MENU_ITEMS 64
 #define MAX_GAMES 64
 
-new Handle:h_Timer_CountDownGamePrepare = INVALID_HANDLE;
-new g_Timer_CountDownGamePrepare_counter = 4;
+new Handle:g_hTimer_CountDownGamePrepare = INVALID_HANDLE;
+new g_iTimer_CountDownGamePrepare_counter = 4;
 
 enum gamestatusinfo
 {
 	TG_GameProgress:GameProgress,
-	String:GameID[ 64 ],
-	String:GameCustomName[ 64 ],
+	String:GameID[TG_MODULE_ID_LENGTH],
+	String:DefaultName[TG_MODULE_NAME_LENGTH],
+	TG_GameType:GameType,
+	String:GameSettings[TG_GAME_SETTINGS_LENGTH],
 	Handle:GameDataPack,
-	GameStarter
+	bool:RemoveDrops,
+	bool:EndOnTeamEmpty,
+	GameStarter,
+	RedTeam[MAXPLAYERS + 1],
+	BlueTeam[MAXPLAYERS + 1]
 }
-new g_Game[ gamestatusinfo ];
+new g_Game[gamestatusinfo];
 
 ClearGameStatusInfo()
 {
-	g_Game[ GameProgress ] = NoGame;
-	strcopy( g_Game[ GameID ], 64, "Core_NoGame" );
-	strcopy( g_Game[ GameCustomName ], 64, "" );
-	TG_KillHandle( g_Game[ GameDataPack ] );
-	g_Game[ GameStarter ] = 0;
+	g_Game[GameProgress] = TG_NoGame;
+	g_Game[GameType] = TG_FiftyFifty;
+	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, "Core_NoGame");
+	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, "Core_NoGame");
+	strcopy(g_Game[GameSettings], TG_MODULE_NAME_LENGTH, "");
+	
+	if (g_Game[GameDataPack] != INVALID_HANDLE) {
+		CloseHandle(g_Game[GameDataPack]);
+		g_Game[GameDataPack] = INVALID_HANDLE;
+	}
+	
+	g_Game[RemoveDrops] = false;
+	g_Game[EndOnTeamEmpty] = true;
+	g_Game[GameStarter] = 0;
+	g_Game[RedTeam][0] = 0;
+	g_Game[BlueTeam][0] = 0;
+	
+	for (new i = 1; i <= MaxClients; i++) {
+		if (Client_IsIngame(i))
+			SDKUnhook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
+	}
 }
 
 enum MenuItemStruct
 {
 	bool:Used,
-	String:Id[ 64 ],
-    String:DefaultName[ 64 ],
-    String:RequiredFlag[ 16 ],
-	Separator
+	bool:Visible,
+	String:Id[TG_MODULE_ID_LENGTH],
+    String:DefaultName[TG_MODULE_NAME_LENGTH],
+    Separator
 }
-new g_MenuItemList[ MAX_MENU_ITEMS ][ MenuItemStruct ];
-new g_MenuItemListEnd = 0;
+new g_MenuItemList[MAX_MENU_ITEMS][MenuItemStruct];
+new g_iMenuItemListEnd = 0;
 
 enum GameStruct
 {
 	bool:Used,
-	String:Id[ 64 ],
-    String:Name[ 64 ],
-    String:RequiredFlag[ 16 ],
-	TG_GameType:GameType,
+	bool:Visible,
+	String:Id[TG_MODULE_ID_LENGTH],
+    String:DefaultName[TG_MODULE_NAME_LENGTH],
+    TG_GameType:GameType,
 	Separator
 }
-new g_GameList[ MAX_GAMES ][ GameStruct ];
-new g_GameListEnd = 0;
+new g_GameList[MAX_GAMES][GameStruct];
+new g_iGameListEnd = 0;
 
-bool:ExistMenuItem( const String:id[] )
+bool:ExistMenuItem(const String:sID[])
 {
-	if( GetMenuItemIndex( id ) >= 0 )
+	if (GetMenuItemIndex(sID) != -1)
 		return true;
 
 	return false;
 }
 
-bool:ExistGame( const String:id[] )
+bool:ExistGame(const String:sID[])
 {
-	if( GetGameIndex( id ) >= 0 )
+	if (GetGameIndex(sID) != -1)
 		return true;
 
 	return false;
 }
 
-GetMenuItemIndex( const String:id[], bool:OnlyUsed = true )
+GetMenuItemIndex(const String:sID[], bool:bOnlyRunning = true)
 {
-	for( new i = 0; i < MAX_MENU_ITEMS; i++ )
-	{
-		if( !g_MenuItemList[ i ][ Used ] && OnlyUsed )
+	for (new i = 0; i < MAX_MENU_ITEMS; i++) {
+		if (!g_MenuItemList[i][Used] && bOnlyRunning)
 			continue;
 
-		if( StrEqual( g_MenuItemList[ i ][ Id ], id ) )
+		if (StrEqual(g_MenuItemList[i][Id], sID))
 			return i;
 	}
 
 	return -1;
 }
 
-GetGameIndex( const String:id[], bool:OnlyUsed = true )
+GetGameIndex(const String:sID[], bool:bOnlyRunning = true)
 {
-	for( new i = 0; i < MAX_GAMES; i++ )
-	{
-		if( !g_GameList[ i ][ Used ] && OnlyUsed )
+	for (new i = 0; i < MAX_GAMES; i++) {
+		if (!g_GameList[i][Used] && bOnlyRunning)
 			continue;
 
-		if( StrEqual( g_GameList[ i ][ Id ], id ) )
+		if (StrEqual(g_GameList[i][Id], sID))
 			return i;
 	}
 
@@ -92,159 +112,128 @@ GetGameIndex( const String:id[], bool:OnlyUsed = true )
 
 GetCountAllGames()
 {
-	new count = 0;
+	new iCount = 0;
 
-	for( new i = 0; i < MAX_GAMES; i++ )
-	{
-		if( !g_GameList[ i ][ Used ] )
+	for (new i = 0; i < MAX_GAMES; i++) {
+		if (!g_GameList[i][Used])
 			continue;
 
-		count++;
+		iCount++;
 	}
 
-	return count;
+	return iCount;
 }
 
 RemoveAllTGMenuItems()
 {
-	for( new i = 0; i < MAX_MENU_ITEMS; i++ )
-		g_MenuItemList[ i ][ Used ] = false;
+	for (new i = 0; i < MAX_MENU_ITEMS; i++)
+		g_MenuItemList[i][Used] = false;
 }
 
 RemoveAllGames()
 {
-	for( new i = 0; i < MAX_GAMES; i++ )
-		g_GameList[ i ][ Used ] = false;
+	for (new i = 0; i < MAX_GAMES; i++)
+		g_GameList[i][Used] = false;
 }
 
-bool:IsGameDisabled( const String:id[ 64 ] )
+bool:IsGameDisabled(const String:sID[TG_MODULE_ID_LENGTH])
 {
-	decl String:path[ PLATFORM_MAX_PATH ];
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
+	decl String:sPath[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sPath, sizeof(sPath), MODULES_CONFIG);
 
-	new Handle:kv = CreateKeyValues( "Games" );
-	FileToKeyValues( kv, path );
+	new Handle:hKV = CreateKeyValues(MODCONF_MENUITEMS);
+	FileToKeyValues(hKV, sPath);
 
-	if( !KvJumpToKey( kv, id ) )
-	{
-		CloseHandle( kv );
+	if (!KvJumpToKey(hKV, sID)) {
+		CloseHandle(hKV);
 		return false;
 	}
 	
-	new bool:disabled = bool:KvGetNum( kv, "disabled", 0 );
-	CloseHandle( kv );
+	new bool:bDisabled = bool:KvGetNum(hKV, "Disabled", 0);
+	CloseHandle(hKV);
 
-	return disabled;
+	return bDisabled;
 }
 
-bool:IsMenuItemDisabled( const String:id[ 64 ] )
+bool:IsMenuItemDisabled(const String:sID[TG_MODULE_ID_LENGTH])
 {
-	decl String:path[ PLATFORM_MAX_PATH ];
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
+	decl String:sPath[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, sPath, sizeof(sPath), MODULES_CONFIG);
 
-	new Handle:kv = CreateKeyValues( "MainMenu" );
-	FileToKeyValues( kv, path );
+	new Handle:hKV = CreateKeyValues(MODCONF_MENUITEMS);
+	FileToKeyValues(hKV, sPath);
 
-	if( !KvJumpToKey( kv, id ) )
-	{
-		CloseHandle( kv );
+	if (!KvJumpToKey(hKV, sID)) {
+		CloseHandle(hKV);
 		return false;
 	}
 	
-	new bool:disabled = bool:KvGetNum( kv, "disabled", 0 );
-	CloseHandle( kv );
+	new bool:bDisabled = bool:KvGetNum(hKV, "Disabled", 0);
+	CloseHandle(hKV);
 
-	return disabled;
+	return bDisabled;
 }
 
-bool:IsGameTypeAvailable( TG_GameType:type )
+bool:IsGameTypeAvailable(TG_GameType:iType)
 {
-	if( type == FiftyFifty )
-	{
-		if( GetCountPlayersInTeam( RedTeam ) == GetCountPlayersInTeam( BlueTeam ) && GetCountPlayersInTeam( RedTeam ) > 0 )
+	if (iType == TG_FiftyFifty) {
+		if (GetCountPlayersInTeam(TG_RedTeam) == GetCountPlayersInTeam(TG_BlueTeam) && GetCountPlayersInTeam(TG_RedTeam) > 0)
 			return true;
-	}
-	else if( type == RedOnly )
-	{
-		if( GetCountPlayersInTeam( RedTeam ) >= 2 && GetCountPlayersInTeam( BlueTeam ) == 0 )
+	} else if (iType == TG_RedOnly) {
+		if (GetCountPlayersInTeam(TG_RedTeam) >= 2 && GetCountPlayersInTeam(TG_BlueTeam) == 0)
 			return true;
 	}
 
 	return false;
 }
 
-ListGames( client )
+ListGames(iClient)
 {
-	if( Client_IsValid( client ) )
-	{
-		PrintToConsole( client, "\n[TeamGames] Games list" );
-		PrintToConsole( client, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-		PrintToConsole( client, "|     | Game name                                                        | Game ID                                                          |" );
-		PrintToConsole( client, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-	}
-	else
-	{
-		PrintToServer( "\n[TeamGames] Games list" );
-		PrintToServer( "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-		PrintToServer( "|     | Game name                                                        | Game ID                                                          |" );
-		PrintToServer( "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-	}
+	PrintToConsoleOrServer(iClient, "\n[TeamGames] Games list");
+	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
+	PrintToConsoleOrServer(iClient, "|     | Game ID                                                          | Default game name                                                |");
+	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
 	
-	new index = 1;
+	new iIndex = 1;
 	
-	for( new i = 0; i < MAX_GAMES; i++ )
-	{
-		if( !g_GameList[ i ][ Used ] )
+	for (new i = 0; i < MAX_GAMES; i++) {
+		if (!g_GameList[i][Used])
 			continue;
 		
-		if( Client_IsValid( client ) )
-			PrintToConsole( client, "| #%2d | %64s | %64s |", index, g_GameList[ i ][ Name ], g_GameList[ i ][ Id ] );
-		else		
-			PrintToServer( "| #%2d | %64s | %64s |", index, g_GameList[ i ][ Name ], g_GameList[ i ][ Id ] );
-		
-		index++;
+		PrintToConsoleOrServer(iClient, "| #%2d | %64s | %64s", iIndex, g_GameList[i][Id], g_GameList[i][DefaultName]);		
+		iIndex++;
 	}
 	
-	if( Client_IsValid( client ) )
-		PrintToConsole( client, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n" );
-	else
-		PrintToServer( "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n" );
+	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n");
 }
 
-ListMenuItems( client )
+ListMenuItems(iClient)
 {
-	if( Client_IsValid( client ) )
-	{
-		PrintToConsole( client, "\n[TeamGames] Menu items list" );
-		PrintToConsole( client, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-		PrintToConsole( client, "|     | Default menu item name                                           | Menu item ID                                                     |" );
-		PrintToConsole( client, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-	}
-	else
-	{
-		PrintToServer( "\n[TeamGames] Menu items list" );
-		PrintToServer( "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-		PrintToServer( "|     | Default menu item name                                           | Menu item ID                                                     |" );
-		PrintToServer( "+-----+------------------------------------------------------------------+------------------------------------------------------------------+" );
-	}
+	PrintToConsoleOrServer(iClient, "\n[TeamGames] Menu items list");
+	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
+	PrintToConsoleOrServer(iClient, "|     | Menu item ID                                                     | Default menu item name                                           |");
+	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
 	
-	new index = 1;
+	new iIndex = 1;
 	
-	for( new i = 0; i < MAX_MENU_ITEMS; i++ )
-	{
-		if( !g_MenuItemList[ i ][ Used ] )
+	for (new i = 0; i < MAX_MENU_ITEMS; i++) {
+		if (!g_MenuItemList[i][Used])
 			continue;
 		
-		if( Client_IsValid( client ) )
-			PrintToConsole( client, "| #%2d | %64s | %64s |", index, g_MenuItemList[ i ][ DefaultName ], g_MenuItemList[ i ][ Id ] );
-		else		
-			PrintToServer( "| #%2d | %64s | %64s |", index, g_MenuItemList[ i ][ DefaultName ], g_MenuItemList[ i ][ Id ] );
-		
-		index++;
+		PrintToConsoleOrServer(iClient, "| #%2d | %64s | %64s", iIndex, g_MenuItemList[i][Id], g_MenuItemList[i][DefaultName]);
+		iIndex++;
 	}
 	
-	if( Client_IsValid( client ) )
-		PrintToConsole( client, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n" );
+	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n");
+}
+
+PrintToConsoleOrServer(iClient, const String:format[], any:...)
+{
+	decl String:sMsg[256];	
+	VFormat(sMsg, sizeof(sMsg), format, 3);
+	
+	if (Client_IsValid(iClient))
+		PrintToConsole(iClient, sMsg);
 	else
-		PrintToServer( "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n" );
+		PrintToServer(sMsg);
 }

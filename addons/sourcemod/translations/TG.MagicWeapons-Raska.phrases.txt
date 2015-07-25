@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"en"		"Magic weapons"
+		"cze"		"Magie"
+	}
+}

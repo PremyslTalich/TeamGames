@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"en"		"HE Grenades"
+		"cze"		"Granátová"
+	}
+}

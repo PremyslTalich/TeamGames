@@ -20,7 +20,7 @@
     </node>
     <node name="scripting" isDir="True" isExpand="True">
       <node name="includes" isDir="True" isExpand="False" />
-      <node name="modules" isDir="True" isExpand="False">
+      <node name="modules" isDir="True" isExpand="True">
         <node name="opravit" isDir="True" isExpand="False">
           <node name="TG_DodgeBall.sp" isDir="False" isExpand="False" />
         </node>

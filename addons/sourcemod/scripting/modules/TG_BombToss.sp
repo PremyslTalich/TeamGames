@@ -2,148 +2,188 @@
 #include <sdkhooks>
 #include <cstrike>
 #include <smlib>
-#include <teamgames> // include TeamGames features
+#include <teamgames>
 
-#define MENU_ITEM_ID "BombToss-Raska" // define for BombToss item id
-#define MENU_ITEM_NAME "Spawnout bombu" // define for BombToss item default name
+#define MENU_ITEM_ID_SPAWNBOMB 	"BombToss-SpawnBomb"
+#define MENU_ITEM_ID_TARGET 	"BombToss-Target"
 
-#define TARGET_MATERIAL "materials/sprites/laserbeam.vmt"
-#define TARGET_HALO "materials/sprites/glow01.vmt"
-#define LASER_COLOR { 255, 0, 0, 255 }
+#define TARGET_DOWNLOAD_PREFIX 	"BombToss-Target"
 
-new g_TargetMaterial = -1;
-new g_TargetHalo = -1;
-new Float:g_TargetPosition[ 3 ];
+#define TARGET_TARGETNAME 		"BombToss-Target"
+#define BOMB_TARGETNAME 		"BombToss"
+#define BOMB_TARGETNAME_USED 	"BombToss-"
 
-new Handle:gh_timer = INVALID_HANDLE;
-new Handle:gh_BombList = INVALID_HANDLE;
+new Handle:g_hOneBomb, g_bOneBomb;
 
-new String:g_ItemName[ 64 ];
+new String:g_sTargetModel[PLATFORM_MAX_PATH];
+new Float:g_fTargetPosition[3];
+new g_iTargetEntity = -1;
 
-new g_MaxBombs = 32;
-new g_BombCounter = 0;
+new Handle:g_hTimer = INVALID_HANDLE;
+new Handle:g_hBombList = INVALID_HANDLE;
+new Handle:g_hTossedBombList = INVALID_HANDLE;
+
+new g_iMaxBombs = 32;
+new g_iBombCounter = 0;
 
 public Plugin:myinfo =
 {
-	name = "TG_BombToss",
+	name = "[TG] BombToss",
 	author = "Raska",
 	description = "",
-	version = "0.3",
+	version = "0.7",
 	url = ""
-}
-
-RegModule()
-{
-	TG_AddMenuItem( MENU_ITEM_ID, MENU_ITEM_NAME ); // registrer module
-	TG_KvAddInt( MenuItem, MENU_ITEM_ID, "MaxBombsCount", 32 ); // add keyValue to modules config (default configs/teamgames/modules.cfg) - this will NOT OVERWRITE IF EXIST
-	
-	g_MaxBombs = TG_KvGetInt( MenuItem, MENU_ITEM_ID, "MaxBombsCount", 32 ); // get value of kayValue in modules config
-	TG_GetMenuItemName( MENU_ITEM_ID, g_ItemName, sizeof( g_ItemName ) ); // get changed item name (item name can be changed in modules config)
 }
 
 public OnPluginStart()
 {
-	HookEvent( "round_start", 	Event_RoundStart, 	EventHookMode_Post );
-	HookEvent( "bullet_impact", Event_BulletImpact, EventHookMode_Post );
+	LoadTranslations("TG.BombToss-Raska.phrases");
 	
-	g_TargetMaterial = PrecacheModel( TARGET_MATERIAL );
-	g_TargetHalo = PrecacheModel( TARGET_HALO );
+	g_hOneBomb = CreateConVar("tg_bt_onebomb", "1", "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
 	
-	if( LibraryExists( "TeamGames" ) ) // in case of late load...
-		RegModule();
+	HookEvent("round_start", 	Event_RoundStart, 	EventHookMode_Post);
+	HookEvent("bullet_impact", Event_BulletImpact, EventHookMode_Post);
 }
 
-public OnLibraryAdded( const String:name[] )
+public OnLibraryAdded(const String:name[])
 {
-    if( StrEqual( name, "TeamGames" ) )
-		RegModule();
+	if (StrEqual(name, "TeamGames") && !TG_IsModuleReged(TG_MenuItem, MENU_ITEM_ID_SPAWNBOMB)) {
+		TG_RegMenuItem(MENU_ITEM_ID_SPAWNBOMB, "%t", "SpawnBomb", g_iMaxBombs - g_iBombCounter);
+		TG_RegMenuItem(MENU_ITEM_ID_TARGET, "%t", "SpawnTarget");
+	}
+}
+
+public OnConfigsExecuted()
+{
+	g_bOneBomb = GetConVarBool(g_hOneBomb);
+}
+
+public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bool:bKnown)
+{
+	if (StrEqual(sPrefixName, TARGET_DOWNLOAD_PREFIX, false)) {
+		PrecacheModel(sFile);
+		strcopy(g_sTargetModel, sizeof(g_sTargetModel), sFile);
+		bKnown = true;
+	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveMenuItem( MENU_ITEM_ID ); // remove menu item
+	TG_RemoveMenuItem(MENU_ITEM_ID_SPAWNBOMB);
+	TG_RemoveMenuItem(MENU_ITEM_ID_TARGET);
 	
-	TG_KillTimer( gh_timer );
+	g_hTimer = INVALID_HANDLE;
 }
 
-public Action:Event_RoundStart( Handle:event, const String:name[], bool:dontBroadcast )
+public OnClientPutInServer(iClient)
 {
-	TG_KillTimer( gh_timer );
-	
-	if( gh_BombList != INVALID_HANDLE )
-		CloseHandle( gh_BombList );
-	
-	gh_BombList = CreateArray();
-	
-	g_BombCounter = 0;
-	g_TargetPosition[ 0 ] = 0.0;
-	g_TargetPosition[ 1 ] = 0.0;
-	g_TargetPosition[ 2 ] = 0.0;
+	SDKHook(iClient, SDKHook_WeaponCanUse, 		Hook_OnWeaponCanUse);
+	SDKHook(iClient, SDKHook_WeaponDropPost, 	Hook_WeaponDrop);
 }
 
-public TG_OnMenuItemSelected( const String:id[], client ) // somebody selected BombToss item in menu
+public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if( !StrEqual( id, MENU_ITEM_ID, true ) )
-		return;
+	g_hTimer = INVALID_HANDLE;
 	
-	if( g_BombCounter >= g_MaxBombs )
-		return;
+	if (g_hBombList != INVALID_HANDLE) {
+		CloseHandle(g_hBombList);
+	}
 	
-	decl Float:ClientPosition[ 3 ], Float:ClientAngles[ 3 ];
-	GetClientAbsOrigin( client, ClientPosition );
-	GetClientAbsAngles( client, ClientAngles );
+	g_hBombList = CreateArray();
 	
-	NormalizeVector( ClientAngles, ClientAngles );
-	ScaleVector( ClientAngles, 32.0 );
+	if (g_hTossedBombList != INVALID_HANDLE) {
+		CloseHandle(g_hTossedBombList);
+	}
 	
-	new weapon = CreateEntityByName( "weapon_c4" );
-	DispatchKeyValue( weapon, "targetname", MENU_ITEM_ID );
-	DispatchKeyValue( weapon, "Solid", "6" );
-	DispatchSpawn( weapon );
-	TeleportEntity( weapon, ClientPosition, NULL_VECTOR, ClientAngles );	
-	SetEntData( weapon, FindSendPropInfo( "CBaseEntity", "m_CollisionGroup" ), 2, 4, true );
-	g_BombCounter++;
+	g_hTossedBombList = CreateArray();
 	
-	TG_LogRoundMessage( MENU_ITEM_ID, "Player %L spawned bomb. (%d bombs remaining)", client, g_MaxBombs - g_BombCounter );
+	g_iBombCounter = 0;
+	RemoveTarget();
+}
+
+public TG_OnMenuItemDisplay(const String:id[], iClient, &TG_MenuItemStatus:status, String:name[])
+{
+	if (StrEqual(id, MENU_ITEM_ID_SPAWNBOMB)) {
+		if (g_iBombCounter < g_iMaxBombs) {
+			status = TG_Active;
+		} else {
+			status = TG_Inactive;
+		}
+		
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnBomb", iClient, g_iMaxBombs - g_iBombCounter);
+	} else if (StrEqual(id, MENU_ITEM_ID_TARGET)) {
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnTarget", iClient);
+	}
+}
+
+public TG_OnMenuItemSelected(const String:id[], iClient) // somebody selected BombToss item in menu
+{
+	if (StrEqual(id, MENU_ITEM_ID_SPAWNBOMB, true)) {
+		if (g_iBombCounter >= g_iMaxBombs){
+			return;
+		}
+		
+		decl Float:ClientPosition[3];
+		GetClientAbsOrigin(iClient, ClientPosition);
+		
+		new iWeapon = CreateEntityByName("weapon_c4");
+		DispatchKeyValue(iWeapon, "targetname", BOMB_TARGETNAME);
+		DispatchKeyValue(iWeapon, "Solid", "6");
+		DispatchSpawn(iWeapon);
+		TeleportEntity(iWeapon, ClientPosition, NULL_VECTOR, NULL_VECTOR);	
+		SetEntData(iWeapon, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
+		g_iBombCounter++;
+		
+		TG_LogRoundMessage("BombToss", "Player %L spawned bomb. (%d bombs remaining)", iClient, g_iMaxBombs - g_iBombCounter);
+		
+		TurnTimerOn();
+		TG_FakeSelect(iClient, TG_MenuItem, "Core_MainMenu");
+	} else if (StrEqual(id, MENU_ITEM_ID_TARGET, true)) {
+		if (!IsModelPrecached(g_sTargetModel)) {
+			return;
+		}
+		
+		RemoveTarget();
+		
+		g_iTargetEntity = CreateEntityByName("prop_physics_override");
 	
-	TurnTimerOn();		
-	TG_ShowMainMenu( client );
+		if (!IsValidEntity(g_iTargetEntity)) {
+			return;
+		}
+		
+		GetClientAbsOrigin(iClient, g_fTargetPosition);
+		
+		DispatchKeyValue(g_iTargetEntity, "targetname", TARGET_TARGETNAME);
+		DispatchKeyValue(g_iTargetEntity, "model", g_sTargetModel);
+		DispatchKeyValue(g_iTargetEntity, "spawnflags", "4");
+		DispatchSpawn(g_iTargetEntity);
+		TeleportEntity(g_iTargetEntity, g_fTargetPosition, NULL_VECTOR, NULL_VECTOR);
+		SetEntityModel(g_iTargetEntity, g_sTargetModel);
+		SetEntityMoveType(g_iTargetEntity, MOVETYPE_NONE);
+		
+		TG_LogRoundMessage("BombToss", "Player %L spawned target.", iClient);
+		
+		TG_FakeSelect(iClient, TG_MenuItem, "Core_MainMenu");
+	}
 	
 	return;
 }
 
-public TG_OnMenuItemDisplay( const String:id[], client, &TG_MenuItemStatus:status, String:name[] ) // somebody is viewing menu with BombToss menu item
+public Action:Hook_OnWeaponCanUse(iClient, weapon) // hook pickup bomb
 {
-	if( g_BombCounter < g_MaxBombs )
-		status = Active;
-	else
-		status = Inactive;
-	
-	Format( name, 64, "%s (%d)", g_ItemName, g_MaxBombs - g_BombCounter );
-}
+	decl String:sWeaponClassName[32];
+	GetEdictClassname(weapon, sWeaponClassName, sizeof(sWeaponClassName));
 
-public OnClientPutInServer( client )
-{
-	SDKHook( client, SDKHook_WeaponCanUse, 	 Hook_OnWeaponCanUse );
-	SDKHook( client, SDKHook_WeaponDropPost, Hook_WeaponDrop );
-}
-
-public Action:Hook_OnWeaponCanUse( client, weapon )
-{
-	decl String:WeaponClassName[ 32 ];
-	GetEdictClassname( weapon, WeaponClassName, sizeof( WeaponClassName ) );
-
-	if( StrEqual( WeaponClassName, "weapon_c4" ) )
-	{
-		decl String:WeaponTargetName[ 64 ];
-		GetEntPropString( weapon, Prop_Data, "m_iName", WeaponTargetName, sizeof( WeaponTargetName ) );
+	if (StrEqual(sWeaponClassName, "weapon_c4")) {
+		if (g_bOneBomb && Client_GetWeapon(iClient, "weapon_c4") != INVALID_ENT_REFERENCE)
+			return Plugin_Handled;
 		
-		if( StrEqual( WeaponTargetName, MENU_ITEM_ID ) )
-		{
-			PushArrayCell( gh_BombList, weapon );
-		}
-		else if( StrStartWith( WeaponTargetName, "BombToss-Raska-" ) )
-		{
+		decl String:sWeaponTargetName[64];
+		GetEntPropString(weapon, Prop_Data, "m_iName", sWeaponTargetName, sizeof(sWeaponTargetName));
+		
+		if (StrEqual(sWeaponTargetName, BOMB_TARGETNAME)) {
+			PushArrayCell(g_hBombList, weapon);
+		} else if (StrContains(sWeaponTargetName, BOMB_TARGETNAME_USED) == 0) {
 			return Plugin_Handled;
 		}
 	}
@@ -151,60 +191,72 @@ public Action:Hook_OnWeaponCanUse( client, weapon )
 	return Plugin_Continue;
 }
 
-public Action:Hook_WeaponDrop( client, weapon )
+public Action:Hook_WeaponDrop(iClient, weapon) // hook drop bomb
 {
-	if( FindValueInArray( gh_BombList, weapon ) != -1 )
-	{
-		decl String:WeaponTargetName[ 64 ];
-				
-		Format( WeaponTargetName, sizeof( WeaponTargetName ), "%s-%d", MENU_ITEM_ID, GetClientUserId( client ) );			
-		Entity_SetName( weapon, WeaponTargetName );
-		SetEntityRenderColor( weapon, GetRandomInt( 0, 255 ), GetRandomInt( 0, 255 ), GetRandomInt( 0, 255 ), 255 );
+	if (g_hBombList == INVALID_HANDLE) {
+		g_hBombList = CreateArray();
+	}
+	
+	if (FindValueInArray(g_hBombList, weapon) != -1) {
+		decl String:sWeaponTargetName[64];
 		
-		RemoveFromArray( gh_BombList, FindValueInArray( gh_BombList, weapon ) );
+		Format(sWeaponTargetName, sizeof(sWeaponTargetName), "%s%d", BOMB_TARGETNAME_USED, GetClientUserId(iClient));
+		Entity_SetName(weapon, sWeaponTargetName);
+		SetEntityRenderColor(weapon, GetRandomInt(0, 255), GetRandomInt(0, 255), GetRandomInt(0, 255), 255);
+		PushArrayCell(g_hTossedBombList, weapon);
+		
+		RemoveFromArray(g_hBombList, FindValueInArray(g_hBombList, weapon));
 	}
 
 	return Plugin_Continue;
 }
 
-public Action:Event_BulletImpact(Handle:event,const String:name[],bool:dontBroadcast)
+public Action:Event_BulletImpact(Handle:event,const String:name[],bool:dontBroadcast) // hook shot to bomb or target
 {
-	if( gh_timer == INVALID_HANDLE )
-		return Plugin_Continue;
+	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
 	
-	new client = GetClientOfUserId( GetEventInt( event, "userid" ) );
-	
-	if( Client_IsIngame( client ) && IsPlayerAlive( client ) && GetClientTeam( client ) == CS_TEAM_CT )
-	{
-		new entity = GetClientAimTarget( client, false );
+	if (Client_IsIngame(iClient) && IsPlayerAlive(iClient) && GetClientTeam(iClient) == CS_TEAM_CT) {
+		new iEntity = GetClientAimTarget(iClient, false);
 		
-		if( entity == -1 )
+		if (g_iTargetEntity != -1 && iEntity == g_iTargetEntity) {
+			RemoveTarget();
 			return Plugin_Continue;
+		}
 		
-		decl String:EntityClassName[ 32 ];
-		GetEdictClassname( entity, EntityClassName, sizeof( EntityClassName ) );
+		if (g_hTimer == INVALID_HANDLE) {
+			return Plugin_Continue;
+		}
+		
+		if (iEntity < 0 || !IsValidEdict(iEntity)) {
+			return Plugin_Continue;
+		}
+		
+		decl String:EntityClassName[32];
+		GetEdictClassname(iEntity, EntityClassName, sizeof(EntityClassName));
 
-		if( StrEqual( EntityClassName, "weapon_c4" ) )
-		{
-			decl String:EntityTargetName[ 64 ];
-			GetEntPropString( entity, Prop_Data, "m_iName", EntityTargetName, sizeof( EntityTargetName ) );
+		if (g_iBombCounter > 0 && StrEqual(EntityClassName, "weapon_c4")) {
+			decl String:sEntityTargetName[64];
+			GetEntPropString(iEntity, Prop_Data, "m_iName", sEntityTargetName, sizeof(sEntityTargetName));
 			
-			if( StrStartWith( EntityTargetName, MENU_ITEM_ID ) )
-			{
-				if( GetClientButtons( client ) & IN_USE )
-				{
-					GetEntPropVector( entity, Prop_Send, "m_vecOrigin", g_TargetPosition );
-				}
-				else
-				{
-					AcceptEntityInput( entity, "Kill" );
+			if (StrContains(sEntityTargetName, BOMB_TARGETNAME) == 0) {
+				AcceptEntityInput(iEntity, "Kill");
 				
-					g_BombCounter--;
+				new iBomb = FindValueInArray(g_hTossedBombList, iEntity);
+				
+				if (iBomb != -1) {
+					RemoveFromArray(g_hTossedBombList, iBomb);
+				} else {
+					iBomb = FindValueInArray(g_hBombList, iEntity);
 					
-					if( g_BombCounter < 1 && gh_timer != INVALID_HANDLE )
-					{
-						TG_KillTimer( gh_timer );
+					if (iBomb != -1) {
+						RemoveFromArray(g_hBombList, iBomb);
 					}
+				}
+				
+				g_iBombCounter--;
+				
+				if (g_iBombCounter < 1 && g_hTimer != INVALID_HANDLE) {
+					g_hTimer = INVALID_HANDLE;
 				}
 			}
 		}
@@ -215,63 +267,142 @@ public Action:Event_BulletImpact(Handle:event,const String:name[],bool:dontBroad
 
 TurnTimerOn()
 {
-	if( gh_timer == INVALID_HANDLE )
-		gh_timer = CreateTimer( 0.2, Timer_BombLookEvent, _, TIMER_REPEAT );
+	if (g_hTimer == INVALID_HANDLE) {
+		g_hTimer = CreateTimer(0.2, Timer_BombLookEvent, _, TIMER_REPEAT);
+	}
 }
 
-public Action:Timer_BombLookEvent( Handle:timer, Handle:DataPack )
+public Action:Timer_BombLookEvent(Handle:hTimer)
 {
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !Client_IsIngame( i ) )
-			continue;
-		
-		ShowBombOwner( i, GetClientAimTarget( i, false ) );		
+	if (g_hTimer == INVALID_HANDLE) {
+		return Plugin_Stop;
 	}
+	
+	for (new i = 1; i <= MaxClients; i++) {
+		if (!Client_IsIngame(i)) {
+			continue;
+		}
 		
-	if( g_TargetPosition[ 0 ] != 0.0 && g_TargetPosition[ 1 ] != 0.0 && g_TargetPosition[ 2 ] != 0.0 )
-	{
-		new Float:PositionEnd[ 3 ];
-		PositionEnd = g_TargetPosition;
-		PositionEnd[ 2 ] += 64;
-		TE_SetupBeamPoints( g_TargetPosition, PositionEnd, g_TargetMaterial, g_TargetHalo, 2, 1, 0.2, 1.0, 1.0, 0, 0.0, { 255, 0, 0, 255 }, 1 );
-		TE_SendToAll();
+		ShowBombInfo(i, GetClientAimTarget(i, false));
 	}
 	
 	return Plugin_Continue;
 }
 
-ShowBombOwner( client, bomb )
+ShowBombInfo(iClient, iEntity)
 {
-	if( !Client_IsIngame( client ) )
+	if (!Client_IsIngame(iClient) || !IsValidEntity(iEntity) || g_iBombCounter == 0) {
 		return;
-	
-	if( !IsValidEdict( bomb ) )
-		return;
-	
-	decl String:EntityClassName[ 32 ];
-	GetEdictClassname( bomb, EntityClassName, sizeof( EntityClassName ) );
-
-	if( !StrEqual( EntityClassName, "weapon_c4" ) )
-		return;
-		
-	decl String:BombTargetName[ 64 ];
-	GetEntPropString( bomb, Prop_Data, "m_iName", BombTargetName, sizeof( BombTargetName ) );
-
-	if( ReplaceString( BombTargetName, sizeof( BombTargetName ), "BombToss-Raska-", "" ) != 1 )
-		return;
-	
-	new user = GetClientOfUserId( StringToInt( BombTargetName ) );
-	if( user != -1 )
-	{
-		if( g_TargetPosition[ 0 ] != 0.0 && g_TargetPosition[ 1 ] != 0.0 && g_TargetPosition[ 2 ] != 0.0 )
-		{
-			new Float:distance[ 3 ];
-			GetEntPropVector( bomb, Prop_Send, "m_vecOrigin", distance );
-			MakeVectorFromPoints( g_TargetPosition, distance, distance );
-			Client_PrintHintText( client, "Zahodil: %N (vzdálenost: %.2f)", user, GetVectorLength( distance ) );
-		}
-		else
-			Client_PrintHintText( client, "Zahodil: %N", user );
 	}
+	
+	if (g_iTargetEntity == iEntity) {
+		new iSize = GetArraySize(g_hTossedBombList);
+		
+		if (iSize < 1) {
+			return;
+		}
+		
+		new iNearest = GetArrayCell(g_hTossedBombList, 0);
+		new iFarthest = GetArrayCell(g_hTossedBombList, 0);
+		new Float:fNearest = GetBombDistance(iNearest);
+		new Float:fFarthest = fNearest;
+		new iBomb, Float:fDistance;
+		
+		for (new i = 1; i < iSize; i++) {
+			iBomb = GetArrayCell(g_hTossedBombList, i);
+			fDistance = GetBombDistance(iBomb);
+			
+			if (fDistance > fFarthest) {
+				fFarthest = fDistance;
+				iFarthest = iBomb;
+			} else if (fDistance < fNearest) {
+				fNearest = fDistance;
+				iNearest = iBomb;
+			}
+		}
+		
+		new String:sNearest[64], String:sFarthest[64];
+		GetEntPropString(iNearest, Prop_Data, "m_iName", sNearest, sizeof(sNearest));
+		GetEntPropString(iFarthest, Prop_Data, "m_iName", sFarthest, sizeof(sFarthest));
+
+		if (ReplaceString(sNearest, sizeof(sNearest), BOMB_TARGETNAME_USED, "") != 1) {
+			return;
+		}
+		
+		if (ReplaceString(sFarthest, sizeof(sFarthest), BOMB_TARGETNAME_USED, "") != 1) {
+			return;
+		}
+		
+		new String:sNearestUser[64], String:sFarthestUser[64];
+		new iNearestUser = GetClientOfUserId(StringToInt(sNearest));
+		new iFarthestUser = GetClientOfUserId(StringToInt(sFarthest));
+		
+		if (iNearestUser != -1) {
+			GetClientName(iNearestUser, sNearestUser, sizeof(sNearestUser));
+		}
+		
+		if (iFarthestUser != -1) {
+			GetClientName(iFarthestUser, sFarthestUser, sizeof(sFarthestUser));
+		}
+		
+		PrintHintText(iClient, "%T", "TargetInfo", iClient, sNearestUser, fNearest, sFarthestUser, fFarthest);
+		
+	} else {
+		
+		decl String:sClassName[64];
+		GetEdictClassname(iEntity, sClassName, sizeof(sClassName));
+
+		if (!StrEqual(sClassName, "weapon_c4")) {
+			return;
+		}
+		
+		decl String:sBombTargetName[64];
+		GetEntPropString(iEntity, Prop_Data, "m_iName", sBombTargetName, sizeof(sBombTargetName));
+
+		if (ReplaceString(sBombTargetName, sizeof(sBombTargetName), BOMB_TARGETNAME_USED, "") != 1) {
+			return;
+		}
+		
+		new iUser = GetClientOfUserId(StringToInt(sBombTargetName));
+		if (iUser != -1) {
+			decl String:sUser[64];
+			GetClientName(iUser, sUser, sizeof(sUser));
+			
+			if (IsTargetSpawned()) {
+				new Float:fDistance[3], Float:fBomb[3];
+				GetEntPropVector(iEntity, Prop_Send, "m_vecOrigin", fBomb);
+				MakeVectorFromPoints(g_fTargetPosition, fBomb, fDistance);
+				PrintHintText(iClient, "%T", "BombInfoWithTarget", iClient, sUser, GetVectorLength(fDistance));
+			} else {
+				PrintHintText(iClient, "%T", "BombInfo", iClient, sUser);
+			}
+		}	
+	}	
+}
+
+bool:IsTargetSpawned()
+{
+	return (g_iTargetEntity != -1);
+}
+
+RemoveTarget()
+{
+	g_fTargetPosition[0] = 0.0;
+	g_fTargetPosition[1] = 0.0;
+	g_fTargetPosition[2] = 0.0;
+	
+	if (IsValidEdict(g_iTargetEntity)) {
+		RemoveEdict(g_iTargetEntity);
+	}
+	
+	g_iTargetEntity = -1;
+}
+
+Float:GetBombDistance(iBomb)
+{
+	new Float:fDistance[3], Float:fBombPosition[3];
+	GetEntPropVector(iBomb, Prop_Send, "m_vecOrigin", fBombPosition);
+	MakeVectorFromPoints(g_fTargetPosition, fBombPosition, fDistance);
+	
+	return GetVectorLength(fDistance);
 }

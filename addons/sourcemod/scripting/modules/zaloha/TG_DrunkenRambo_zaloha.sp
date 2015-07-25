@@ -12,43 +12,20 @@ public Plugin:myinfo =
 	name = "[TG] DrunkenRambo",
 	author = "Raska",
 	description = "",
-	version = "0.7",
+	version = "0.5",
 	url = ""
 }
 
 new String:g_sOverlay[PLATFORM_MAX_PATH];
 new String:g_sSkin[PLATFORM_MAX_PATH];
 new String:g_sOriginalSkin[PLATFORM_MAX_PATH];
-new Handle:g_hReffilAmmo;
-new g_iRambo, g_iFog;
+new g_iRambo;
 new EngineVersion:g_iEngVersion;
-
-new Handle:g_hFogEnable, bool:g_bFogEnable;
-new Handle:g_hFogColor, String:g_sFogColor[18];
-new Handle:g_hFogDistance, Float:g_fFogDistance;
 
 public OnPluginStart()
 {
 	LoadTranslations("TG.DrunkenRambo-Raska.phrases");
 	g_iEngVersion = GetEngineVersion();
-	
-	g_hFogEnable = CreateConVar("tg_dr_fog_enable", "1", "Enable fog for rambo? (1 = yes, 0 = no)");
-	g_hFogColor = CreateConVar("tg_dr_fog_color", "255 0 0", "RGB color code of the fog.");
-	g_hFogDistance = CreateConVar("tg_dr_fog_distance", "448.0", "Distance from rambo, where the \"fog wall\" starts.", _, true, 64.0);
-	
-	HookConVarChange(g_hFogEnable, OnConVarChanged);
-	HookConVarChange(g_hFogColor, OnConVarChanged);
-	HookConVarChange(g_hFogDistance, OnConVarChanged);
-}
-
-public OnConVarChanged(Handle:hConVar, const String:sOldValue[], const String:sNewValue[])
-{
-	LoadConVars();
-}
-
-public OnConfigsExecuted()
-{
-	LoadConVars();
 }
 
 public OnLibraryAdded(const String:sName[])
@@ -108,17 +85,7 @@ public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[
 		return;
 	
 	ResetPack(hDataPack);
-	g_iRambo = ReadPackCell(hDataPack);	
-	
-	g_iFog = -1;
-	if (g_bFogEnable) {
-		g_iFog = CreateFog();
-	}
-	
-	if (g_hReffilAmmo != INVALID_HANDLE) {
-		KillTimer(g_hReffilAmmo);
-	}
-	g_hReffilAmmo = CreateTimer(7.0, Timer_RefillAmmo, _, TIMER_REPEAT);
+	g_iRambo = ReadPackCell(hDataPack);
 	
 	for (new i = 1; i <= MaxClients; i++)
 	{
@@ -129,31 +96,23 @@ public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[
 			SetEntityHealth(i, 10);
 			SetFovAndOverlay(i, 120, g_sOverlay);
 			
-			SetVariantString("TeamGames_DrunkenRambo_Fog");
-			AcceptEntityInput(i, "SetFogController");
-			
 			if (g_sSkin[0] != '\0' && IsModelPrecached(g_sSkin)) {
-				GetClientModel(i, g_sOriginalSkin, sizeof(g_sOriginalSkin));
-				SetEntityModel(i, g_sSkin);
+				GetClientModel(g_iRambo, g_sOriginalSkin, sizeof(g_sOriginalSkin));
+				SetEntityModel(g_iRambo, g_sSkin);
 			}
 			
 			switch (g_iEngVersion) {
 				case Engine_CSS: {
-					GivePlayerWeaponAndAmmo(i, "weapon_m249", 100, 0);
+					GivePlayerWeaponAndAmmo(i, "weapon_m249");
 				}
 				case Engine_CSGO: {
-					GivePlayerWeaponAndAmmo(i, "weapon_m249", 100, 0);
+					GivePlayerWeaponAndAmmo(i, "weapon_m249");
 				}
 			}
 		} else {
+			SetEntityHealth(i, 100);
 			GivePlayerItem(i, "weapon_knife");
-			
-			if (GetRandomInt(1, 5) == 1) {
-				GivePlayerItem(i, "weapon_taser");				
-				SetEntityHealth(i, 50);
-			} else {
-				SetEntityHealth(i, 100);
-			}
+			GivePlayerItem(i, "weapon_taser");
 		}
 	}
 }
@@ -188,74 +147,9 @@ public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, iWinners[], iWinnersCount
 			SetEntityModel(g_iRambo, g_sOriginalSkin);
 		}
 		
-		if (IsValidEntity(g_iFog)) {
-			AcceptEntityInput(g_iFog, "kill");
-			
-			new iFog = FindEntityByClassname(-1, "env_fog_controller");
-			if (iFog != -1 && Client_IsIngame(g_iRambo)) {
-				new String:sTargetName[64];
-				GetEntPropString(iFog, Prop_Data, "m_iName", sTargetName, sizeof(sTargetName));
-				
-				if (sTargetName[0] == '\0') {
-					strcopy(sTargetName, sizeof(sTargetName), "TeamGames_DrunkenRambo_OriginalFog");
-					DispatchKeyValue(iFog, "targetname", sTargetName);
-				}
-				
-				SetVariantString(sTargetName);
-				AcceptEntityInput(g_iRambo, "SetFogController");
-			}
-		}
-		g_iFog = -1;
-		
-		if (g_hReffilAmmo != INVALID_HANDLE) {
-			KillTimer(g_hReffilAmmo);
-		}
-		g_hReffilAmmo = INVALID_HANDLE;
-		
 		SetFovAndOverlay(g_iRambo, 90, "");
 		g_iRambo = 0;
 	}
-}
-
-public Action:Timer_RefillAmmo(Handle:hTimer)
-{
-	if (!TG_IsCurrentGameID(GAME_ID) || !Client_IsIngame(g_iRambo)) {
-		return Plugin_Stop;
-	}
-		
-	new String:sWeapon[64];
-	new iWeapon = Client_GetActiveWeaponName(g_iRambo, sWeapon, sizeof(sWeapon));
-	
-	if (iWeapon != INVALID_ENT_REFERENCE) {
-		if (g_iEngVersion == Engine_CSS && StrEqual(sWeapon, "weapon_m249")) {
-			SetPlayerWeaponAmmo(g_iRambo, iWeapon, 100, 0);
-		} else if (g_iEngVersion == Engine_CSGO && StrEqual(sWeapon, "weapon_m249")) {
-			SetPlayerWeaponAmmo(g_iRambo, iWeapon, 100, 0);
-		}
-	}
-	
-	return Plugin_Continue;
-}
-
-CreateFog()
-{
-	new iFog = CreateEntityByName("env_fog_controller");
-	
-	if (iFog != -1) {
-		DispatchKeyValue(iFog, "targetname", "TeamGames_DrunkenRambo_Fog");
-		DispatchKeyValue(iFog, "fogenable", "1");
-		DispatchKeyValue(iFog, "fogblend", "0");
-		DispatchKeyValue(iFog, "fogcolor", g_sFogColor);
-		DispatchKeyValue(iFog, "fogcolor2", g_sFogColor);
-		DispatchKeyValueFloat(iFog, "fogstart", 64.0);
-		DispatchKeyValueFloat(iFog, "fogend", g_fFogDistance);
-		DispatchKeyValueFloat(iFog, "fogmaxdensity", 1.0);
-		DispatchSpawn(iFog);
-		
-		AcceptEntityInput(iFog, "TurnOn");
-	}
-	
-	return iFog;
 }
 
 SetFovAndOverlay(iClient, iFov, const String:sOverlay[])
@@ -269,11 +163,4 @@ SetFovAndOverlay(iClient, iFov, const String:sOverlay[])
 	if (sOverlay[0] == '\0' || IsDecalPrecached(sOverlay)) {
 		Client_SetScreenOverlay(iClient, sOverlay);
 	}
-}
-
-LoadConVars()
-{
-	g_bFogEnable = GetConVarBool(g_hFogEnable);
-	g_fFogDistance = GetConVarFloat(g_hFogDistance);
-	GetConVarString(g_hFogColor, g_sFogColor, sizeof(g_sFogColor));
 }

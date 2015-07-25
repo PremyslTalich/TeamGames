@@ -4,168 +4,126 @@
 #include <smlib>
 #include <teamgames>
 
-#define GAME_NAME	"Smoke DodgeBall"
-#define GAME_ID		"DodgeBall-Raska"
+#define GAME_ID			"DodgeBall-Raska"
+#define GAME_GRAVITY	0.6
 
 public Plugin:myinfo =
 {
-	name = "TeamGamesModul_DodgeBall",
+	name = "TG_DodgeBall",
 	author = "Raska",
 	description = "",
-	version = "0.1",
+	version = "0.4",
 	url = ""
 }
 
-new Handle:g_timerDodgeBall = INVALID_HANDLE;
-
-public OnAllPluginsLoaded()
+public OnPluginStart()
 {
-	TG_RegGame( GAME_NAME, GAME_ID, { 2, 3 } );
+	LoadTranslations( "TG.DodgeBall-Raska.phrases" );
+	
+	if( LibraryExists( "TeamGames" ) && !TG_IsModuleReged( TG_Game, GAME_ID ) )
+		TG_RegGame( GAME_ID, TG_FiftyFifty, "%t", "GameName" );
 }
 
-public Action:TG_OnGameSelected( client, const String:id[] )
+public OnLibraryAdded( const String:name[] )
+{
+	if( StrEqual( name, "TeamGames" ) )
+		TG_RegGame( GAME_ID, TG_FiftyFifty, "%t", "GameName" );
+}
+
+public OnPluginEnd()
+{
+	TG_RemoveGame( GAME_ID );
+}
+
+public TG_OnMenuGameDisplay( const String:id[], iClient, String:name[] )
+{
+	if( StrEqual( id, GAME_ID ) )
+		Format( name, TG_MODULE_NAME_LENGTH, "%T", "GameName", iClient );
+}
+
+public Action:TG_OnGameSelected( const String:id[], iClient )
 {
 	if( !StrEqual( id, GAME_ID, true ) )
 		return Plugin_Continue;
-	
-	ModulStartMenu( client );
-	
+
+	TG_StartGame( iClient, GAME_ID );
+
 	return Plugin_Continue;
 }
 
-public Action:TG_OnGamePrepare( const String:id[] )
+
+public TG_OnGameStart( const String:id[], iClient, const String:GameSettings[], Handle:DataPack )
 {
 	if( !StrEqual( id, GAME_ID, true ) )
-		return Plugin_Continue;
-	
+		return;
+
 	for( new i = 1; i <= MaxClients; i++ )
 	{
-		if( TG_GetPlayerTeam( i ) == 1 || TG_GetPlayerTeam( i ) == 2 )
-		{
-			Client_RemoveAllWeapons( i, "", true );
-			SetEntityHealth( i, 1 );
-			SetEntityGravity( i, 0.6 );
-		}
+		if( !TG_IsPlayerRedOrBlue( i ) )
+			continue;
+		
+		SetEntityHealth( i, 1 );
+		SetEntityGravity( i, GAME_GRAVITY );
+		Client_GiveWeapon( i, "weapon_flashbang", true );
 	}
-	
-	return Plugin_Continue;
 }
 
-public Action:TG_OnGameStart( const String:id[] )
+public Action:Event_FlashBangDetonate( Handle:event, const String:name[], bool:dontBroadcast )
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return Plugin_Continue;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( TG_GetPlayerTeam( i ) == 1 || TG_GetPlayerTeam( i ) == 2 )
-		{
-			Client_GiveWeapon( i, "weapon_smokegrenade", true );
-		}
-	}
-	
-	g_timerDodgeBall = CreateTimer( 1.0, Timer_EquipDodgeBall, _, TIMER_REPEAT );	
-	
-	return Plugin_Continue;
-}
-
-public Action:Timer_EquipDodgeBall( Handle:timer )
-{		
 	if( !TG_IsCurrentGameID( GAME_ID ) )
-		return Plugin_Handled;
-	
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( TG_GetPlayerTeam( i ) == 1 || TG_GetPlayerTeam( i ) == 2 )
-		{
-			if( GetPlayerWeaponSlot( i, CS_SLOT_GRENADE ) == -1 )
-			{
-				Client_GiveWeapon( i, "weapon_smokegrenade", true );
-			}
-		}
-	}
-	
-	return Plugin_Handled;
-}
-
-public OnEntityCreated(entity, const String:classname[])
-{
-	if( TG_IsCurrentGameID( GAME_ID ) )
-	{	
-		if(StrEqual(classname, "env_particlesmokegrenade"))
-		{
-			SDKHook(entity, SDKHook_Spawn, OnSmokeSpawned);
-		}
-	}
-}
-
-public Action:OnSmokeSpawned(entity, activator, caller, UseType:type, Float:value)
-{
-	RemoveEdict(entity);
-}
-
-public Action:TG_OnTeamSurvive( team, const String:id[] )
-{
-	if( !StrEqual( id, GAME_ID, true ) )
 		return Plugin_Continue;
-	
-	TG_StopGame( team, 0 );
-	
+
+	new iClient = GetClientOfUserId( GetEventInt( event, "userid" ) );
+
+	if( TG_IsPlayerRedOrBlue( iClient ) )
+		Client_GiveWeapon( iClient, "weapon_flashbang", true );
+
 	return Plugin_Continue;
 }
 
-public Action:TG_OnGameEnd( team, Handle:winners, const String:id[] )
+public TG_OnTeamEmpty( const String:id[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger )
 {
 	if( !StrEqual( id, GAME_ID, true ) )
-		return Plugin_Continue;
+		return;
+	
+	TG_StopGame( TG_GetOppositeTeam( team ) );
+}
+
+public TG_OnGameEnd( const String:id[], TG_Team:iTeam, winners[], winnersCount, Handle:DataPack )
+{
+	if( !StrEqual( id, GAME_ID, true ) )
+		return;
 	
 	for( new i = 1; i <= MaxClients; i++ )
 	{
-		if( TG_GetPlayerTeam( i ) == 1 || TG_GetPlayerTeam( i ) == 2 )
-		{
-			Client_RemoveAllWeapons( i, "", true );
-			Client_GiveWeapon( i, "weapon_knife", true );
-			SetEntityHealth( i, 100 );
-			TG_SetPlayerTeam( -1, i, NoneTeam );
-		}
+		if( !TG_IsPlayerRedOrBlue( i ) )
+			continue;
 		
-		if( Client_IsValid( i, true ) )
-			SetEntityGravity( i, 1.0 )
+		SetEntityGravity( i, 1.0 )
 	}
 	
-	if( g_timerDodgeBall != INVALID_HANDLE )
+	return;
+}
+
+public OnEntityCreated( entity, const String:classname[] )
+{
+    if( StrEqual( classname, "flashbang_projectile" ) )
+        CreateTimer( 1.5, Timer_RemoveFlashbang, entity );
+}
+
+public Action:Timer_RemoveFlashbang( Handle:hTimer, any:entity )
+{
+	if( !TG_IsCurrentGameID( GAME_ID ) || !IsValidEntity( entity ) )
+		return Plugin_Continue;
+
+	new owner = GetEntPropEnt( entity, Prop_Send, "m_hOwnerEntity" );
+
+	if( TG_IsPlayerRedOrBlue( owner ) )
 	{
-		KillTimer( g_timerDodgeBall );
-		g_timerDodgeBall = INVALID_HANDLE;
+		AcceptEntityInput( entity, "Kill" );
+
+		Client_GiveWeapon( owner, "weapon_flashbang", true );
 	}
 	
 	return Plugin_Continue;
-}
-
-ModulStartMenu( client )
-{
-	new Handle:menu = CreateMenu( ModulStartMenu_Handler );
-
-	SetMenuTitle( menu, "DodgeBall - začít hru:" );
-	AddMenuItem( menu, "START_GAME", "Začít hru*" );
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
-}
-
-public ModulStartMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
-{
-	if( action == MenuAction_Cancel && param2 == MenuCancel_ExitBack )
-	{
-		TG_ShowGamesMenu( client );
-	}
-	else if( action == MenuAction_Select )
-	{
-		decl String:info[ 64 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
-		
-		if( StrEqual( info, "START_GAME" ) )
-		{
-			TG_StartGame( client, GAME_ID );
-		}
-	}
 }

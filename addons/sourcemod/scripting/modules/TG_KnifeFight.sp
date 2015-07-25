@@ -1,104 +1,110 @@
 #include <sourcemod>
 #include <smlib>
 #include <teamgames>
+#include <menu-stocks>
 
-#define DEFAULT_GAME_NAME	"Knife fight"
-#define GAME_ID				"KnifeFight-Raska"
-
-new String:g_GameName[ 64 ];
+#define GAME_ID_FIFTYFIFTY	"KnifeFight-FiftyFifty"
+#define GAME_ID_REDONLY		"KnifeFight-RedOnly"
 
 public Plugin:myinfo =
 {
-	name = "TG_KnifeFight",
+	name = "[TG] KnifeFight",
 	author = "Raska",
 	description = "",
 	version = "0.5",
 	url = ""
 }
 
-public OnLibraryAdded( const String:name[] )
+public OnPluginStart()
 {
-	if( !StrEqual( name, "TeamGames" ) )
-		return;
+	LoadTranslations("TG.KnifeFight-Raska.phrases");
+}
 
-	TG_RegGame( GAME_ID, DEFAULT_GAME_NAME );
-	TG_GetGameName( GAME_ID, g_GameName, sizeof( g_GameName ) );
+public OnLibraryAdded(const String:sName[])
+{
+	if (StrEqual(sName, "TeamGames")) {
+		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY))
+			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
+		
+		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY))
+			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
+	}
 }
 
 public OnPluginEnd()
 {
-	TG_UnRegGame( GAME_ID );
+	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
-public Action:TG_OnGameSelected( const String:id[], client )
+public TG_OnMenuGameDisplay(const String:sID[], iClient, String:name[])
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return Plugin_Continue;
-	
-	SetHPMenu( client );
+	if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", iClient);
+	} else if (StrEqual(sID, GAME_ID_REDONLY)) {
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", iClient);
+	}
+}
+
+public Action:TG_OnGameSelected(const String:sID[], iClient)
+{
+	if (StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY))
+		SetHPMenu(iClient, sID);
 	
 	return Plugin_Continue;
 }
 
-public TG_OnGamePrepare( const String:id[], client, const String:CustomName[], Handle:DataPack )
+public TG_OnGamePrepare(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
 {
-	if( !StrEqual( id, GAME_ID, true ) )
+	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 	
-	ResetPack( DataPack );
-	new hp = ReadPackCell( DataPack );
+	ResetPack(DataPack);
+	new hp = ReadPackCell(DataPack);
 	
-	for( new i = 1; i <= MaxClients; i++ )
+	for (new i = 1; i <= MaxClients; i++)
 	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
+		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 		
-		Client_GiveWeapon( i, "weapon_knife", true );
-		SetEntityHealth( i, hp );
+		Client_GiveWeapon(i, "weapon_knife", true);
+		SetEntityHealth(i, hp);
 	}
-	
-	return;
 }
 
-public TG_OnLastInTeamDie( const String:id[], TG_Team:team )
+SetHPMenu(iClient, const String:sID[])
 {
-	if( !StrEqual( id, GAME_ID, true ) )
-		return;
+	new Handle:hMenu = CreateMenu(SetHPMenu_Handler);
+
+	SetMenuTitle(hMenu, "%t:", "ChooseHP");
+	AddMenuItem(hMenu, "35", "35 HP");
+	AddMenuItem(hMenu, "100", "100 HP");
+	AddMenuItem(hMenu, "300", "300 HP");
 	
-	TG_StopGame( TG_GetOppositeTeam( team ), true, true );
+	PushMenuString(hMenu, "_GAME_ID_", sID);
 	
-	return;
+	SetMenuExitBackButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
 }
 
-SetHPMenu( client )
+public SetHPMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 {
-	new Handle:menu = CreateMenu( SetHPMenu_Handler );
-
-	SetMenuTitle( menu, "Knife fight - vyberte počet HP:" );
-	AddMenuItem( menu, "35", "35 HP" );
-	AddMenuItem( menu, "100", "100 HP" );
-	AddMenuItem( menu, "300", "300 HP" );
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
-}
-
-public SetHPMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
-{
-	if( action == MenuAction_Cancel && param2 == MenuCancel_ExitBack )
+	if (iAction == MenuAction_Select)
 	{
-		TG_ShowGamesMenu( client );
-	}
-	else if( action == MenuAction_Select )
-	{
-		decl String:info[ 64 ], String:CustomName[ 64 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
+		new String:info[64], String:sSettings[64], String:sID[TG_MODULE_ID_LENGTH];
+		GetMenuItem(hMenu, iKey, info, sizeof(info), _, sSettings, 64);
 		
-		new Handle:pack = CreateDataPack();
-		new hp = StringToInt( info );
+		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
+			return;
+		}
 		
-		WritePackCell( pack, hp );
-		Format( CustomName, sizeof( CustomName ), "%s{settings} - %d HP", g_GameName, hp );
+		new Handle:hDataPack = CreateDataPack();
+		WritePackCell(hDataPack, StringToInt(info));
 		
-		TG_StartGame( client, GAME_ID, CustomName, pack );
+		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
+			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sSettings, hDataPack);
+		} else {
+			TG_StartGame(iClient, GAME_ID_REDONLY, sSettings, hDataPack);
+		}
 	}
 }

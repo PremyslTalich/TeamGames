@@ -1,0 +1,18 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"en"		"Reload battle"
+		"cze"		"Nabíjená"
+	}
+	"GameName-RedOnly"
+	{
+		"en"		"Reload battle"
+		"cze"		"Nabíjená"
+	}
+	"ChooseWeapon"
+	{
+		"en"		"choose weapon"
+		"cze"		"vyberte zbraň"
+	}
+}

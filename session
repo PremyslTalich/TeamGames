@@ -1,0 +1,14 @@
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="6">
+            <File firstVisibleLine="123" xOffset="0" scrollWidth="2219" startPos="8238" endPos="8238" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\GITs\TeamGames\addons\sourcemod\scripting\TeamGames.sp" backupFilePath="" originalFileLastModifTimestamp="1432941578" />
+            <File firstVisibleLine="40" xOffset="0" scrollWidth="1120" startPos="1109" endPos="1109" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\SourcePawn\moje\include\equipmentstorage.inc" backupFilePath="" originalFileLastModifTimestamp="1425391656" />
+            <File firstVisibleLine="74" xOffset="0" scrollWidth="889" startPos="2067" endPos="2067" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\SourcePawn\moje\include\teamgames-stocks.inc" backupFilePath="" originalFileLastModifTimestamp="1433194139" />
+            <File firstVisibleLine="663" xOffset="0" scrollWidth="2016" startPos="19143" endPos="19143" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\GITs\TeamGames\addons\sourcemod\scripting\Api.sp" backupFilePath="" originalFileLastModifTimestamp="1433161318" />
+            <File firstVisibleLine="64" xOffset="0" scrollWidth="903" startPos="1492" endPos="1492" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\GITs\TeamGames\addons\sourcemod\scripting\modules\TG_Machines.sp" backupFilePath="" originalFileLastModifTimestamp="1433174873" />
+            <File firstVisibleLine="32" xOffset="0" scrollWidth="1218" startPos="1533" endPos="1533" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\GITs\TeamGames\addons\sourcemod\scripting\modules\TG_TaserMania.sp" backupFilePath="" originalFileLastModifTimestamp="1433246100" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1534" startPos="801" endPos="801" selMode="0" lang="sourcemod" encoding="-1" filename="D:\Dropbox\SourcePawn\moje\Test-SetAmmo.sp" backupFilePath="" originalFileLastModifTimestamp="1433320578" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>

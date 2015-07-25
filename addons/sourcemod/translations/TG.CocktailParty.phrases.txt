@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"en"		"Cocktail party"
+		"cze"		"Cocktail párty"
+	}
+}

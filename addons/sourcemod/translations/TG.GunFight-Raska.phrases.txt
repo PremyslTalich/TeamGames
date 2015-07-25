@@ -1,0 +1,18 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"en"		"Gun fight"
+		"cze"		"Přestřelka"
+	}
+	"GameName-RedOnly"
+	{
+		"en"		"Gun fight"
+		"cze"		"Přestřelka"
+	}
+	"ChooseWeapon"
+	{
+		"en"		"choose weapon"
+		"cze"		"vyberte zbraň"
+	}
+}

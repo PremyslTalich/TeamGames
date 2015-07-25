@@ -1,0 +1,13 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"en"		"Drunken Rambo"
+		"cze"		"Opilý Rambo"
+	}
+	"ChooseRambo"
+	{
+		"en"		"Choose Rambo:"
+		"cze"		"Vyberte Ramba:"
+	}
+}

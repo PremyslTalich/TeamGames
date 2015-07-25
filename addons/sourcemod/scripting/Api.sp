@@ -1,1245 +1,1336 @@
 //------------------------------------------------------------------------------------------------
 // Natives
-public Native_GetPlayerTeam( Handle:plugin, numParams )
+public Native_GetPlayerTeam(Handle:hPlugin, iNumParams)
 {
-	new client = GetNativeCell( 1 );
+	new iClient = GetNativeCell(1);
 
-	if( !Client_IsIngame( client ) || !IsPlayerAlive( client ) || GetClientTeam( client ) != CS_TEAM_T )
-		return _:ErrorTeam;
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_T)
+		return _:TG_ErrorTeam;
 
-	return _:g_PlayerData[ client ][ Team ];
+	return _:g_PlayerData[iClient][Team];
 }
 
-public Native_SetPlayerTeam( Handle:plugin, numParams )
+public Native_SetPlayerTeam(Handle:hPlugin, iNumParams)
 {
-	if(	SwitchToTeam( GetNativeCell( 1 ), GetNativeCell( 2 ), TG_Team:GetNativeCell( 3 ) ) != 1 )
+	new iClient = GetNativeCell(1);
+	new iTarget = GetNativeCell(2);
+	new TG_Team:iTeam = TG_Team:GetNativeCell(3);
+	
+	if (SwitchToTeam(iClient, iTarget, iTeam) != 1)
 		return false;
 
 	return true;
 }
 
-public Native_IsPlayerRedOrBlue( Handle:plugin, numParams )
+public Native_IsPlayerRedOrBlue(Handle:hPlugin, iNumParams)
 {
-	new client = GetNativeCell( 1 );
+	new iClient = GetNativeCell(1);
 
-	if( !Client_IsIngame( client ) || !IsPlayerAlive( client ) || GetClientTeam( client ) != CS_TEAM_T )
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_T)
 		return false;
 	
-	return TG_IsTeamRedOrBlue( g_PlayerData[ client ][ Team ] );
+	return TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]);
 }
 
-public Native_InOppositeTeams( Handle:plugin, numParams )
+public Native_InOppositeTeams(Handle:hPlugin, iNumParams)
 {
-	new client1 = GetNativeCell( 1 );
-	new client2 = GetNativeCell( 2 );
+	new iClient1 = GetNativeCell(1);
+	new iClient2 = GetNativeCell(2);
 
-	if( g_PlayerData[ client1 ][ Team ] == NoneTeam )
+	if (!Client_IsIngame(iClient1) || !Client_IsIngame(iClient2))
+		return false;
+	
+	if (g_PlayerData[iClient1][Team] == TG_NoneTeam)
 		return false;
 
-	if( g_PlayerData[ client2 ][ Team ] == NoneTeam )
+	if (g_PlayerData[iClient2][Team] == TG_NoneTeam)
 		return false;
 
-	if( g_PlayerData[ client1 ][ Team ] != g_PlayerData[ client2 ][ Team ] )
+	if (g_PlayerData[iClient1][Team] != g_PlayerData[iClient2][Team])
 		return true;
 	else
 		return false;
 }
 
-public Native_GetTeamFromString( Handle:plugin, numParams )
+public Native_GetTeamFromString(Handle:hPlugin, iNumParams)
 {
-	decl String:team[ 64 ];	
-	GetNativeString( 1, team, sizeof( team ) );
+	decl String:iTeam[64];	
+	GetNativeString(1, iTeam, sizeof(iTeam));
 	
-	if( StrEqual( team, "RedTeam", false ) || StrEqual( team, "red", false ) || team[ 0 ] == '1' )
-		return _:RedTeam;
-	else if( StrEqual( team, "BlueTeam", false ) || StrEqual( team, "blue", false ) || team[ 0 ] == '2' )
-		return _:BlueTeam;
-	else if( StrEqual( team, "NoneTeam", false ) || StrEqual( team, "none", false ) || team[ 0 ] == '0' )
-		return _:NoneTeam;
+	if (StrEqual(iTeam, "RedTeam", false) || StrEqual(iTeam, "red", false) || iTeam[0] == '1')
+		return _:TG_RedTeam;
+	else if (StrEqual(iTeam, "BlueTeam", false) || StrEqual(iTeam, "blue", false) || iTeam[0] == '2')
+		return _:TG_BlueTeam;
+	else if (StrEqual(iTeam, "NoneTeam", false) || StrEqual(iTeam, "none", false) || iTeam[0] == '0')
+		return _:TG_NoneTeam;
 	else
-		return _:ErrorTeam;
+		return _:TG_ErrorTeam;
 }
 
-public Native_SwitchRandomRedToBlue( Handle:plugin, numParams )
+public Native_SwitchRandomRedToBlue(Handle:hPlugin, iNumParams)
 {
-	new client = TG_GetRandomClient( RedTeam );
+	new iClient = TG_GetRandomClient(TG_RedTeam);
 
-	if( !Client_IsIngame( client ) || !IsPlayerAlive( client ) )
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient))
 		return 0;
 
-	if(	SwitchToTeam( -1, client, BlueTeam ) != 0 )
-		return ( -1 * client );
+	if (	SwitchToTeam(-1, iClient, TG_BlueTeam) != 0)
+		return (-1 * iClient);
 
 	#if defined DEBUG
-	LogMessage( "[TG DEBUG] SwitchRandomRedToBlue switched player %N.", client );
+	LogMessage("[TG DEBUG] SwitchRandomRedToBlue switched player %N.", iClient);
 	#endif
 
-	return client;
+	return iClient;
 }
 
-public Native_IsGameTypeAvailable( Handle:plugin, numParams )
+public Native_IsGameTypeAvailable(Handle:hPlugin, iNumParams)
 {
-	return IsGameTypeAvailable( TG_GameType:GetNativeCell( 1 ) );
+	new TG_GameType:iGameType = TG_GameType:GetNativeCell(1); 
+	return IsGameTypeAvailable(iGameType);
 }
 
-public Native_LoadPlayerWeapons( Handle:plugin, numParams )
+public Native_LoadPlayerWeapons(Handle:hPlugin, iNumParams)
 {
-	new client = GetNativeCell( 1 );
+	new iClient = GetNativeCell(1);
 
-	if( !Client_IsIngame( client ) || !IsPlayerAlive( client ) || GetClientTeam( client ) == CS_TEAM_CT )
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) == CS_TEAM_CT)
 		return false;
 
-	PlayerEquipmentLoad( client );
+	PlayerEquipmentLoad(iClient);
 
 	return true;
 }
 
-public Native_FenceCreate( Handle:plugin, numParams )
+public Native_FenceCreate(Handle:hPlugin, iNumParams)
 {
-	new Float:a[ 3 ], Float:c[ 3 ];
+	new Float:fA[3], Float:fC[3];
 
-	GetNativeArray( 1, a, 3 );
-	GetNativeArray( 2, c, 3 );
+	GetNativeArray(1, fA, 3);
+	GetNativeArray(2, fC, 3);
 
-	CreateFence( a, c );
+	CreateFence(fA, fC);
 }
 
-public Native_FenceDestroy( Handle:plugin, numParams )
+public Native_FenceDestroy(Handle:hPlugin, iNumParams)
 {
 	DestroyFence();
 }
 
-public Native_FencePlayerCross( Handle:plugin, numParams )
+public Native_FencePlayerCross(Handle:hPlugin, iNumParams)
 {
-	FencePunishPlayer( GetNativeCell( 1 ), bool:GetNativeCell( 2 ) );
+	new bool:bCallForward = bool:GetNativeCell(2);
+	new iClient = GetNativeCell(2);
+	FencePunishPlayer(iClient, bCallForward);
 }
 
-public Native_TG_SpawnMark( Handle:plugin, numParams )
+public Native_TG_SpawnMark(Handle:hPlugin, iNumParams)
 {
-	new Float:pos[ 3 ];
+	new Float:fPos[3];
 
-	new client = GetNativeCell( 1 );
-	new TG_Team:team = TG_Team:GetNativeCell( 2 );
-	GetNativeArray( 3, pos, 3 );
-	new Float:time = GetNativeCell( 4 );
-	new bool:fireEvent = GetNativeCell( 5 );
-	new bool:count = GetNativeCell( 6 );
+	new iClient = GetNativeCell(1);
+	new TG_Team:iTeam = TG_Team:GetNativeCell(2);
+	GetNativeArray(3, fPos, 3);
+	new Float:fTime = GetNativeCell(4);
+	new bool:bFireEvent = GetNativeCell(5);
+	new bool:bCount = GetNativeCell(6);
 
-	return SpawnMark( client, team, pos[ 0 ], pos[ 1 ], pos[ 2 ], time, count, fireEvent );
+	return SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2], fTime, bCount, bFireEvent);
 }
 
-public Native_GetTeamCount( Handle:plugin, numParams )
+public Native_GetTeamCount(Handle:hPlugin, iNumParams)
 {
-	return GetCountPlayersInTeam( TG_Team:GetNativeCell( 1 ) );
+	new TG_Team:iTeam = TG_Team:GetNativeCell(1);
+	return GetCountPlayersInTeam(iTeam);
 }
 
-public Native_ClearTeam( Handle:plugin, numParams )
+public Native_ClearTeam(Handle:hPlugin, iNumParams)
 {
-	ClearTeam( TG_Team:GetNativeCell( 1 ) );
+	new TG_Team:iTeam = TG_Team:GetNativeCell(1);
+	ClearTeam(iTeam);
 }
 
-public Native_SetTeamsLock( Handle:plugin, numParams )
+public Native_SetTeamsLock(Handle:hPlugin, iNumParams)
 {
-	g_TeamsLock = GetNativeCell( 1 );
+	g_bTeamsLock = GetNativeCell(1);
 }
 
-public Native_GetTeamsLock( Handle:plugin, numParams )
+public Native_GetTeamsLock(Handle:hPlugin, iNumParams)
 {
-	return g_TeamsLock;
+	return g_bTeamsLock;
 }
 
-public Native_RegGame( Handle:plugin, numParams )
+public Native_RegGame(Handle:hPlugin, iNumParams)
 {
-	if( !ExistMenuItemsConfigFile() )
-	{
-		ThrowNativeError( 10, "Game registration Failed! Config file (ConVar \"tg_modules_config\") must exist! (Error - \"TG_RegGame #10\")" );
-		return 10;
+	if (!ExistMenuItemsConfigFile()) {
+		return ThrowNativeError(10, "Game registration Failed! Config file (ConVar \"tg_modules_config\") must exist! (Error - \"TG_RegGame #10\")");
 	}
 
-	if( g_GameListEnd > MAX_GAMES - 1 )
-	{
-		ThrowNativeError( 9, "Game registration Failed! Reached maximum count of games! (Error - \"TG_RegGame #9\")" );
-		return 9;
+	if (g_iGameListEnd > MAX_GAMES - 1) {
+		return ThrowNativeError(9, "Game registration Failed! Reached maximum count of games! (Error - \"TG_RegGame #9\")");
 	}
 
-	decl String:name[ 64 ], String:id[ 64 ], String:flag[ 16 ];
+	decl String:sName[TG_MODULE_NAME_LENGTH], String:sID[TG_MODULE_ID_LENGTH];
 
-	if( GetNativeString( 1, id, sizeof( id ) ) != SP_ERROR_NONE )
-	{
-		ThrowNativeError( 1, "Game registration Failed! Couldn't get Arg1 (Game ID)! (Error - \"TG_RegGame #1\")" );
-		return 1;
+	if (GetNativeString(1, sID, sizeof(sID)) != SP_ERROR_NONE) {
+		return ThrowNativeError(1, "Game registration Failed! Couldn't get Arg1 (Game ID)! (Error - \"TG_RegGame #1\")");
 	}
 
-	if( IsGameDisabled( id ) )
+	if (IsGameDisabled(sID))
 		return 5;
 
-	if( StrStartWith( id, "Core_" ) )
-	{
-		ThrowNativeError( 4, "Game registration Failed! Game ID can't start with \"Core_\" - it's reserved for core! (Error - \"TG_RegGame #4\")" );
-		return 4;
+	if (StrContains(sID, "Core_", false) == 0) {
+		return ThrowNativeError(4, "Game registration Failed! Game ID can't start with \"Core_\" - it's reserved for core! (Error - \"TG_RegGame #4\")");
 	}
 
-	if( ExistGame( id ) )
-	{
-		ThrowNativeError( 3, "Game registration Failed! Game ID (\"%s\") must be unique! (Error - \"TG_RegGame #3\")", id );
-		return 3;
+	if (ExistGame(sID)) {
+		return ThrowNativeError(3, "Game registration Failed! Game ID (\"%s\") must be unique! (Error - \"TG_RegGame #3\")", sID);
+	}
+	
+	if (FormatNativeString(0, 3, 4, sizeof(sName), _, sName) != SP_ERROR_NONE) {
+		return ThrowNativeError(2, "Game registration Failed! Couldn't get Arg2 (Game sName)! (Error - \"TG_RegGame #2\")");
+	}
+	
+	new TG_GameType:iType = GetNativeCell(2);
+
+	new iIndex = GetGameIndex(sID, false);
+
+	if (iIndex == -1) {
+		iIndex = g_iGameListEnd;
+		g_iGameListEnd++;
+
+		strcopy(g_GameList[iIndex][Id], TG_MODULE_ID_LENGTH, sID);
+		strcopy(g_GameList[iIndex][DefaultName], TG_MODULE_NAME_LENGTH, sName);
+		SaveGameToConfig(sID, sName);
+		
+		g_GameList[iIndex][Visible] = GetConVarBool(g_hModuleDefVisibility);
 	}
 
-	if( GetNativeString( 2, name, sizeof( name ) ) != SP_ERROR_NONE )
-	{
-		ThrowNativeError( 2, "Game registration Failed! Couldn't get Arg2 (Game name)! (Error - \"TG_RegGame #2\")" );
-		return 2;
-	}
-
-	new TG_GameType:type = GetNativeCell( 3 );
-
-	strcopy( flag, sizeof( flag ), "" );
-
-	new index = GetGameIndex( id, false );
-
-	if( index == -1 )
-	{
-		index = g_GameListEnd;
-		g_GameListEnd++;
-
-		strcopy( g_GameList[ index ][ Id ], 64, id );
-		strcopy( g_GameList[ index ][ Name ], 64, name );
-		strcopy( g_GameList[ index ][ RequiredFlag ], 16, flag );
-		SaveGameToConfig( id, name, flag );
-	}
-
-	g_GameList[ index ][ Used ] = true;
-	g_GameList[ index ][ GameType ] = type;
-
+	g_GameList[iIndex][Used] = true;	
+	g_GameList[iIndex][GameType] = iType;
+	
 	#if defined DEBUG
-	LogMessage( "[TG DEBUG] Registred game index = '%d', id = '%s', name = '%s', flag = '%s', type = '%d'. (g_GameListEnd = '%d')", index, g_GameList[ index ][ Id ], g_GameList[ index ][ Name ], g_GameList[ index ][ RequiredFlag ], g_GameList[ index ][ GameType ], g_GameListEnd );
+	LogMessage("[TG DEBUG] Registred game index = '%d', id = '%s', defaultname = '%s, type = '%d'. (g_iGameListEnd = '%d')", iIndex, g_GameList[iIndex][Id], g_GameList[iIndex][DefaultName], g_GameList[iIndex][GameType], g_iGameListEnd);
 	#endif
 	
 	return 0;
 }
 
-public Native_UnRegGame( Handle:plugin, numParams )
+public Native_RemoveGame(Handle:hPlugin, iNumParams)
 {
-	decl String:id[ 64 ];
+	decl String:sID[TG_MODULE_ID_LENGTH];
 
-	if( GetNativeString( 1, id, sizeof( id ) ) != SP_ERROR_NONE )
-	{
-		ThrowNativeError( 1, "Game unregistration Failed! Couldn't get Arg2 (Game ID)! (Error - \"TG_UnRegGame #1\")" );
-		return 1;
+	if (GetNativeString(1, sID, sizeof(sID)) != SP_ERROR_NONE) {
+		return ThrowNativeError(1, "Game unregistration Failed! Couldn't get Arg2 (Game ID)! (Error - \"TG_RemoveGame #1\")");
 	}
 
-	if( !ExistGame( id ) )
-	{
-		ThrowNativeError( 2, "Game unregistration Failed! No game with \"GAME_ID\" = \"%s\" found! (Error - \"TG_UnRegGame #2\")", id );
-		return 2;
+	// if (!ExistGame(sID)) {
+		// return ThrowNativeError(2, "Game unregistration Failed! No game with \"GAME_ID\" = \"%s\" found! (Error - \"TG_RemoveGame #2\")", sID);
+	// }
+	
+	if (ExistGame(sID)) {
+		g_GameList[GetGameIndex(sID)][Used] = false;
 	}
-
-	g_GameList[ GetGameIndex( id ) ][ Used ] = false;
 
 	return 0;
 }
 
-public Native_GetRegGames( Handle:plugin, numParams )
+public Native_GetAddedGames(Handle:hPlugin, iNumParams)
 {
-	new Handle:GamesArray = INVALID_HANDLE;
+	new Handle:hGames = INVALID_HANDLE;
 
-	GamesArray = CreateArray( 64 );
+	hGames = CreateArray(TG_MODULE_ID_LENGTH);
 
-	for( new i = 0; i < MAX_GAMES; i++ )
-	{
-		if( !g_GameList[ i ][ Used ] )
+	for (new i = 0; i < MAX_GAMES; i++) {
+		if (!g_GameList[i][Used])
 			continue;
 
-		PushArrayString( GamesArray, g_GameList[ i ][ Id ] );
+		PushArrayString(hGames, g_GameList[i][Id]);
 	}
 
-	return _:GamesArray;
+	return _:hGames;
 }
 
-public Native_ShowMainMenu( Handle:plugin, numParams )
+public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 {
-	new client = GetNativeCell( 1 );
-
-	if( Client_IsIngame( client ) )
-		MainMenu( client );
+	new iClient = GetNativeCell(1);
+	new TG_Team:iTeam = TG_Team:GetNativeCell(2);
+	new Function:fCallBack = Function:GetNativeCell(3);
+	
+	decl String:CustomTitle[64];	
+	FormatNativeString(0, 4, 5, sizeof(CustomTitle), _, CustomTitle);
+	
+	if (!TG_IsTeamRedOrBlue(iTeam))
+		return false;
+	
+	if (TG_GetTeamCount(iTeam) > 1) {
+		new Handle:hMenu = CreateMenu(PlayerSelectMenu_Handler);
+		decl String:sUserId[32];
+		
+		if (CustomTitle[0] == '\0')		
+			SetMenuTitle(hMenu, "%T", "MenuPlayerSelect-Title", iClient);
+		else
+			SetMenuTitle(hMenu, CustomTitle);
+		
+		AddMenuItemFormat(hMenu, "--RANDOM--", _, "%T", "MenuPlayerSelect-Random", iClient);
+		
+		for (new i = 1; i <= MaxClients; i++) {
+			if (!Client_IsIngame(i) || TG_GetPlayerTeam(i) != iTeam)
+				continue;
+			
+			FormatEx(sUserId, sizeof(sUserId), "%d", GetClientUserId(i));
+			AddMenuItemFormat(hMenu, sUserId, _, "%N", i);
+		}
+		
+		PushMenuCell(hMenu, "--TEAM--", _:iTeam);
+		PushMenuCell(hMenu, "--PLUGIN--", _:hPlugin);
+		PushMenuCell(hMenu, "--FUNCTION--", _:fCallBack);
+		
+		SetMenuExitBackButton(hMenu, true);
+		DisplayMenu(hMenu, iClient, 30);
+	} else {
+		new iUser = 0;
+		
+		if (TG_GetTeamCount(iTeam) == 1) {
+			for (new i = 1; i <= MaxClients; i++) {
+				if (Client_IsIngame(i) && TG_GetPlayerTeam(i) == iTeam) {
+					iUser = i;
+					break;
+				}
+			}			
+		}
+		
+		Call_StartFunction(hPlugin, fCallBack);
+		Call_PushCell(iUser);
+		Call_PushCell(false);
+		Call_Finish();
+	}
+	
+	return true;
 }
 
-public Native_ShowGamesMenu( Handle:plugin, numParams )
+public PlayerSelectMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 {
-	new client = GetNativeCell( 1 );
-
-	if( Client_IsIngame( client ) )
-		GamesMenu( client );
+	if (iAction == MenuAction_Select) {
+		new iUser;
+		new bool:bRandom = false;
+		new TG_Team:iTeam = TG_Team:GetMenuCell(hMenu, "--TEAM--");
+		new Handle:hPlugin = Handle:GetMenuCell(hMenu, "--PLUGIN--");
+		new Function:fCallBack = Function:GetMenuCell(hMenu, "--FUNCTION--");
+		decl String:sUserId[32];
+		GetMenuItem(hMenu, iKey, sUserId, sizeof(sUserId));
+		
+		if (StrEqual("--RANDOM--", sUserId)) {
+			iUser = TG_GetRandomClient(iTeam);
+			bRandom = true;
+		} else {
+			iUser = GetClientOfUserId(StringToInt(sUserId));
+		}
+		
+		Call_StartFunction(hPlugin, fCallBack);
+		Call_PushCell(iClient);
+		Call_PushCell(iUser);
+		Call_PushCell(bRandom);
+		Call_Finish();
+	}
+	// else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack)
+	// {
+		// MainMenu(iClient);
+	//}
 }
 
-public Native_ShowTeamsMenu( Handle:plugin, numParams )
+public Native_FakeSelect(Handle:hPlugin, iNumParams)
 {
-	new client = GetNativeCell( 1 );
+	new iStarter = GetNativeCell(1);
+	new TG_ModuleType:iType = GetNativeCell(2);
+	decl String:sID[TG_MODULE_ID_LENGTH];
 
-	if( Client_IsIngame( client ) )
-		TeamsMenu( client );
+	if (GetNativeString(3, sID, sizeof(sID)) != SP_ERROR_NONE) {
+		return ThrowNativeError(1, "Fake select failed! Couldn't get Arg3 (Module ID)!");
+	}
+	
+	if (iType == TG_Game) {
+		new Action:iResult = Plugin_Continue;
+		
+		Call_StartForward(Forward_OnGameSelected);
+		Call_PushString(sID);
+		Call_PushCell(iStarter);
+		Call_Finish(iResult);
+		
+		if (iResult != Plugin_Continue)
+			return 0;
+	} else if (iType == TG_MenuItem) {
+		Call_StartForward(Forward_OnMenuItemSelected);
+		Call_PushString(sID);
+		Call_PushCell(iStarter);
+		Call_Finish();
+		
+		if (StrContains(sID, "Core_", false) == 0) {
+			CoreMenuItemsActions(iStarter, sID);
+		}
+	}
+	
+	return 0;
 }
 
-public Native_ShowFencesMenu( Handle:plugin, numParams )
+public Native_RegMenuItem(Handle:hPlugin, iNumParams)
 {
-	new client = GetNativeCell( 1 );
-
-	if( Client_IsIngame( client ) )
-		FencesMenu( client );
-}
-
-public Native_AddMenuItem( Handle:plugin, numParams )
-{
-	if( !ExistMenuItemsConfigFile() )
-	{
-		ThrowNativeError( 6, "Main menu item registration Failed! Config file (ConVar \"tg_modules_config\") must exist! (Error - \"TG_AddMenuItem #6\")" );
-		return 6;
+	if (!ExistMenuItemsConfigFile()) {
+		return ThrowNativeError(6, "Main menu item registration Failed! Config file (ConVar \"tg_modules_config\") must exist! (Error - \"TG_RegMenuItem #6\")");
 	}
 
-	if( g_MenuItemListEnd > MAX_MENU_ITEMS - 1 )
-	{
-		ThrowNativeError( 5, "Main menu item registration Failed! Reached maximum count of main menu items! (Error - \"TG_AddMenuItem #5\")" );
-		return 5;
+	if (g_iMenuItemListEnd > MAX_MENU_ITEMS - 1) {
+		return ThrowNativeError(5, "Main menu item registration Failed! Reached maximum count of main hMenu items! (Error - \"TG_RegMenuItem #5\")");
 	}
 
-	decl String:ItemName[ 64 ], String:ItemId[ 64 ], String:ItemFlag[ 16 ];
+	decl String:sItemName[TG_MODULE_NAME_LENGTH], String:sItemID[TG_MODULE_ID_LENGTH];
 
-	if( GetNativeString( 1, ItemId, sizeof( ItemId ) ) != SP_ERROR_NONE )
-	{
-		ThrowNativeError( 2, "Main menu item registration Failed! Couldn't get Arg1 (Item ID)! (Error - \"TG_AddMenuItem #2\")" );
-		return 2;
+	if (GetNativeString(1, sItemID, sizeof(sItemID)) != SP_ERROR_NONE) {
+		return ThrowNativeError(2, "Main menu item registration Failed! Couldn't get Arg1 (Item ID)! (Error - \"TG_RegMenuItem #2\")");
 	}
 
-	if( IsMenuItemDisabled( ItemId ) )
-		return 5;
+	if (IsMenuItemDisabled(sItemID))
+		return 7;
 
-	if( StrStartWith( ItemId, "Core_" ) )
-	{
-		ThrowNativeError( 4, "Main menu item registration Failed! Item ID can't start with \"Core_\" - it's reserved for core items! (Error - \"TG_AddMenuItem #4\")" );
-		return 4;
+	if (StrContains(sItemID, "Core_", false) == 0) {
+		return ThrowNativeError(4, "Main menu item registration Failed! Item ID can't start with \"Core_\" - it's reserved for core items! (Error - \"TG_RegMenuItem #4\")");
 	}
 
-	if( ExistMenuItem( ItemId ) )
-	{
-		ThrowNativeError( 3, "Main menu item registration Failed! Item ID (\"%s\") must be unique! (Error - \"TG_AddMenuItem #3\")", ItemId );
-		return 3;
+	if (ExistMenuItem(sItemID)) {
+		return ThrowNativeError(3, "Main menu item registration Failed! Item ID (\"%s\") must be unique! (Error - \"TG_RegMenuItem #3\")", sItemID);
+	}
+		
+	if (FormatNativeString(0, 2, 3, sizeof(sItemName), _, sItemName) != SP_ERROR_NONE) {
+		return ThrowNativeError(1, "Main menu item registration Failed! Couldn't get Arg2 (Item sName)! (Error - \"TG_RegMenuItem #1\")");
+	}
+	
+	new iItemIndex = GetMenuItemIndex(sItemID, false);
+
+	if (iItemIndex == -1) {
+		iItemIndex = g_iMenuItemListEnd;
+		g_iMenuItemListEnd++;
+
+		strcopy(g_MenuItemList[iItemIndex][Id], TG_MODULE_ID_LENGTH, sItemID);
+		strcopy(g_MenuItemList[iItemIndex][DefaultName], TG_MODULE_NAME_LENGTH, sItemName);
+		SaveMenuItemToConfig(sItemID, sItemName);
+		
+		g_MenuItemList[iItemIndex][Visible] = GetConVarBool(g_hModuleDefVisibility);
 	}
 
-	if( GetNativeString( 2, ItemName, sizeof( ItemName ) ) != SP_ERROR_NONE )
-	{
-		ThrowNativeError( 1, "Main menu item registration Failed! Couldn't get Arg2 (Item name)! (Error - \"TG_AddMenuItem #1\")" );
-		return 1;
-	}
-
-	strcopy( ItemFlag, sizeof( ItemFlag ), "" );
-
-	new ItemIndex = GetMenuItemIndex( ItemId, false );
-
-	if( ItemIndex == -1 )
-	{
-		ItemIndex = g_MenuItemListEnd;
-		g_MenuItemListEnd++;
-
-		strcopy( g_MenuItemList[ ItemIndex ][ Id ], 64, ItemId );
-		strcopy( g_MenuItemList[ ItemIndex ][ DefaultName ], 64, ItemName );
-		strcopy( g_MenuItemList[ ItemIndex ][ RequiredFlag ], 16, ItemFlag );
-		SaveMenuItemToConfig( ItemId, ItemName, ItemFlag );
-	}
-
-	g_MenuItemList[ ItemIndex ][ Used ] = true;
-
+	g_MenuItemList[iItemIndex][Used] = true;
+	
 	#if defined DEBUG
-	LogMessage( "[TG DEBUG] Registred item id = '%s', name = '%s', flag = '%s'.", ItemId, ItemName, ItemFlag );
+	LogMessage("[TG DEBUG] Registred item sID = '%s', sName = '%s'.", sItemID, sItemName);
 	#endif
 
 	return 0;
 }
 
-public Native_RemoveMenuItem( Handle:plugin, numParams )
+public Native_RemoveMenuItem(Handle:hPlugin, iNumParams)
 {
-	decl String:id[ 64 ];
+	decl String:sID[TG_MODULE_ID_LENGTH];
 
-	if( GetNativeString( 1, id, sizeof( id ) ) != SP_ERROR_NONE )
-	{
-		ThrowNativeError( 1, "Main menu item unregistration Failed! Couldn't get Arg1 (Item ID)! (Error - \"TG_RemoveMenuItem #1\")" );
-		return 1;
+	if (GetNativeString(1, sID, sizeof(sID)) != SP_ERROR_NONE) {
+		return ThrowNativeError(1, "Main menu item unregistration Failed! Couldn't get Arg1 (Item ID)! (Error - \"TG_RemoveMenuItem #1\")");
 	}
 
-	if( !ExistMenuItem( id ) )
-	{
-		ThrowNativeError( 2, "Main menu item unregistration Failed! No menu item with \"ITEM_ID\" = \"%s\" found! (Error - \"TG_RemoveMenuItem #2\")", id );
-		return 2;
-	}
+	// if (!ExistMenuItem(sID)) {
+		// return ThrowNativeError(2, "Main menu item unregistration Failed! No menu item with \"ITEM_ID\" = \"%s\" found! (Error - \"TG_RemoveMenuItem #2\")", sID);
+	// }
 
-	g_MenuItemList[ GetMenuItemIndex( id ) ][ Used ] = false;
+	if (ExistMenuItem(sID)) {
+		g_MenuItemList[GetMenuItemIndex(sID)][Used] = false;		
+	}
 
 	return 0;
 }
 
-public Native_GetMenuItemName( Handle:plugin, numParams )
+public Native_GetMenuItemName(Handle:hPlugin, iNumParams)
 {
-	new len = GetNativeCell( 3 );
+	new iLength = GetNativeCell(3);
 
-	if( len < 64 )
+	if (iLength < TG_MODULE_NAME_LENGTH)
 		return 1;
 
-	decl String:name[ 64 ], String:id[ 64 ];
-	GetNativeString( 1, id, sizeof( id ) );
+	decl String:sName[TG_MODULE_NAME_LENGTH], String:sID[TG_MODULE_ID_LENGTH];
+	GetNativeString(1, sID, sizeof(sID));
 
-	if( !ExistMenuItem( id ) )
+	if (!ExistMenuItem(sID))
 		return 2;
 
-	strcopy( name, 64, g_MenuItemList[ GetMenuItemIndex( id ) ][ DefaultName ] );
-	SetNativeString( 2, name, 64 );
+	strcopy(sName, TG_MODULE_NAME_LENGTH, g_MenuItemList[GetMenuItemIndex(sID)][DefaultName]);
+	SetNativeString(2, sName, TG_MODULE_NAME_LENGTH);
 
 	return 0;
 }
 
-public Native_KvAddString( Handle:plugin, numParams )
+public Native_IsModuleReged(Handle:hPlugin, iNumParams)
 {
-	decl String:path[ PLATFORM_MAX_PATH ], String:id[ 64 ], String:key[ 512 ], String:value[ 512 ];
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
-
-	new Handle:kv = CreateKeyValues( "Root" );
-
-	if( !FileToKeyValues( kv, path ) )
-	{
-		LogError( "Can't open file '%s' !", MODULES_CONFIG );
-		return false;
-	}
-
-	if( TG_ModuleType:GetNativeCell( 1 ) == MenuItem )
-	{
-		KvJumpToKey( kv, "MainMenu" );
-	}
-	else
-	{
-		KvJumpToKey( kv, "Games" );
-	}
-
-	GetNativeString( 2, id, sizeof( id ) );
-
-	if( !KvJumpToKey( kv, id ) )
-	{
-		LogError( "Module with id '%s' wasn't found !", id );
-		return false;
-	}
-
-	GetNativeString( 3, key, sizeof( key ) );
-
-	if( KvJumpToKey( kv, key ) )
-		return false;
-
-	GetNativeString( 4, value, sizeof( value ) );
-	KvSetString( kv, key, value );
-	KvRewind( kv );
-
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
-	new Handle:file = OpenFile( path, "w" );
-	SaveKvToFile( kv, file );
-
-	CloseHandle( file );
-	CloseHandle( kv );
-
-	return true;
-}
-
-public Native_KvSetString( Handle:plugin, numParams )
-{
-	decl String:path[ PLATFORM_MAX_PATH ], String:id[ 64 ], String:key[ 512 ], String:value[ 512 ];
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
-
-	new Handle:kv = CreateKeyValues( "Root" );
-
-	if( !FileToKeyValues( kv, path ) )
-		return false;
-
-	if( TG_ModuleType:GetNativeCell( 1 ) == MenuItem )
-	{
-		KvJumpToKey( kv, "MainMenu" );
-	}
-	else
-	{
-		KvJumpToKey( kv, "Games" );
-	}
-
-	GetNativeString( 2, id, sizeof( id ) );
-
-	if( !KvJumpToKey( kv, id ) )
-		return false;
-
-	GetNativeString( 3, key, sizeof( key ) );
-	GetNativeString( 4, value, sizeof( value ) );
-
-	KvSetString( kv, key, value );
-	KvRewind( kv );
-
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
-	new Handle:file = OpenFile( path, "w" );
-	SaveKvToFile( kv, file );
-
-	CloseHandle( file );
-	CloseHandle( kv );
-
-	return true;
-}
-
-public Native_KvGetString( Handle:plugin, numParams )
-{
-	new maxsize = GetNativeCell( 5 );
-	decl String:path[ PLATFORM_MAX_PATH ], String:id[ 64 ], String:key[ 512 ], String:defaultValue[ 512 ], String:value[ 512 ];
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
-
-	new Handle:kv = CreateKeyValues( "Root" );
-
-	GetNativeString( 6, defaultValue, sizeof( defaultValue ) );
-
-	if( !FileToKeyValues( kv, path ) )
-	{
-		SetNativeString( 4, defaultValue, maxsize );
-		return false;
-	}
-
-	if( TG_ModuleType:GetNativeCell( 1 ) == MenuItem )
-	{
-		KvJumpToKey( kv, "MainMenu" );
-	}
-	else
-	{
-		KvJumpToKey( kv, "Games" );
-	}
-
-	GetNativeString( 2, id, sizeof( id ) );
-
-	if( !KvJumpToKey( kv, id ) )
-	{
-		SetNativeString( 4, defaultValue, maxsize );
-		return false;
-	}
-
-	GetNativeString( 3, key, sizeof( key ) );
-
-	KvGetString( kv, key, value, sizeof( value ), defaultValue );
-	SetNativeString( 4, value, maxsize );
-	KvRewind( kv );
-
-	BuildPath( Path_SM, path, sizeof( path ), MODULES_CONFIG );
-	new Handle:file = OpenFile( path, "w" );
-	SaveKvToFile( kv, file );
-
-	CloseHandle( file );
-	CloseHandle( kv );
-
-	return true;
-}
-
-public Native_StartGame( Handle:plugin, numParams )
-{
-	new client, DataPack;
-	client = GetNativeCell( 1 );
-
-	new String:id[ 64 ], String:name[ 64 ], String:CustomName[ 64 ], String:MenuItemStartGame[ 64 ], String:MenuTitle[ 64 ];
-	GetNativeString( 2, id, sizeof( id ) );
-
-	strcopy( name, sizeof( name ), g_GameList[ GetGameIndex( id ) ][ Name ] );
-
-	if( GetNativeString( 3, CustomName, sizeof( CustomName ) ) != SP_ERROR_NONE || CustomName[ 0 ] == EOS )
-		strcopy( CustomName, sizeof( CustomName ), name );
-
-	DataPack = GetNativeCell( 4 );
+	decl String:sID[TG_MODULE_ID_LENGTH];
+	new TG_ModuleType:iType = GetNativeCell(1);
 	
-	new Action:result = Plugin_Continue;
-	Call_StartForward( Forward_OnGamePreparePre );
-	Call_PushString( id );
-	Call_PushCell( client );
-	Call_PushString( CustomName );
-	Call_PushCell( DataPack );
-	Call_Finish( result );
-	if( result != Plugin_Continue )
-	{
-		CloseHandle( Handle:DataPack );
+	if (GetNativeString(2, sID, sizeof(sID)) != SP_ERROR_NONE)
+		return false;
+	
+	if (iType == TG_Game) {
+		return ExistGame(sID);
+	} else if (iType == TG_MenuItem) {
+		return ExistMenuItem(sID);
+	}
+	
+	return false;
+}
+
+public Native_StartGame(Handle:hPlugin, iNumParams)
+{
+	new iClient, Handle:hDataPack;
+	iClient = GetNativeCell(1);
+
+	new String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODULE_NAME_LENGTH], String:sSettings[TG_MODULE_NAME_LENGTH], String:sMenuItemStartGame[64], String:sMenuTitle[64];
+	GetNativeString(2, sID, sizeof(sID));
+
+	strcopy(sName, sizeof(sName), g_GameList[GetGameIndex(sID)][DefaultName]);
+
+	GetNativeString(3, sSettings, sizeof(sSettings));
+
+	hDataPack = Handle:GetNativeCell(4);
+	new bool:bRemoveDropppedWeapons = GetNativeCell(5);
+	new bool:bCheckTeams = GetNativeCell(6);
+	new bool:bEndOnTeamEmpty = GetNativeCell(7);
+	
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnGameStartMenu);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_PushString(sSettings);
+	Call_PushCell(hDataPack);
+	Call_Finish(iResult);
+	if (iResult != Plugin_Continue) {
+		CloseHandle(hDataPack);
 		return 1;
 	}
+	
+	if (iClient == 0) {
+		TG_StartGamePreparation(iClient, sID, sSettings, hDataPack, bRemoveDropppedWeapons, bCheckTeams, bEndOnTeamEmpty);
+		return 0;
+	}
+	
+	Format(sMenuTitle, sizeof(sMenuTitle), "%T", "MenuGames-Start-Title", iClient, sName);
+	Format(sMenuItemStartGame, sizeof(sMenuItemStartGame), "%T", "MenuGames-Start", iClient);
 
-	Format( MenuTitle, sizeof( MenuTitle ), "%T", "Menu games start title", client, name );
-	Format( MenuItemStartGame, sizeof( MenuItemStartGame ), "%T", "Menu games start", client );
-
-	new Handle:menu = CreateMenu( GameStartMenu_Handler );
-	SetMenuTitle( menu, MenuTitle );
-	AddMenuItem( menu, "START_GAME", MenuItemStartGame );
-	TG_PushMenuCell( menu, "-CLIENT-", client );
-	TG_PushMenuString( menu, "-GAMEID-", id );
-	TG_PushMenuString( menu, "-CUSTOMNAME-", CustomName );
-	TG_PushMenuCell( menu, "-DATAPACK-", _:DataPack );
-	SetMenuExitBackButton( menu, true );
-	DisplayMenu( menu, client, 30 );
+	new Handle:hMenu = CreateMenu(GameStartMenu_Handler);
+	SetMenuTitle(hMenu, sMenuTitle);
+	AddMenuItem(hMenu, "START_GAME", sMenuItemStartGame);
+	PushMenuCell(hMenu, "-CLIENT-", iClient);
+	PushMenuString(hMenu, "-GAMEID-", sID);
+	PushMenuString(hMenu, "-GAMESETTINGS-", sSettings);
+	PushMenuCell(hMenu, "-DATAPACK-", _:hDataPack);
+	PushMenuCell(hMenu, "-REMOVEDROPS-", _:bRemoveDropppedWeapons);
+	PushMenuCell(hMenu, "-CHECKTEAMS-", _:bCheckTeams);
+	PushMenuCell(hMenu, "-ENDONTEAMEMPTY-", _:bEndOnTeamEmpty);
+	SetMenuExitBackButton(hMenu, true);
+	DisplayMenu(hMenu, iClient, 30);
 
 	return 0;
 }
 
-public Native_GetCurrentGameID( Handle:plugin, numParams )
+public Native_GetCurrentGameID(Handle:hPlugin, iNumParams)
 {
-	new len = GetNativeCell( 2 );
+	new iLength = GetNativeCell(2);
 
-	if( len < 64 )
+	if (iLength < TG_MODULE_ID_LENGTH)
 		return false;
 
-	if( !StrEqual( g_Game[ GameID ], "Core_NoGame" ) )
-	{
-		new String:id[ 64 ];
+	if (!StrEqual(g_Game[GameID], "Core_NoGame")) {
+		new String:sID[TG_MODULE_ID_LENGTH];
 		
-		strcopy( id, 64, g_Game[ GameID ] );
+		strcopy(sID, TG_MODULE_ID_LENGTH, g_Game[GameID]);
 
-		SetNativeString( 1, id, 64 );
+		SetNativeString(1, sID, TG_MODULE_ID_LENGTH);
+	} else {
+		SetNativeString(1, "Core_NoGame", TG_MODULE_ID_LENGTH);
 	}
-	else
-		SetNativeString( 1, "Core_NoGame", 64 );
 
 	return true;
 }
 
-public Native_IsCurrentGameID( Handle:plugin, numParams )
+public Native_IsCurrentGameID(Handle:hPlugin, iNumParams)
 {
-	decl String:id[ 64 ];
-	GetNativeString( 1, id, sizeof( id ) );
+	decl String:sID[TG_MODULE_ID_LENGTH];
+	GetNativeString(1, sID, sizeof(sID));
 
-	if( StrEqual( g_Game[ GameID ], id ) )
+	if (StrEqual(g_Game[GameID], sID))
 		return true;
 	else
 		return false;
 }
 
-public Native_GetCurrentDataPack( Handle:plugin, numParams )
+public Native_GetCurrentDataPack(Handle:hPlugin, iNumParams)
 {
-	return _:g_Game[ GameDataPack ];
+	return _:g_Game[GameDataPack];
 }
 
-public Native_GetCurrentStarter( Handle:plugin, numParams )
+public Native_GetCurrentStarter(Handle:hPlugin, iNumParams)
 {
-	return g_Game[ GameStarter ];
+	return g_Game[GameStarter];
 }
 
-public Native_GetCurrentCustomName( Handle:plugin, numParams )
+public Native_GetCurrentGameSettings(Handle:hPlugin, iNumParams)
 {
-	new len = GetNativeCell( 2 );
+	new iLength = GetNativeCell(2);
 
-	if( len < 64 )
+	if (iLength < TG_MODULE_NAME_LENGTH)
 		return false;
 
-	if( g_Game[ GameProgress ] != NoGame )
-	{
-		SetNativeString( 1, g_Game[ GameCustomName ], 64 );
+	if (g_Game[GameProgress] != TG_NoGame) {
+		SetNativeString(1, g_Game[GameSettings], TG_MODULE_NAME_LENGTH);
+	} else {
+		SetNativeString(1, "Core_NoGame", TG_MODULE_NAME_LENGTH);
 	}
-	else
-		SetNativeString( 1, "Core_NoGame", 64 );
 
 	return true;
 }
 
-public Native_GetGameName( Handle:plugin, numParams )
+public Native_GetGameDefaultName(Handle:hPlugin, iNumParams)
 {
-	new len = GetNativeCell( 3 );
+	new iLength = GetNativeCell(3);
 
-	if( len < 64 )
+	if (iLength < TG_MODULE_NAME_LENGTH)
 		return 1;
 
-	decl String:name[ 64 ], String:id[ 64 ];
+	decl String:sName[TG_MODULE_NAME_LENGTH], String:sID[TG_MODULE_ID_LENGTH];
 
-	GetNativeString( 1, id, sizeof( id ) );
+	GetNativeString(1, sID, sizeof(sID));
 
-	if( !ExistGame( id ) )
+	if (!ExistGame(sID))
 		return 2;
 
-	strcopy( name, 64, g_GameList[ GetGameIndex( id ) ][ Name ] );
+	strcopy(sName, TG_MODULE_NAME_LENGTH, g_GameList[GetGameIndex(sID)][DefaultName]);
 
-	SetNativeString( 2, name, 64 );
+	SetNativeString(2, sName, TG_MODULE_NAME_LENGTH);
 
 	return 0;
 }
 
-public Native_GetGameType( Handle:plugin, numParams )
+public Native_GetGameType(Handle:hPlugin, iNumParams)
 {
-	decl String:id[ 64 ];
+	decl String:sID[TG_MODULE_ID_LENGTH];
 
-	if( GetNativeString( 1, id, sizeof( id ) ) != SP_ERROR_NONE )
+	if (GetNativeString(1, sID, sizeof(sID)) != SP_ERROR_NONE)
 		return 1;
 
-	if( !ExistGame( id ) )
+	if (!ExistGame(sID))
 		return 2;
 
-	return _:g_GameList[ GetGameIndex( id ) ][ GameType ];
+	return _:g_GameList[GetGameIndex(sID)][GameType];
 }
 
-public Native_GetGameRequiredFlag( Handle:plugin, numParams )
+public Native_StopGame(Handle:hPlugin, iNumParams)
 {
-	new len = GetNativeCell( 3 );
-
-	if( len < 16 )
+	if (g_Game[GameProgress] != TG_InProgress && g_Game[GameProgress] != TG_InPreparation)
 		return 1;
 
-	decl String:flag[ 16 ], String:id[ 64 ];
-
-	GetNativeString( 1, id, sizeof( id ) );
-
-	if( !ExistGame( id ) )
-		return 2;
-
-	strcopy( flag, 16, g_GameList[ GetGameIndex( id ) ][ RequiredFlag ] );
-
-	SetNativeString( 2, flag, 16 );
-
-	return 0;
-}
-public Native_StopGame( Handle:plugin, numParams )
-{
-	if( g_Game[ GameProgress ] != InProgress && g_Game[ GameProgress ] != InPreparation )
-		return 1;
-
-	g_Game[ GameProgress ] = NoGame;
-
-	if( h_Timer_CountDownGamePrepare != INVALID_HANDLE )
-	{
-		KillTimer( h_Timer_CountDownGamePrepare );
-		h_Timer_CountDownGamePrepare = INVALID_HANDLE;
-	}
-
-	new TG_Team:team = GetNativeCell( 1 );
-	new clear = GetNativeCell( 2 );
-	new weapons = GetNativeCell( 3 );
-
-	if( GetConVarInt( gh_SaveWeapons ) == 1 )
-	{
-		weapons = true;
-	}
-	else if( GetConVarInt( gh_SaveWeapons ) == 2 && weapons )
-	{
-		weapons = true;
-	}
-
-	if( g_LogCvar )
-	{
-		new String:team1[ 4096 ], String:team2[ 4096 ];
-		new count1, count2;
-
-		for( new i = 1; i <= MaxClients; i++ )
+	g_Game[GameProgress] = TG_NoGame;
+	
+	if (g_Game[RemoveDrops]) {
+		for (new i = 1; i <= MaxClients; i++)
 		{
-			if( TG_GetPlayerTeam( i ) == RedTeam )
-			{
-				Format( team1, sizeof( team1 ), "%s%L, ", team1, i );
-				count1++;
-			}
-
-			if( TG_GetPlayerTeam( i ) == BlueTeam )
-			{
-				Format( team2, sizeof( team2 ), "%s%L, ", team2, i );
-				count2++;
-			}
+			if (Client_IsIngame(i))
+				SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
 		}
-
-		if( strlen( team1 ) > 2 )
-			team1[ strlen( team1 ) - 2 ] = '\0';
-		else
-			strcopy( team1, sizeof( team1 ), "" );
-
-		if( strlen( team2 ) > 2 )
-			team2[ strlen( team2 ) - 2 ] = '\0';
-		else
-			strcopy( team2, sizeof( team2 ), "" );
-
-		TG_LogRoundMessage(    "GameEnd", "game ended (name: \"%s\") (id: \"%s\") (winner team: \"team %d\")", g_GameList[ GetGameIndex( g_Game[ GameID ] ) ][ Name ], g_Game[ GameID ], team );
-		TG_LogRoundMessage( _, "{" );
-		TG_LogRoundMessage( _, "\tGame name: \"%s\"", g_GameList[ GetGameIndex( g_Game[ GameID ] ) ][ Name ] );
-		TG_LogRoundMessage( _, "\tGame ID: \"%s\"", g_Game[ GameID ] );
-		TG_LogRoundMessage( _, "\tWinner team: \"team %d\"", _:team );
-		TG_LogRoundMessage( _, "" );
-		TG_LogRoundMessage( _, "\tSurvivors RedTeam:  \"%s\" (number of players: \"%d\")", team1, count1 );
-		TG_LogRoundMessage( _, "\tSurvivors BlueTeam: \"%s\" (number of players: \"%d\")", team2, count2 );
-		TG_LogRoundMessage( _, "}" );
-	}
-
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( !TG_IsPlayerRedOrBlue( i ) )
-			continue;
-		
-		SetEntityMoveType( i, MoveType:MOVETYPE_ISOMETRIC );
-		
-		if( weapons )
-			PlayerEquipmentLoad( i );
 	}
 	
-	new winners[ MAXPLAYERS ];
-	new winnersCount = 0;
+	if (g_hTimer_CountDownGamePrepare != INVALID_HANDLE) {
+		KillTimer(g_hTimer_CountDownGamePrepare);
+		g_hTimer_CountDownGamePrepare = INVALID_HANDLE;
+	}
+	
+	new TG_Team:iTeam = TG_Team:GetNativeCell(1);
+	new Handle:hWinners = Handle:GetNativeCellRef(2);
+	new bool:bClear = bool:GetNativeCell(3);
+	new bool:bWeapons = bool:GetNativeCell(4);
 
-	if( TG_IsTeamRedOrBlue( team ) )
-	{
-		for( new i = 1; i <= MaxClients; i++ )
-		{
-			if( TG_GetPlayerTeam( i ) == team )
-			{
-				winners[ winnersCount ] = i;
-				winnersCount++;
+	if (g_iSaveWeapons == 1) {
+		bWeapons = true;
+	} else if (g_iSaveWeapons == 2 && bWeapons) {
+		bWeapons = true;
+	}
+
+	new iWinners[MAXPLAYERS + 1];
+	new iWinnersCount = 0;
+	
+	if (hWinners != INVALID_HANDLE) {
+		if (GetArraySize(hWinners) > 0) {
+			iWinnersCount = GetArraySize(hWinners);
+			
+			for (new i = 0; i < iWinnersCount; i++) {
+				iWinners[i] = GetArrayCell(hWinners, i);
+			}			
+		}
+
+		CloseHandle(hWinners);
+		SetNativeCellRef(2, INVALID_HANDLE);
+	} else {
+		if (g_Game[GameType] == TG_FiftyFifty && TG_IsTeamRedOrBlue(iTeam)) {
+			for (new i = 0; i < MAXPLAYERS + 1; i++) {
+				if ((iTeam == TG_RedTeam && g_Game[RedTeam][i] == 0) || (iTeam == TG_BlueTeam && g_Game[BlueTeam][i] == 0)) {
+					break;
+				}
+				
+				if (iTeam == TG_RedTeam) {
+					iWinners[i] = GetClientOfUserId(g_Game[RedTeam][i]);
+				} else if (iTeam == TG_BlueTeam) {
+					iWinners[i] = GetClientOfUserId(g_Game[BlueTeam][i]);
+				}
+				
+				iWinnersCount++;
+			}
+		} else if (g_Game[GameType] == TG_RedOnly && (iTeam == TG_RedTeam || iTeam == TG_BlueTeam)) {
+			for (new i = 0; i < MAXPLAYERS + 1; i++) {
+				if (g_Game[RedTeam][i] == 0) {
+					break;
+				}
+				
+				iWinners[i] = GetClientOfUserId(g_Game[RedTeam][i]);
+				iWinnersCount++;
 			}
 		}
 	}
+	
+	new String:sWinners[1024];
+	for (new i = 0; i < iWinnersCount; i++) {
+		Format(sWinners, sizeof(sWinners), "%s, %N", sWinners, iWinners[i]);
+	}
+	strcopy(sWinners, sizeof(sWinners), sWinners[2]);
+	
+	if (g_bLogCvar) {
+		new String:sTeam1[4096], String:sTeam2[4096];
+		new iCount1, iCount2;
 
-	if( GetConVarInt( gh_FriendlyFire ) == 2 )
-		SetConVarStringSilent( "mp_friendlyfire", "0" );
+		for (new i = 1; i <= MaxClients; i++) {
+			if (TG_GetPlayerTeam(i) == TG_RedTeam) {
+				Format(sTeam1, sizeof(sTeam1), "%s%L, ", sTeam1, i);
+				iCount1++;
+			}
 
-	Call_StartForward( Forward_OnGameEnd );
-	Call_PushString( g_Game[ GameID ] );
-	Call_PushCell( team );
-	Call_PushArray( winners, MAXPLAYERS );
-	Call_PushCell( winnersCount );
-	Call_PushCell( g_Game[ GameDataPack ] );
+			if (g_Game[GameType] == TG_FiftyFifty && TG_GetPlayerTeam(i) == TG_BlueTeam) {
+				Format(sTeam2, sizeof(sTeam2), "%s%L, ", sTeam2, i);
+				iCount2++;
+			}
+		}
+		
+		if (strlen(sTeam1) > 2)
+			sTeam1[strlen(sTeam1) - 2] = '\0';
+		else
+			strcopy(sTeam1, sizeof(sTeam1), "");
+
+		if (strlen(sTeam2) > 2)
+			sTeam2[strlen(sTeam2) - 2] = '\0';
+		else
+			strcopy(sTeam2, sizeof(sTeam2), "");
+
+		TG_LogRoundMessage(   "GameEnd", "(ID: \"%s\")", g_Game[GameID]);
+		TG_LogRoundMessage(_, "{");
+		if (g_Game[GameType] == TG_FiftyFifty) {
+			TG_LogRoundMessage(_, "\tWinner team: \"%s\"", (iTeam == TG_RedTeam) ? "RedTeam" : (iTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+			TG_LogRoundMessage(_, "");
+			TG_LogRoundMessage(_, "\tSurvivors RedTeam (%d):  \"%s\"", iCount1, sTeam1);
+			TG_LogRoundMessage(_, "\tSurvivors BlueTeam (%d): \"%s\"", iCount2, sTeam2);
+		} else if (g_Game[GameType] == TG_RedOnly) {
+			TG_LogRoundMessage(_, "\tSurvivors (%d):  \"%s\"", iCount1, sTeam1);
+			TG_LogRoundMessage(_, "\tWinners (%d):  \"%s\"", iWinnersCount, sWinners);
+		}
+		TG_LogRoundMessage(_, "}");
+	}
+	
+	for (new i = 1; i <= MaxClients; i++) {
+		if (!TG_IsPlayerRedOrBlue(i))
+			continue;
+		
+		SetEntityMoveType(i, MoveType:MOVETYPE_ISOMETRIC);
+		
+		if (bWeapons)
+			PlayerEquipmentLoad(i);
+	}
+	
+	if (g_iFriendlyFire == 2)
+		SetConVarIntSilent("mp_friendlyfire", 0);
+	
+	Call_StartForward(Forward_OnGameEnd);
+	Call_PushString(g_Game[GameID]);
+	Call_PushCell(iTeam);
+	Call_PushArray(iWinners, MAXPLAYERS + 1);
+	Call_PushCell(iWinnersCount);
+	Call_PushCell(g_Game[GameDataPack]);
 	Call_Finish();
-
-	if( GetConVarInt( gh_MoveSurvivors ) == 1 )
-	{
+	
+	for (new i = 1; i <= MaxClients; i++) {
+		if (TG_IsPlayerRedOrBlue(i)) {
+			Call_StartForward(Forward_OnPlayerLeaveGame);
+			Call_PushString(g_Game[GameID]);
+			Call_PushCell(i);
+			Call_PushCell(g_PlayerData[i][Team]);
+			Call_PushCell(TG_PlayerTrigger:TG_GameEnd);
+			Call_Finish();
+		}
+	}
+	
+	
+	if (g_iMoveSurvivors == 1) {
+		ClearTeams();
+	} else if (g_iMoveSurvivors == 2 && bClear) {
 		ClearTeams();
 	}
-	else if( GetConVarInt( gh_MoveSurvivors ) == 2 && clear )
-	{
-		ClearTeams();
+	
+	if (g_Game[GameType] == TG_FiftyFifty) {
+		PrintImportantMessage("%t", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie");
+	} else if (g_Game[GameType] == TG_RedOnly) {
+		if (iWinnersCount == 1) {
+			new String:sWinner[64];
+			GetClientName(iWinners[0], sWinner, sizeof(sWinner));
+			PrintImportantMessage("%t", "TeamWins-Winner", sWinner, g_Game[DefaultName]);
+		} else if (iWinnersCount > 1) {
+			PrintImportantMessage("%t", "TeamWins-Winners", sWinners, g_Game[DefaultName]);
+		} else {
+			PrintImportantMessage("%t", "TeamWins-Tie");
+		}
 	}
-
-	g_TeamsLock = false;
+	
+	g_bTeamsLock = false;
 	ClearGameStatusInfo();
 
-	if( IsSoundPrecached( g_GameEnd[ team ] ) )
-		EmitSoundToAll( g_GameEnd[ team ], _, _, _, _, 1.0, _, _, _, _, _, _ );
-
-	if( team == RedTeam )
-	{
-		TG_PrintToChatAll( "%t", "Team won Red team" );
-		if( g_DoubleMsg )
-			TG_PrintToChatAll( "%t", "Team won Red team" );
-	}
-	else if( team == BlueTeam )
-	{
-		TG_PrintToChatAll( "%t", "Team won Blue team" );
-		if( g_DoubleMsg )
-			TG_PrintToChatAll( "%t", "Team won Blue team" );
-	}
-
+	if (IsSoundPrecached(g_sGameEnd[iTeam]))
+		EmitSoundToAllAny(g_sGameEnd[iTeam]);
+	
 	return 0;
 }
 
-public Native_GetGameStatus( Handle:plugin, numParams )
+static PrintImportantMessage(String:sFormat[], any:...)
 {
-	return _:g_Game[ GameProgress ];
+	decl String:sMessage[1024];
+	
+	for (new iClient = 1; iClient <= MaxClients; iClient++) {
+		if (!IsClientInGame(iClient)) {
+			continue;
+		}
+		
+		SetGlobalTransTarget(iClient);
+		VFormat(sMessage, sizeof(sMessage), sFormat, 2);
+	
+		CPrintToChat(iClient, sMessage);
+		if (g_bImportantMsg)
+			CPrintToChat(iClient, sMessage);
+	}	
 }
 
-public Native_IsGameStatus( Handle:plugin, numParams )
+public Native_SetModuleVisibility(Handle:hPlugin, iNumParams)
 {
-	if( g_Game[ GameProgress ] == TG_GameProgress:GetNativeCell( 1 ) )
+	decl String:sID[TG_MODULE_ID_LENGTH];
+	new TG_ModuleType:iType = TG_ModuleType:GetNativeCell(1);
+	new bool:bVisibility = bool:GetNativeCell(3);
+	
+	if (GetNativeString(2, sID, sizeof(sID)) != SP_ERROR_NONE)
+		return false;
+	
+	new iIndex;
+	new bool:bChanged = false;
+	
+	if (iType == TG_Game) {
+		iIndex = GetGameIndex(sID);
+		
+		if (iIndex == -1)
+			return false;
+		
+		if (g_GameList[iIndex][Visible] && !bVisibility) {
+			g_GameList[iIndex][Visible] = false;
+			bChanged = true;
+		} else if (!g_GameList[iIndex][Visible] && bVisibility) {
+			g_GameList[iIndex][Visible] = true;
+			bChanged = true;
+		}
+		
+		if (bChanged)
+			TG_LogMessage("ModuleVisibility", "Changed game (ID = '%s') visibility to %d", sID, _:bVisibility);
+	}
+	else if (iType == TG_MenuItem)
+	{
+		iIndex = GetMenuItemIndex(sID);
+		
+		if (iIndex == -1)
+			return false;
+		
+		if (g_MenuItemList[iIndex][Visible] && !bVisibility) {
+			g_MenuItemList[iIndex][Visible] = false;
+			bChanged = true;
+			
+		} else if (!g_MenuItemList[iIndex][Visible] && bVisibility) {
+			g_MenuItemList[iIndex][Visible] = true;
+			bChanged = true;
+		}
+		
+		if (bChanged)
+			TG_LogMessage("ModuleVisibility", "Changed hMenu item (ID = '%s') visibility to %d", sID, _:bVisibility);
+	}
+	
+	return true;
+}
+
+public Native_GetModuleVisibility(Handle:hPlugin, iNumParams)
+{
+	decl String:sID[TG_MODULE_ID_LENGTH];
+	new TG_ModuleType:iType = GetNativeCell(1);
+	
+	if (GetNativeString(2, sID, sizeof(sID)) != SP_ERROR_NONE)
+		return false;
+	
+	new iIndex;
+	
+	if (iType == TG_Game) {
+		iIndex = GetGameIndex(sID);
+		
+		if (iIndex != -1)
+			return g_GameList[iIndex][Visible];
+	} else if (iType == TG_MenuItem) {
+		iIndex = GetMenuItemIndex(sID);
+		
+		if (iIndex != -1)
+			return g_MenuItemList[iIndex][Visible];
+	}
+	
+	return false;
+}
+
+public Native_GetGameStatus(Handle:hPlugin, iNumParams)
+{
+	return _:g_Game[GameProgress];
+}
+
+public Native_IsGameStatus(Handle:hPlugin, iNumParams)
+{
+	if (g_Game[GameProgress] == TG_GameProgress:GetNativeCell(1))
 		return true;
 	else
 		return false;
 }
 
-public Native_PrintToChat( Handle:plugin, numParams )
+public Native_LogMessage(Handle:hPlugin, iNumParams)
 {
-	decl String:msg[ 512 ];
-	new client = GetNativeCell( 1 ), written;
-
-	FormatNativeString( 0, 2, 3, sizeof( msg ), written, msg );
-	Format( msg, sizeof( msg ), "%s %s", CHAT_BANNER, msg );
-	
-	if( FindCharInString( msg, '{' ) != -1 )
-		TG_ProcessPhrasesColors( msg, sizeof( msg ) );
-
-	if( Client_IsIngame( client ) )
-		PrintToChat( client, msg );
-}
-
-public Native_PrintToChatEx( Handle:plugin, numParams )
-{
-	decl String:msg[ 512 ];
-	new client = GetNativeCell( 1 ), written;
-
-	FormatNativeString( 0, 2, 3, sizeof( msg ), written, msg );
-	Format( msg, sizeof( msg ), "%t%s", "Color default", msg );
-	
-	if( FindCharInString( msg, '{' ) != -1 )
-		TG_ProcessPhrasesColors( msg, sizeof( msg ) );
-
-	if( Client_IsIngame( client ) )
-		PrintToChat( client, msg );
-}
-
-public Native_LogMessage( Handle:plugin, numParams )
-{
-	if( !g_LogCvar )
+	if (!g_bLogCvar)
 		return;
 
-	decl String:prefix[ 64 ], String:msg[ 512 ];
-	new String:out[ 512 ];
-	new written;
+	decl String:sPrefix[64], String:sMsg[512];
+	new String:sOutput[512];
+	new iWritten;
 
-	GetNativeString( 1, prefix, sizeof( prefix ) );
-	FormatNativeString( 0, 2, 3, sizeof( msg ), written, msg );
+	GetNativeString(1, sPrefix, sizeof(sPrefix));
+	FormatNativeString(0, 2, 3, sizeof(sMsg), iWritten, sMsg);
 
-	if( strlen( prefix ) > 0 )
-		Format( out, sizeof( out ), "[%s]", prefix );
+	if (strlen(sPrefix) > 0)
+		Format(sOutput, sizeof(sOutput), "[%s]", sPrefix);
 	
-	if( strlen( prefix ) > 0 && strlen( msg ) > 0 )
-		StrCat( out, sizeof( out ), " " );
+	if (strlen(sPrefix) > 0 && strlen(sMsg) > 0)
+		StrCat(sOutput, sizeof(sOutput), " ");
 	
-	StrCat( out, sizeof( out ), msg );
+	StrCat(sOutput, sizeof(sOutput), sMsg);
+	
+	LogToFileEx(g_sLogFile, sOutput);
+}
+
+public Native_LogRoundMessage(Handle:hPlugin, iNumParams)
+{
+	if (!g_bLogCvar)
+		return;
+
+	decl String:sPrefix[64], String:sMsg[512];
+	new String:sOutput[512];
+	new iWritten;
+
+	GetNativeString(1, sPrefix, sizeof(sPrefix));
+	FormatNativeString(0, 2, 3, sizeof(sMsg), iWritten, sMsg);
+
+	if (strlen(sPrefix) > 0)
+		Format(sOutput, sizeof(sOutput), "[%s]", sPrefix);
+	
+	if (strlen(sPrefix) > 0 && strlen(sMsg) > 0)
+		StrCat(sOutput, sizeof(sOutput), " ");
+	
+	StrCat(sOutput, sizeof(sOutput), sMsg);
+	
+	Format(sOutput, sizeof(sOutput), "\t%s", sOutput);
+
+	LogToFileEx(g_sLogFile, sOutput);
+}
+
+public Native_LogGameMessage(Handle:hPlugin, iNumParams)
+{
+	if (!g_bLogCvar)
+		return;
+
+	decl String:sGameId[TG_MODULE_ID_LENGTH], String:sPrefix[64], String:sMsg[512];
+	new String:sOutput[512];
+	new iWritten;
+
+	if (GetNativeString(1, sGameId, sizeof(sGameId)) != SP_ERROR_NONE)
+		return;
+
+	GetNativeString(2, sPrefix, sizeof(sPrefix));
+	FormatNativeString(0, 3, 4, sizeof(sMsg), iWritten, sMsg);
+
+	Format(sOutput, sizeof(sOutput), "[%s]", sGameId);
+
+	if (strlen(sPrefix) > 0)
+		Format(sOutput, sizeof(sOutput), "%s[%s]", sOutput, sPrefix);
 		
-	LogToFileEx( g_LogFile, out );
-}
-
-public Native_LogRoundMessage( Handle:plugin, numParams )
-{
-	if( !g_LogCvar )
-		return;
-
-	decl String:prefix[ 64 ], String:msg[ 512 ];
-	new String:out[ 512 ];
-	new written;
-
-	GetNativeString( 1, prefix, sizeof( prefix ) );
-	FormatNativeString( 0, 2, 3, sizeof( msg ), written, msg );
-
-	if( strlen( prefix ) > 0 )
-		Format( out, sizeof( out ), "[%s]", prefix );
+	if (strlen(sMsg) > 0)
+		Format(sOutput, sizeof(sOutput), "%s %s", sOutput, sMsg);
 	
-	if( strlen( prefix ) > 0 && strlen( msg ) > 0 )
-		StrCat( out, sizeof( out ), " " );
+	Format(sOutput, sizeof(sOutput), "\t%s", sOutput);
 	
-	StrCat( out, sizeof( out ), msg );
+	if (g_Game[GameProgress] != TG_NoGame)
+		Format(sOutput, sizeof(sOutput), "\t%s", sOutput);
 	
-	Format( out, sizeof( out ), "\t%s", out );
-
-	LogToFileEx( g_LogFile, out );
-}
-
-public Native_LogGameMessage( Handle:plugin, numParams )
-{
-	if( !g_LogCvar )
-		return;
-
-	decl String:gameID[ 72 ], String:prefix[ 64 ], String:msg[ 512 ];
-	new String:out[ 512 ];
-	new written;
-
-	if( GetNativeString( 1, gameID, sizeof( gameID ) ) != SP_ERROR_NONE )
-		return;
-
-	GetNativeString( 2, prefix, sizeof( prefix ) );
-	FormatNativeString( 0, 3, 4, sizeof( msg ), written, msg );
-
-	Format( out, sizeof( out ), "[%s]", gameID );
-
-	if( strlen( prefix ) > 0 )
-		Format( out, sizeof( out ), "%s[%s]", out, prefix );
-		
-	if( strlen( msg ) > 0 )
-		Format( out, sizeof( out ), "%s %s", out, msg );
-	
-	Format( out, sizeof( out ), "\t%s", out );
-	
-	if( g_Game[ GameProgress ] != NoGame )
-		Format( out, sizeof( out ), "\t%s", out );
-	
-	LogToFileEx( g_LogFile, out );
+	LogToFileEx(g_sLogFile, sOutput);
 }
 
 //------------------------------------------------------------------------------------------------
 // AskPluginLoad2
 
-public APLRes:AskPluginLoad2( Handle:myself, bool:late, String:error[], err_max )
+public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMax)
 {
-	CreateNative( "TG_GetPlayerTeam", Native_GetPlayerTeam );
-	CreateNative( "TG_SetPlayerTeam", Native_SetPlayerTeam );
-	CreateNative( "TG_IsPlayerRedOrBlue", Native_IsPlayerRedOrBlue );
-	CreateNative( "TG_InOppositeTeams", Native_InOppositeTeams );
-	CreateNative( "TG_GetTeamFromString", Native_GetTeamFromString );
-	CreateNative( "TG_SwitchRandomRedToBlue", Native_SwitchRandomRedToBlue );
-	CreateNative( "TG_IsGameTypeAvailable", Native_IsGameTypeAvailable );
+	CreateNative("TG_GetPlayerTeam", Native_GetPlayerTeam);
+	CreateNative("TG_SetPlayerTeam", Native_SetPlayerTeam);
+	CreateNative("TG_IsPlayerRedOrBlue", Native_IsPlayerRedOrBlue);
+	CreateNative("TG_InOppositeTeams", Native_InOppositeTeams);
+	CreateNative("TG_GetTeamFromString", Native_GetTeamFromString);
+	CreateNative("TG_SwitchRandomRedToBlue", Native_SwitchRandomRedToBlue);
+	CreateNative("TG_IsGameTypeAvailable", Native_IsGameTypeAvailable);
 
-	CreateNative( "TG_LoadPlayerWeapons", Native_LoadPlayerWeapons );
+	CreateNative("TG_LoadPlayerWeapons", Native_LoadPlayerWeapons);
 
-	CreateNative( "TG_FenceCreate", Native_FenceCreate );
-	CreateNative( "TG_FenceDestroy", Native_FenceDestroy );
-	CreateNative( "TG_FencePlayerCross", Native_FencePlayerCross );
+	CreateNative("TG_FenceCreate", Native_FenceCreate);
+	CreateNative("TG_FenceDestroy", Native_FenceDestroy);
+	CreateNative("TG_FencePlayerCross", Native_FencePlayerCross);
 
-	CreateNative( "TG_SpawnMark", Native_TG_SpawnMark );
+	CreateNative("TG_SpawnMark", Native_TG_SpawnMark);
 
-	CreateNative( "TG_GetTeamCount", Native_GetTeamCount );
-	CreateNative( "TG_ClearTeam", Native_ClearTeam );
-	CreateNative( "TG_SetTeamsLock", Native_SetTeamsLock );
-	CreateNative( "TG_GetTeamsLock", Native_GetTeamsLock );
+	CreateNative("TG_GetTeamCount", Native_GetTeamCount);
+	CreateNative("TG_ClearTeam", Native_ClearTeam);
+	CreateNative("TG_SetTeamsLock", Native_SetTeamsLock);
+	CreateNative("TG_GetTeamsLock", Native_GetTeamsLock);
 
-	CreateNative( "TG_RegGame", Native_RegGame );
-	CreateNative( "TG_UnRegGame", Native_UnRegGame );
-	CreateNative( "TG_GetRegGames", Native_GetRegGames );
+	CreateNative("TG_RegGame", Native_RegGame);
+	CreateNative("TG_RemoveGame", Native_RemoveGame);
+	CreateNative("TG_GetAddedGames", Native_GetAddedGames);
 
-	CreateNative( "TG_ShowMainMenu", Native_ShowMainMenu );
-	CreateNative( "TG_ShowGamesMenu", Native_ShowGamesMenu );
-	CreateNative( "TG_ShowTeamsMenu", Native_ShowTeamsMenu );
-	CreateNative( "TG_ShowFencesMenu", Native_ShowFencesMenu );
+	CreateNative("TG_ShowPlayerSelectMenu", Native_ShowPlayerSelectMenu);
+	
+	CreateNative("TG_FakeSelect", Native_FakeSelect);
 
-	CreateNative( "TG_AddMenuItem", Native_AddMenuItem );
-	CreateNative( "TG_RemoveMenuItem", Native_RemoveMenuItem );
-	CreateNative( "TG_GetMenuItemName", Native_GetMenuItemName );
+	CreateNative("TG_RegMenuItem", Native_RegMenuItem);
+	CreateNative("TG_RemoveMenuItem", Native_RemoveMenuItem);
+	CreateNative("TG_GetMenuItemName", Native_GetMenuItemName);
+	
+	CreateNative("TG_IsModuleReged", Native_IsModuleReged);
+	
+	CreateNative("TG_StartGame", Native_StartGame);
+	CreateNative("TG_GetCurrentGameID", Native_GetCurrentGameID);
+	CreateNative("TG_IsCurrentGameID", Native_IsCurrentGameID);
+	CreateNative("TG_GetCurrentDataPack", Native_GetCurrentDataPack);
+	CreateNative("TG_GetCurrentStarter", Native_GetCurrentStarter);
+	CreateNative("TG_GetCurrentGameSettings", Native_GetCurrentGameSettings);
+	CreateNative("TG_GetGameDefaultName", Native_GetGameDefaultName);
+	CreateNative("TG_GetGameType", Native_GetGameType);
+	CreateNative("TG_StopGame", Native_StopGame);
 
-	CreateNative( "TG_KvAddString", Native_KvAddString );
-	CreateNative( "TG_KvSetString", Native_KvSetString );
-	CreateNative( "TG_KvGetString", Native_KvGetString );
+	CreateNative("TG_SetModuleVisibility", Native_SetModuleVisibility);
+	CreateNative("TG_GetModuleVisibility", Native_GetModuleVisibility);
+	
+	CreateNative("TG_GetGameStatus", Native_GetGameStatus);
+	CreateNative("TG_IsGameStatus", Native_IsGameStatus);
 
-	CreateNative( "TG_StartGame", Native_StartGame );
-	CreateNative( "TG_GetCurrentGameID", Native_GetCurrentGameID );
-	CreateNative( "TG_IsCurrentGameID", Native_IsCurrentGameID );
-	CreateNative( "TG_GetCurrentDataPack", Native_GetCurrentDataPack );
-	CreateNative( "TG_GetCurrentStarter", Native_GetCurrentStarter );
-	CreateNative( "TG_GetCurrentCustomName", Native_GetCurrentCustomName );
-	CreateNative( "TG_GetGameName", Native_GetGameName );
-	CreateNative( "TG_GetGameType", Native_GetGameType );
-	CreateNative( "TG_GetGameRequiredFlag", Native_GetGameRequiredFlag );
-	CreateNative( "TG_StopGame", Native_StopGame );
-
-	CreateNative( "TG_GetGameStatus", Native_GetGameStatus );
-	CreateNative( "TG_IsGameStatus", Native_IsGameStatus );
-
-	CreateNative( "TG_PrintToChat", Native_PrintToChat );
-	CreateNative( "TG_PrintToChatEx", Native_PrintToChatEx );
-
-	CreateNative( "TG_LogMessage", Native_LogMessage );
-	CreateNative( "TG_LogRoundMessage", Native_LogRoundMessage );
-	CreateNative( "TG_LogGameMessage", Native_LogGameMessage );
-
-	CreateDownloadTableConfigFileIfNotExist();
+	CreateNative("TG_LogMessage", Native_LogMessage);
+	CreateNative("TG_LogRoundMessage", Native_LogRoundMessage);
+	CreateNative("TG_LogGameMessage", Native_LogGameMessage);
+	
+	Forward_OnTraceAttack = 	 		CreateGlobalForward("TG_OnTraceAttack", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, Param_CellByRef, 	Param_Cell, Param_Cell);
+	Forward_OnPlayerDamage = 	 		CreateGlobalForward("TG_OnPlayerDamage", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, Param_CellByRef, 	Param_Cell, Param_Cell);
+	Forward_OnPlayerDeath = 	 		CreateGlobalForward("TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 	 Param_String, 		Param_Cell, Param_String);
+	Forward_OnPlayerTeam = 	 			CreateGlobalForward("TG_OnPlayerTeam", 					ET_Event, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
+	Forward_OnPlayerRebel = 	 		CreateGlobalForward("TG_OnPlayerRebel", 				ET_Event, 	Param_Cell, 		Param_Cell);
+	Forward_OnPlayerLeaveGame = 	 	CreateGlobalForward("TG_OnPlayerLeaveGame", 			ET_Event, 	Param_String, 		Param_Cell, 		Param_Cell, 		Param_Cell);
+	Forward_OnLaserFenceCreatePre = 	CreateGlobalForward("TG_OnLaserFenceCreatePre", 		ET_Event, 	Param_Array, 		Param_Array);
+	Forward_OnLaserFenceCrossed = 		CreateGlobalForward("TG_OnLaserFenceCrossed", 			ET_Hook, 	Param_Cell, 		Param_FloatByRef);
+	Forward_OnLaserFenceDestroyed = 	CreateGlobalForward("TG_OnLaserFenceDestroyed", 		ET_Ignore, 	Param_Array, 		Param_Array);
+	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Hook, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
+	Forward_OnMenuGameDisplay = 		CreateGlobalForward("TG_OnMenuGameDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_String);
+	Forward_OnGameSelected = 			CreateGlobalForward("TG_OnGameSelected",				ET_Event, 	Param_String,		Param_Cell);
+	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGamePrepare =  			CreateGlobalForward("TG_OnGamePrepare",					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGameStart = 	 			CreateGlobalForward("TG_OnGameStart", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGameStartError = 			CreateGlobalForward("TG_OnGameStartError",				ET_Ignore, 	Param_String,		Param_Cell, 		Param_Cell, 		Param_String);
+	Forward_OnTeamEmpty = 	 			CreateGlobalForward("TG_OnTeamEmpty", 					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell,			Param_Cell);
+	Forward_OnGameEnd = 	 			CreateGlobalForward("TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell);
+	Forward_OnMenuDisplay =  			CreateGlobalForward("TG_OnMenuDisplay",					ET_Event, 	Param_Cell);
+	Forward_OnMenuItemDisplay = 		CreateGlobalForward("TG_OnMenuItemDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_CellByRef, 	Param_String);
+	Forward_OnMenuItemSelected = 		CreateGlobalForward("TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell);
+	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
+	
 	CreateModulesConfigFileIfNotExist();
-
+	
+	RemoveAllTGMenuItems();
+	RemoveAllGames();
+	
 	LoadMenuItemsConfig();
 	LoadGamesMenuConfig();
-
+	
+	g_iEngineVersion = GetEngineVersion();
+	if (g_iEngineVersion != Engine_CSS && g_iEngineVersion != Engine_CSGO) {
+		LogError("Unsupported engine version detected!");
+	}
+	
 	RegPluginLibrary("TeamGames");
 	
 	return APLRes_Success;
 }
 
-public GameStartMenu_Handler( Handle:menu, MenuAction:action, client, param2 )
+public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 {
-	if( action == MenuAction_Cancel )
-	{
-		CloseHandle( Handle:TG_GetMenuCell( menu, "-DATAPACK-" ) );
-		TG_ShowGamesMenu( client );
-	}
-	else if( action == MenuAction_Select )
-	{
-		decl String:info[ 64 ];
-		GetMenuItem( menu, param2, info, sizeof( info ) );
+	if (iAction == MenuAction_Cancel) {
+		if (Handle:GetMenuCell(hMenu, "-DATAPACK-") != INVALID_HANDLE) {
+			CloseHandle(Handle:GetMenuCell(hMenu, "-DATAPACK-"));
+		}
+		
+		MainMenu(iClient);
+	} else if (iAction == MenuAction_Select) {
+		decl String:sKey[64];
+		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
 
-		if( StrEqual( info, "START_GAME" ) )
-		{
-			decl String:CustomName[ 64 ];
-			decl String:GameIdStr[ 64 ];
+		if (StrEqual(sKey, "START_GAME")) {
+			decl String:sSettings[TG_GAME_SETTINGS_LENGTH];
+			decl String:sGameIdStr[TG_MODULE_ID_LENGTH];
 
-			TG_GetMenuString( menu, "-GAMEID-", GameIdStr, sizeof( GameIdStr ) );
-			TG_GetMenuString( menu, "-CUSTOMNAME-", CustomName, sizeof( CustomName ) );
+			GetMenuString(hMenu, "-GAMEID-", sGameIdStr, sizeof(sGameIdStr));
+			GetMenuString(hMenu, "-GAMESETTINGS-", sSettings, sizeof(sSettings));
 			
-			TG_StartGamePreparation( TG_GetMenuCell( menu, "-CLIENT-" ), GameIdStr, CustomName, Handle:TG_GetMenuCell( menu, "-DATAPACK-" ) );
+			TG_StartGamePreparation(GetMenuCell(hMenu, "-CLIENT-"), sGameIdStr, sSettings, Handle:GetMenuCell(hMenu, "-DATAPACK-"), bool:GetMenuCell(hMenu, "-REMOVEDROPS-"), bool:GetMenuCell(hMenu, "-CHECKTEAMS-"), bool:GetMenuCell(hMenu, "-ENDONTEAMEMPTY-"));
 		}
 	}
 }
 
-TG_StartGamePreparation( client, String:id[ 64 ], String:CustomName[ 64 ], Handle:GameCustomDataPack )
+TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettings[TG_GAME_SETTINGS_LENGTH], Handle:hGameCustomDataPack, bool:bRemoveDropppedWeapons, bool:bCheckTeams, bool:bEndOnTeamEmpty)
 {
-	new String:name[ 64 ], String:team1[ 4096 ], String:team2[ 4096 ];
-	new count1, count2;
+	new String:sName[TG_MODULE_NAME_LENGTH], String:sTeam1[4096], String:sTeam2[4096];
+	new iCount1, iCount2;
 
-	decl String:ErrorDescription[ 512 ];
-	new ErrorCode = 0;
+	decl String:sErrorDescription[512];
+	new iErrorCode = 0;
 
-	strcopy( name, 64, g_GameList[ GetGameIndex( id ) ][ Name ] );
+	strcopy(sName, TG_MODULE_NAME_LENGTH, g_GameList[GetGameIndex(sID)][DefaultName]);
 
-	if( g_Game[ GameProgress ] == InProgress || g_Game[ GameProgress ] == InPreparation )
-	{
-		TG_PrintToChat( client, "%t", "StartGame Error Another game in progress" );
-		Format( ErrorDescription, sizeof( ErrorDescription ), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (name: \"%s\") (id: \"%s\") (error: \"Another game in progress\")", 1, client, name, id );
+	if (g_Game[GameProgress] == TG_InProgress || g_Game[GameProgress] == TG_InPreparation) {
+		CPrintToChat(iClient, "%t", "StartGame-AnotherGameInProgress");
+		Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Another game in progress\")", 1, iClient, sName, sID);
 		
-		ErrorCode = 1;
+		iErrorCode = 1;
 	}
 
-	if( !IsGameTypeAvailable( g_GameList[ GetGameIndex( id ) ][ GameType ] ) )
-	{
-		TG_PrintToChat( client, "%t", "StartGame Error Bad team ratio" );
-		Format( ErrorDescription, sizeof( ErrorDescription ), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (name: \"%s\") (id: \"%s\") (error: \"Bad teams ratio\")", 2, client, name, id );
+	if (bCheckTeams && !IsGameTypeAvailable(g_GameList[GetGameIndex(sID)][GameType])) {
+		CPrintToChat(iClient, "%t", "StartGame-BadTeamRatio");
+		Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Bad teams ratio\")", 2, iClient, sName, sID);
 		
-		ErrorCode = 2;
+		iErrorCode = 2;
+	}
+	
+	if (!IsPlayerAlive(iClient) && !CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
+		CPrintToChat(iClient, "%t", "StartGame-AliveOnly");
+		Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"iActivator is dead and doesn't have required admin sFlag\")", 4, iClient, sName, sID);
+		
+		iErrorCode = 4;
 	}
 
-	new String:MenuFlag[ 64 ];
-	GetConVarString( gh_MenuFlag, MenuFlag, sizeof( MenuFlag ) );
-
-	if( !IsPlayerAlive( client ) && !StrEqual( MenuFlag, "" ) && !TG_ClientHasAdminFlag( client, MenuFlag ) )
-	{
-		TG_PrintToChat( client, "%t", "StartGame Error Alive only" );
-		Format( ErrorDescription, sizeof( ErrorDescription ), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (name: \"%s\") (id: \"%s\") (error: \"activator is dead and doesn't have required admin flag\")", 4, client, name, id );
+	if (iErrorCode != 0) {
+		TG_LogRoundMessage("GamePrepare", sErrorDescription);
 		
-		ErrorCode = 4;
-	}
-
-	if( ErrorCode != 0 )
-	{
-		TG_LogRoundMessage( "GamePrepare", ErrorDescription );
-		
-		Call_StartForward( Forward_OnGameStartError );
-		Call_PushString( id );
-		Call_PushCell( client );
-		Call_PushCell( ErrorCode );
-		Call_PushString( ErrorDescription );
+		Call_StartForward(Forward_OnGameStartError);
+		Call_PushString(sID);
+		Call_PushCell(iClient);
+		Call_PushCell(iErrorCode);
+		Call_PushString(sErrorDescription);
 		Call_Finish();
 
-		TG_KillHandle( GameCustomDataPack );
-		return ErrorCode;
+		if (hGameCustomDataPack != INVALID_HANDLE) {
+			CloseHandle(hGameCustomDataPack);
+			hGameCustomDataPack = INVALID_HANDLE;
+		}
+		
+		// ThrowError(sErrorDescription);
+		return iErrorCode;
 	}
-
-	g_Game[ GameProgress ] = InPreparation;
 	
-	g_Game[ GameDataPack ] = GameCustomDataPack;
-	strcopy( g_Game[ GameCustomName ], 64, CustomName );
-	g_Game[ GameStarter ] = client;
+	g_Game[GameProgress] = TG_InPreparation;
 	
-	g_TeamsLock = true;
+	g_Game[GameDataPack] = hGameCustomDataPack;
+	strcopy(g_Game[GameSettings], TG_GAME_SETTINGS_LENGTH, sSettings);
+	g_Game[GameStarter] = iClient;
+	g_Game[RemoveDrops] = bRemoveDropppedWeapons;
+	g_Game[EndOnTeamEmpty] = bEndOnTeamEmpty;
+	
+	g_bTeamsLock = true;
 
-	strcopy( g_Game[ GameID ], 64, id );
+	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, sID);
+	new iGameIndex = GetGameIndex(g_Game[GameID]);
+	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, g_GameList[iGameIndex][DefaultName]);
+	
+	g_Game[GameType] = g_GameList[iGameIndex][GameType];
+	
+	if (g_iRoundLimit > 0)
+		g_iRoundLimit--;
 
-	if( g_RoundLimit > 0 )
-		g_RoundLimit--;
-
-	TG_PrintToChatAll( "%t", "Game preparation", CustomName );
-	if( g_DoubleMsg )
-		TG_PrintToChatAll( "%t", "Game preparation", CustomName );
-
-	for( new i = 1; i <= MaxClients; i++ )
-	{
-		if( TG_IsPlayerRedOrBlue( i ) )
-		{
-			SetEntityMoveType( i, MoveType:MOVETYPE_NONE );
-
-			SavePlayerEquipment( i );
-			Client_RemoveAllWeapons( i, "", true );
-
-			if( TG_GetPlayerTeam( i ) == RedTeam && g_LogCvar )
-			{
-				Format( team1, sizeof( team1 ), "%s%L, ", team1, i );
-				count1++;
+	if (sSettings[0] == '\0') {
+		PrintImportantMessage("%t", "GamePreparation", g_Game[DefaultName]);
+	} else {
+		PrintImportantMessage("%t", "GamePreparation-Settings", g_Game[DefaultName], sSettings);
+	}
+	
+	for (new i = 1; i <= MaxClients; i++) {
+		if (TG_IsPlayerRedOrBlue(i)) {
+			SetEntityMoveType(i, MoveType:MOVETYPE_NONE);
+			
+			SavePlayerEquipment(i);
+			Client_RemoveAllWeapons(i, "", true);
+			
+			if (TG_GetPlayerTeam(i) == TG_RedTeam) {
+				g_Game[RedTeam][iCount1] = GetClientUserId(i);
+				iCount1++;
+				g_Game[RedTeam][iCount1] = 0;
+				
+				if (g_bLogCvar) {
+					Format(sTeam1, sizeof(sTeam1), "%s%L, ", sTeam1, i);
+				}
 			}
-
-			if( TG_GetPlayerTeam( i ) == BlueTeam && g_LogCvar )
-			{
-				Format( team2, sizeof( team2 ), "%s%L, ", team2, i );
-				count2++;
+			
+			if (TG_GetPlayerTeam(i) == TG_BlueTeam) {
+				g_Game[BlueTeam][iCount2] = GetClientUserId(i);
+				iCount2++;
+				g_Game[BlueTeam][iCount2] = 0;
+				
+				if (g_bLogCvar) {
+					Format(sTeam2, sizeof(sTeam2), "%s%L, ", sTeam2, i);
+				}
+			}
+			
+			if (bRemoveDropppedWeapons) {
+				SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
 			}
 		}
 
-		if( IsClientConnected( i ) && IsClientInGame( i ) )
-			PrintToConsole( i, "\n// ----------\n\t[TeamGames] %N started preparation for game \"%s\"\n// ----------\n", client, name );
+		if (IsClientConnected(i) && IsClientInGame(i))
+			PrintToConsole(i, "\n// ----------\n\t[TeamGames] %N started preparation for game \"%s\"\n// ----------\n", iClient, sName);
 	}
 
-	new Handle:DataPack = CreateDataPack();
-	WritePackString( DataPack, CustomName );
-	WritePackCell( DataPack, client );
+	new Handle:hDataPack = CreateDataPack();
+	WritePackString(hDataPack, sSettings);
+	WritePackCell(hDataPack, iClient);
 
-	Call_StartForward( Forward_OnGamePrepare );
-	Call_PushString( g_Game[ GameID ] );
-	Call_PushCell( client );
-	Call_PushString( CustomName );
-	Call_PushCell( g_Game[ GameDataPack ] );
+	Call_StartForward(Forward_OnGamePrepare);
+	Call_PushString(g_Game[GameID]);
+	Call_PushCell(iClient);
+	Call_PushString(sSettings);
+	Call_PushCell(g_Game[GameDataPack]);
 	Call_Finish();
 
-	if( g_LogCvar )
-	{
-		if( strlen( team1 ) > 1 )
-			team1[ strlen( team1 ) - 2 ] = '\0';
+	if (g_bLogCvar) {
+		if (strlen(sTeam1) > 1)
+			sTeam1[strlen(sTeam1) - 2] = '\0';
 
-		if( strlen( team2 ) > 1 )
-			team2[ strlen( team2 ) - 2 ] = '\0';
+		if (strlen(sTeam2) > 1)
+			sTeam2[strlen(sTeam2) - 2] = '\0';
 		
-		TG_LogRoundMessage(    "GamePrepare", "\"%L\" started preparation for game (name: \"%s\") (id: \"%s\")", client, name, g_Game[ GameID ] );
-		TG_LogRoundMessage( _, "{" );
-		TG_LogRoundMessage( _, "\tModified game name: \"%s\"", CustomName );
-		TG_LogRoundMessage( _, "\tGame ID: \"%s\"", g_Game[ GameID ] );
-		TG_LogRoundMessage( _, "\tActivator: \"%L\"", client );
-		TG_LogRoundMessage( _, "" );
-		TG_LogRoundMessage( _, "\tRedTeam: \"%s\" (number of players: \"%d\")", team1, count1 );
-		TG_LogRoundMessage( _, "\tBlueTeam: \"%s\" (number of players: \"%d\")", team2, count2 );
-		TG_LogRoundMessage( _, "}" );
+		TG_LogRoundMessage(   "GamePrepare", "(ID: \"%s\")", g_Game[GameID]);
+		TG_LogRoundMessage(_, "{");
+		TG_LogRoundMessage(_, "\tSettings: \"%s\"", sSettings);
+		TG_LogRoundMessage(_, "\tActivator: \"%L\"", iClient);
+		TG_LogRoundMessage(_, "");
+		TG_LogRoundMessage(_, "\tRedTeam (%d): \"%s\"", iCount1, sTeam1);
+		TG_LogRoundMessage(_, "\tBlueTeam (%d): \"%s\"", iCount2, sTeam2);
+		TG_LogRoundMessage(_, "}");
 	}
 
-	if( IsSoundPrecached( g_GamePrepare[ 5 ] ) )
-		EmitSoundToAll( g_GamePrepare[ 5 ], _, _, _, _, 1.0, _, _, _, _, _, _);
+	if (IsSoundPrecached(g_sGamePrepare[5]))
+		EmitSoundToAllAny(g_sGamePrepare[5]);
 
-	g_Timer_CountDownGamePrepare_counter = 4;
-	h_Timer_CountDownGamePrepare = CreateTimer( 1.0, Timer_CountDownGamePrepare, DataPack, TIMER_REPEAT );
+	g_iTimer_CountDownGamePrepare_counter = 4;
+	g_hTimer_CountDownGamePrepare = CreateTimer(1.0, Timer_CountDownGamePrepare, hDataPack, TIMER_REPEAT);
 
 	return 0;
 }
 
-//------------------------------------------------------------------------------------------------
-// Timers
-
-public Action:Timer_CountDownGamePrepare( Handle:timer, Handle:DataPack )
+public Action:Hook_WeaponDrop(iClient, weapon)
 {
-	if( g_Timer_CountDownGamePrepare_counter > 0 )
-	{
-		if( IsSoundPrecached( g_GamePrepare[ g_Timer_CountDownGamePrepare_counter ] ) )
-			EmitSoundToAll( g_GamePrepare[ g_Timer_CountDownGamePrepare_counter ], _, _, _, _, 1.0, _, _, _, _, _, _);
+	if (!g_Game[RemoveDrops] || g_Game[GameProgress] == TG_NoGame)
+		return Plugin_Continue;
+	
+	if (TG_IsPlayerRedOrBlue(iClient) && IsValidEdict(weapon)) {
+		AcceptEntityInput(weapon, "Kill");
+	}
+	
+	return Plugin_Continue;
+}
+
+public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
+{
+	if (g_iTimer_CountDownGamePrepare_counter > 0) {
+		if (IsSoundPrecached(g_sGamePrepare[g_iTimer_CountDownGamePrepare_counter]))
+			EmitSoundToAllAny(g_sGamePrepare[g_iTimer_CountDownGamePrepare_counter]);
 		
 		#if defined DEBUG
-		LogMessage( "[TG DEBUG] Played file '%s'.", g_GamePrepare[ g_Timer_CountDownGamePrepare_counter ] );
+		LogMessage("[TG DEBUG] Played file '%s'.", g_sGamePrepare[g_iTimer_CountDownGamePrepare_counter]);
 		#endif
 		
-		g_Timer_CountDownGamePrepare_counter--;
-	}
-	else
-	{
-		if( IsSoundPrecached( g_GameStart ) )
-			EmitSoundToAll( g_GameStart, _, _, _, _, 1.0, _, _, _, _, _, _ );
+		g_iTimer_CountDownGamePrepare_counter--;
+	} else {
+		if (IsSoundPrecached(g_sGameStart))
+			EmitSoundToAllAny(g_sGameStart);
 
-		if( h_Timer_CountDownGamePrepare != INVALID_HANDLE )
-		{
-			KillTimer( h_Timer_CountDownGamePrepare );
-			h_Timer_CountDownGamePrepare = INVALID_HANDLE;
+		if (g_hTimer_CountDownGamePrepare != INVALID_HANDLE) {
+			KillTimer(g_hTimer_CountDownGamePrepare);
+			g_hTimer_CountDownGamePrepare = INVALID_HANDLE;
 		}
 
-		g_Timer_CountDownGamePrepare_counter = 4;
+		g_iTimer_CountDownGamePrepare_counter = 4;
 
-		g_Game[ GameProgress ] = InProgress;
+		g_Game[GameProgress] = TG_InProgress;
 
-		for( new i = 1; i <= MaxClients; i++ )
-		{
-			if( TG_IsTeamRedOrBlue( g_PlayerData[ i ][ Team ] ) )
-				SetEntityMoveType( i, MoveType:MOVETYPE_ISOMETRIC );
+		for (new i = 1; i <= MaxClients; i++) {
+			if (TG_IsTeamRedOrBlue(g_PlayerData[i][Team]))
+				SetEntityMoveType(i, MoveType:MOVETYPE_ISOMETRIC);
 		}
+		
+		new iGameIndex = GetGameIndex(g_Game[GameID]);
+		decl String:sSettings[TG_GAME_SETTINGS_LENGTH];
+		new iActivator = -1;
+		ResetPack(hDataPack);
+		ReadPackString(hDataPack, sSettings, sizeof(sSettings));
+		iActivator = ReadPackCell(hDataPack);
+		CloseHandle(hDataPack);
+		
+		if (sSettings[0] == '\0') {
+			PrintImportantMessage("%t", "GameStart", g_GameList[iGameIndex][DefaultName]);
+		} else {
+			PrintImportantMessage("%t", "GameStart-Settings", g_GameList[iGameIndex][DefaultName], sSettings);
+		}
+		
+		if (g_iFriendlyFire == 2)
+			SetConVarIntSilent("mp_friendlyfire", 1);
 
-		decl String:CustomName[ 64 ];
-		new activator = -1;
-		ResetPack( DataPack );
-		ReadPackString( DataPack, CustomName, sizeof( CustomName ) );
-		activator = ReadPackCell( DataPack );
-		CloseHandle( DataPack );
-
-		TG_PrintToChatAll( "%t", "Game started", CustomName );
-		if( g_DoubleMsg )
-			TG_PrintToChatAll( "%t", "Game started", CustomName );
-
-		if( GetConVarInt( gh_FriendlyFire ) == 2 )
-			SetConVarStringSilent( "mp_friendlyfire", "1" );
-
-		Call_StartForward( Forward_OnGameStart );
-		Call_PushString( g_Game[ GameID ] );
-		Call_PushCell( activator );
-		Call_PushString( CustomName );
-		Call_PushCell( g_Game[ GameDataPack ] );
+		Call_StartForward(Forward_OnGameStart);
+		Call_PushString(g_Game[GameID]);
+		Call_PushCell(iActivator);
+		Call_PushString(sSettings);
+		Call_PushCell(g_Game[GameDataPack]);
 		Call_Finish();
 
-		TG_LogRoundMessage( "GameStart", "game started (name: \"%s\") (id: \"%s\")", g_GameList[ GetGameIndex( g_Game[ GameID ] ) ][ Name ], g_Game[ GameID ] );
+		TG_LogRoundMessage("GameStart", "(ID: \"%s\")", g_Game[GameID]);
 	}
 
 	return Plugin_Continue;
