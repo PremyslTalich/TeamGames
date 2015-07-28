@@ -1,0 +1,10 @@
+models/ks/tg/ring_corner.mdl
+models/ks/tg/ring_corner.dx80.vtx
+models/ks/tg/ring_corner.dx90.vtx
+models/ks/tg/ring_corner.phy
+models/ks/tg/ring_corner.sw.vtx
+models/ks/tg/ring_corner.vvd
+materials/models/ks/tg/ring_corner/metalstainless01.vmt
+materials/models/ks/tg/ring_corner/train_metalceiling_02.vmt
+materials/de_train/train_metalceiling_02.vtf
+materials/props/metalstainless01.vtf

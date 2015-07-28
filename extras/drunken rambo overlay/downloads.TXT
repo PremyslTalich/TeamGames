@@ -1,0 +1,5 @@
+materials/effects/strider_pinch_dudv.vmt
+materials/effects/strider_pinch_dudv.vtf
+materials/effects/strider_pinch_dudv_dx60.vmt
+materials/effects/strider_pinch_dx70.vtf
+materials/effects/strider_pinch_normal.vtf
