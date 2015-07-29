@@ -51,15 +51,13 @@ public TG_OnMenuGameDisplay(const String:sID[], iClient, String:sName[])
 	}
 }
 
-public Action:TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnGameSelected(const String:sID[], iClient)
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
-		return Plugin_Continue;
+		return;
 	
 	strcopy(g_sWeapon, sizeof(g_sWeapon), "");
 	SetWeaponMenu(iClient, sID);
-	
-	return Plugin_Continue;
 }
 
 public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)

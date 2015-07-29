@@ -82,14 +82,12 @@ public TG_OnMenuGameDisplay(const String:sID[], iClient, String:name[])
 		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", iClient);
 }
 
-public Action:TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnGameSelected(const String:sID[], iClient)
 {
 	if (!StrEqual(sID, GAME_ID, true)) 
-		return Plugin_Continue;
+		return;
 
 	TG_ShowPlayerSelectMenu(iClient, TG_RedTeam, SelectPlayerHandeler, "%T", "ChooseRambo", iClient);
-	
-	return Plugin_Continue;
 }
 
 public SelectPlayerHandeler(iActivator, iClient, bool:bIsRandom)

@@ -458,12 +458,18 @@ public MainMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 			decl String:sKey[TG_MODULE_ID_LENGTH], String:CustomItemName[TG_MODULE_NAME_LENGTH];
 			GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, CustomItemName, sizeof(CustomItemName));
 			
-			if (!IsPlayerAlive(iClient)) {
-				if (!CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
-					CPrintToChat(iClient, "%t", "Menu-AliveOnly");
-					return;
-				}
+			if (!IsPlayerAlive(iClient) && !CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
+				CPrintToChat(iClient, "%T", "Menu-AliveOnly", iClient);
+				return;
 			}
+			
+			new Action:iResult = Plugin_Continue;
+			Call_StartForward(Forward_OnMenuItemSelect);
+			Call_PushString(sKey);
+			Call_PushCell(iClient);
+			Call_Finish(iResult);			
+			if (iResult != Plugin_Continue)
+				return;
 			
 			Call_StartForward(Forward_OnMenuItemSelected);
 			Call_PushString(sKey);

@@ -79,15 +79,13 @@ public TG_OnMenuGameDisplay(const String:sID[], iClient, String:sName[])
 	}
 }
 
-public Action:TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnGameSelected(const String:sID[], iClient)
 {
 	if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 		TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, _, _, _, _, false);
 	} else if (StrEqual(sID, GAME_ID_REDONLY)) {
 		TG_StartGame(iClient, GAME_ID_REDONLY, _, _, _, _, false);
 	}
-	
-	return Plugin_Continue;
 }
 
 public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)

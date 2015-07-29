@@ -81,7 +81,7 @@ public TG_OnMenuGameDisplay(const String:sID[], iClient, String:name[])
 	}
 }
 
-public Action:TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnGameSelected(const String:sID[], iClient)
 {
 	if (StrEqual(sID, TASERMANIA_FF_ID)) {
 		TG_StartGame(iClient, TASERMANIA_FF_ID, _, _, true);
@@ -94,8 +94,6 @@ public Action:TG_OnGameSelected(const String:sID[], iClient)
 	} else if  (StrEqual(sID, CHICKENHUNT_RO_ID)) {
 		TG_StartGame(iClient, CHICKENHUNT_RO_ID, _, _, _, _, false);
 	}
-	
-	return Plugin_Continue;
 }
 
 public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)

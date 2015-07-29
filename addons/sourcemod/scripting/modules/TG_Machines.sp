@@ -46,14 +46,12 @@ public TG_OnMenuGameDisplay(const String:id[], iClient, String:name[])
 		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", iClient);
 }
 
-public Action:TG_OnGameSelected(const String:id[], iClient)
+public TG_OnGameSelected(const String:id[], iClient)
 {
 	if (!StrEqual(id, GAME_ID, true))
-		return Plugin_Continue;
+		return;
 	
 	TG_StartGame(iClient, GAME_ID, _, _, true);
-	
-	return Plugin_Continue;
 }
 
 public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)

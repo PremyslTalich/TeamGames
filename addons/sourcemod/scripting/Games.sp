@@ -57,12 +57,17 @@ public GamesMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		#endif
 		
 		new Action:result = Plugin_Continue;
-		Call_StartForward(Forward_OnGameSelected);
+		Call_StartForward(Forward_OnGameSelect);
 		Call_PushString(sKey);
 		Call_PushCell(iClient);
 		Call_Finish(result);
 		if (result != Plugin_Continue)
 			return;
+		
+		Call_StartForward(Forward_OnGameSelected);
+		Call_PushString(sKey);
+		Call_PushCell(iClient);
+		Call_Finish();		
 	} else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack) {
 		MainMenu(iClient);
 	}

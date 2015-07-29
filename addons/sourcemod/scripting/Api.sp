@@ -350,16 +350,27 @@ public Native_FakeSelect(Handle:hPlugin, iNumParams)
 	}
 	
 	if (iType == TG_Game) {
-		new Action:iResult = Plugin_Continue;
+		new Action:iResult = Plugin_Continue;		
+		Call_StartForward(Forward_OnGameSelect);
+		Call_PushString(sID);
+		Call_PushCell(iStarter);
+		Call_Finish(iResult);		
+		if (iResult != Plugin_Continue)
+			return 0;
 		
 		Call_StartForward(Forward_OnGameSelected);
 		Call_PushString(sID);
 		Call_PushCell(iStarter);
-		Call_Finish(iResult);
-		
+		Call_Finish();
+	} else if (iType == TG_MenuItem) {
+		new Action:iResult = Plugin_Continue;
+		Call_StartForward(Forward_OnMenuItemSelect);
+		Call_PushString(sID);
+		Call_PushCell(iStarter);
+		Call_Finish(iResult);			
 		if (iResult != Plugin_Continue)
 			return 0;
-	} else if (iType == TG_MenuItem) {
+		
 		Call_StartForward(Forward_OnMenuItemSelected);
 		Call_PushString(sID);
 		Call_PushCell(iStarter);
@@ -1065,7 +1076,8 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Hook, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
 	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
 	Forward_OnMenuGameDisplay = 		CreateGlobalForward("TG_OnMenuGameDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_String);
-	Forward_OnGameSelected = 			CreateGlobalForward("TG_OnGameSelected",				ET_Event, 	Param_String,		Param_Cell);
+	Forward_OnGameSelect = 				CreateGlobalForward("TG_OnGameSelect",					ET_Event, 	Param_String,		Param_Cell);
+	Forward_OnGameSelected = 			CreateGlobalForward("TG_OnGameSelected",				ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGamePrepare =  			CreateGlobalForward("TG_OnGamePrepare",					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGameStart = 	 			CreateGlobalForward("TG_OnGameStart", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
@@ -1075,6 +1087,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnMenuDisplay =  			CreateGlobalForward("TG_OnMenuDisplay",					ET_Event, 	Param_Cell);
 	Forward_OnMenuDisplayed =  			CreateGlobalForward("TG_OnMenuDisplayed",				ET_Ignore, 	Param_Cell);
 	Forward_OnMenuItemDisplay = 		CreateGlobalForward("TG_OnMenuItemDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_CellByRef, 	Param_String);
+	Forward_OnMenuItemSelect = 			CreateGlobalForward("TG_OnMenuItemSelect", 				ET_Event, 	Param_String,		Param_Cell);
 	Forward_OnMenuItemSelected = 		CreateGlobalForward("TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
 	

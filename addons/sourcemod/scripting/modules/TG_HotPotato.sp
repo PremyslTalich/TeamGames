@@ -55,14 +55,12 @@ public OnConfigsExecuted()
 	g_bHealthColor = GetConVarBool(g_hHeathColor);
 }
 
-public Action:TG_OnGameSelected(const String:id[], iClient)
+public TG_OnGameSelected(const String:id[], iClient)
 {
 	if (!StrEqual(id, GAME_ID, true))
-		return Plugin_Continue;
+		return;
 	
 	ModuleSetTypeGameMenu(iClient);
-	
-	return Plugin_Continue;
 }
 
 public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)

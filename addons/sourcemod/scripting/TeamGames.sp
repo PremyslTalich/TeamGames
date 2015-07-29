@@ -43,6 +43,7 @@ new Handle:Forward_OnLaserFenceDestroyed;
 new Handle:Forward_OnMarkSpawn;
 new Handle:Forward_OnMarkSpawned;
 new Handle:Forward_OnMenuGameDisplay;
+new Handle:Forward_OnGameSelect;
 new Handle:Forward_OnGameSelected;
 new Handle:Forward_OnGameStartMenu;
 new Handle:Forward_OnGamePrepare;
@@ -53,6 +54,7 @@ new Handle:Forward_OnTeamEmpty;
 new Handle:Forward_OnMenuDisplay;
 new Handle:Forward_OnMenuDisplayed;
 new Handle:Forward_OnMenuItemDisplay;
+new Handle:Forward_OnMenuItemSelect;
 new Handle:Forward_OnMenuItemSelected;
 new Handle:Forward_OnDownloadFile;
 

@@ -61,7 +61,8 @@ forward TG_OnMenuGameDisplay(const String:id[], client, String:name[]);
  * @param id			Game ID of selected game.
  * @noreturn
  */
-forward Action:TG_OnGameSelected(const String:id[], client);
+forward Action:TG_OnGameSelect(const String:id[], client);
+forward TG_OnGameSelected(const String:id[], client);
 
 /**
  * When modul called TG_StartGame().
@@ -139,7 +140,7 @@ forward TG_OnTeamEmpty(const String:id[], client, TG_Team:iTeam, TG_PlayerTrigge
 forward TG_OnPlayerLeaveGame(const String:id[], client, TG_Team:iTeam, TG_PlayerTrigger:iTrigger);
 
 forward Action:TG_OnMenuDisplay(client);
-forward Action:TG_OnMenuDisplayed(client);
+forward TG_OnMenuDisplayed(client);
 
 /**
  * When the player selected item in TeamGames main menu.
@@ -148,6 +149,7 @@ forward Action:TG_OnMenuDisplayed(client);
  * @param id			Item ID of selected item.
  * @noreturn
  */
+forward Action:TG_OnMenuItemSelect(const String:id[], client);
 forward TG_OnMenuItemSelected(const String:id[], client);
 
 forward TG_OnMenuItemDisplay(const String:id[], client, &TG_MenuItemStatus:status, String:name[]);

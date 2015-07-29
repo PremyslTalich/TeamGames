@@ -46,12 +46,10 @@ public TG_OnMenuGameDisplay(const String:sID[], iClient, String:name[])
 	}
 }
 
-public Action:TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnGameSelected(const String:sID[], iClient)
 {
 	if (StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY))
 		SetHPMenu(iClient, sID);
-	
-	return Plugin_Continue;
 }
 
 public TG_OnGamePrepare(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
