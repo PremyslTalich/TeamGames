@@ -40,6 +40,7 @@ new Handle:Forward_OnLaserFenceCreatePre;
 new Handle:Forward_OnLaserFenceCrossed;
 new Handle:Forward_OnLaserFenceDestroyed;
 new Handle:Forward_OnMarkSpawn;
+new Handle:Forward_OnMarkSpawned;
 new Handle:Forward_OnMenuGameDisplay;
 new Handle:Forward_OnGameSelected;
 new Handle:Forward_OnGameStartMenu;

@@ -1062,6 +1062,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnLaserFenceCrossed = 		CreateGlobalForward("TG_OnLaserFenceCrossed", 			ET_Hook, 	Param_Cell, 		Param_FloatByRef);
 	Forward_OnLaserFenceDestroyed = 	CreateGlobalForward("TG_OnLaserFenceDestroyed", 		ET_Ignore, 	Param_Array, 		Param_Array);
 	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Hook, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
+	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
 	Forward_OnMenuGameDisplay = 		CreateGlobalForward("TG_OnMenuGameDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_String);
 	Forward_OnGameSelected = 			CreateGlobalForward("TG_OnGameSelected",				ET_Event, 	Param_String,		Param_Cell);
 	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);

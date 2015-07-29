@@ -49,6 +49,7 @@ forward Action:TG_OnLaserFenceCreatePre(Float:a[3], Float:c[3]);
 forward TG_OnLaserFenceDestroyed(Float:a[3], Float:c[3]);
 
 forward Action:TG_OnMarkSpawn(client, TG_Team:iTeam, Float:position[3], Float:life);
+forward TG_OnMarkSpawned(client, TG_Team:iTeam, Float:position[3], Float:life);
 
 forward TG_OnMenuGameDisplay(const String:id[], client, String:name[]);
 

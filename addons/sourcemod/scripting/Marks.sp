@@ -48,7 +48,7 @@ public Action:Timer_AbleToMark(Handle:hTimer, any:iClient)
 	return Plugin_Continue;
 }
 
-bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime = 0.0, bool:iCount = true, bool:bFireEvent = true)
+bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime = 0.0, bool:bCount = true, bool:bFireEvent = true)
 {
 	new Float:fPos[3];
 	fPos[0] = fX;
@@ -73,12 +73,19 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 			return false;		
 	}
 	
+	Call_StartForward(Forward_OnMarkSpawned);
+	Call_PushCell(iClient);
+	Call_PushCell(iTeam);
+	Call_PushArray(fPos, 3);
+	Call_PushFloat(fLife);
+	Call_Finish();
+	
 	fPos[2] += g_Mark[iTeam][e_High];
 	
 	TE_SetupGlowSprite(fPos, g_Mark[iTeam][e_Sprite], fLife, g_Mark[iTeam][e_Scale], 255);
 	TE_SendToAll();
 	
-	if (iCount) {
+	if (bCount) {
 		g_PlayerData[iClient][AbleToMark] = false;
 		CreateTimer(0.01, Timer_AbleToMark, iClient);
 		
