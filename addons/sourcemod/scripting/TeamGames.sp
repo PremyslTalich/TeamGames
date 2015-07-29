@@ -51,6 +51,7 @@ new Handle:Forward_OnGameStartError;
 new Handle:Forward_OnGameEnd;
 new Handle:Forward_OnTeamEmpty;
 new Handle:Forward_OnMenuDisplay;
+new Handle:Forward_OnMenuDisplayed;
 new Handle:Forward_OnMenuItemDisplay;
 new Handle:Forward_OnMenuItemSelected;
 new Handle:Forward_OnDownloadFile;

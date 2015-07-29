@@ -332,6 +332,10 @@ MainMenu(iClient)
 	if (iResult != Plugin_Continue)
 		return;
 	
+	Call_StartForward(Forward_OnMenuDisplayed);
+	Call_PushCell(iClient);
+	Call_Finish();
+	
 	new Handle:hMenu = CreateMenu(MainMenu_Handler);
 	decl String:sTransMsg[256], String:sMenuItemName[TG_MODULE_NAME_LENGTH];
 	

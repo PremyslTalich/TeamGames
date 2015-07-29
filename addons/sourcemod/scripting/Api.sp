@@ -1073,6 +1073,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnTeamEmpty = 	 			CreateGlobalForward("TG_OnTeamEmpty", 					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell,			Param_Cell);
 	Forward_OnGameEnd = 	 			CreateGlobalForward("TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell);
 	Forward_OnMenuDisplay =  			CreateGlobalForward("TG_OnMenuDisplay",					ET_Event, 	Param_Cell);
+	Forward_OnMenuDisplayed =  			CreateGlobalForward("TG_OnMenuDisplayed",				ET_Ignore, 	Param_Cell);
 	Forward_OnMenuItemDisplay = 		CreateGlobalForward("TG_OnMenuItemDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_CellByRef, 	Param_String);
 	Forward_OnMenuItemSelected = 		CreateGlobalForward("TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);

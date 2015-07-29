@@ -139,6 +139,7 @@ forward TG_OnTeamEmpty(const String:id[], client, TG_Team:iTeam, TG_PlayerTrigge
 forward TG_OnPlayerLeaveGame(const String:id[], client, TG_Team:iTeam, TG_PlayerTrigger:iTrigger);
 
 forward Action:TG_OnMenuDisplay(client);
+forward Action:TG_OnMenuDisplayed(client);
 
 /**
  * When the player selected item in TeamGames main menu.
