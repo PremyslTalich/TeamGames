@@ -84,7 +84,7 @@ public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, i
 			fA[2] = ReadPackFloat(hDataPack);
 			
 			GetClientAbsOrigin(iClient, fC);			
-			CreateFence(fA, fC);
+			CreateFence(fA, fC, iClient);
 			
 			MainMenu(iClient);
 		}
@@ -100,7 +100,7 @@ public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, i
 	}
 }
 
-CreateFence(Float:fA[3], Float:fC[3])
+CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 {
 	if (g_iFenceType == 0) {
 		return;
@@ -108,12 +108,19 @@ CreateFence(Float:fA[3], Float:fC[3])
 	DestroyFence();
 	
 	new Action:iResult = Plugin_Continue;
-	Call_StartForward(Forward_OnLaserFenceCreatePre);
+	Call_StartForward(Forward_OnLaserFenceCreate);
+	Call_PushCell(iClient);
 	Call_PushArray(fA, 3);
 	Call_PushArray(fC, 3);
 	Call_Finish(iResult);
 	if (iResult != Plugin_Continue)
 		return;
+	
+	Call_StartForward(Forward_OnLaserFenceCreated);
+	Call_PushCell(iClient);
+	Call_PushArray(fA, 3);
+	Call_PushArray(fC, 3);
+	Call_Finish();
 	
 	CreateFencePoints(fA, fC);
 	CreateBrushTrigger();

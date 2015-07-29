@@ -37,7 +37,8 @@ forward Action:TG_OnLaserFenceCrossed(client, Float:FreezeTime);
  * @param c		Float array of coordinates of point c.
  * @noreturn
  */
-forward Action:TG_OnLaserFenceCreatePre(Float:a[3], Float:c[3]);
+forward Action:TG_OnLaserFenceCreate(client, Float:a[3], Float:c[3]);
+forward Action:TG_OnLaserFenceCreated(client, Float:a[3], Float:c[3]);
 
 /**
  * Before fence is destroyed.
