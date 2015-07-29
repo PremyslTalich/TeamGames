@@ -94,9 +94,9 @@ public OnPluginStart()
 	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 		"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are hold forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
 
 	g_hModuleDefVisibility = 		CreateConVar("tg_module_defvisibility",		"1", 			"Default visibility of new modules (might not work properly). (1 = visible, 0 = invisible)");
-	
+
 	g_hMenuPercent = 				CreateConVar("tg_menu_percent", 			"0.0", 			"How many percent of alive CTs must use !tg to unlock !tg menu (0.0 = no limit)", _, true, 0.0, true, 1.0);
-	
+
 	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow sefl damage, even in game");
 
 	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 			"How many games can be played in one round. (-1 = no limit)");
@@ -116,7 +116,7 @@ public OnPluginStart()
 
 	g_hImportantMsg = 				CreateConVar("tg_chat_doubleimportant",		"1",			"Print important messages twice (translations: GamePreparation, GameStart, TeamWins-RedTeam, TeamWins-BlueTeam and TeamWins-Tie)? (1 = true, 0 = false)"); //
 	g_hAllowTeamPrefix = 			CreateConVar("tg_chat_teamprefix",			"1",			"Use chat name prefix (for player in team red or team blue)? (1 = true, 0 = false) (requires plugin \"simple-chatprocessor.smx\")");
-	
+
 	g_hFenceType = 					CreateConVar("tg_fence_type",				"1",			"Fence type:\n\t0 = fence is turned off\n\t1 = beam fence\n\t2 = rope fence");
 	g_hFenceHeight = 				CreateConVar("tg_fence_height",				"72.0",			"Height of fence. (Player can jump over fence)", _, true, 12.0, true, 1024.0);
 	g_hFenceNotify = 				CreateConVar("tg_fence_notify",				"2",			"Notify in chat that player crossed laser fence?\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
@@ -162,9 +162,9 @@ public OnPluginStart()
 
 	// AutoExecConfigAppend(_, PLUGIN_CONFIG);
 	// AutoExecConfig(_, _, PLUGIN_CONFIG);
-	
+
 	CAddVariable("&prefix", 	"TG", true);
-	
+
 	CAddVariable("tg-noneteam", "{default}");
 	CAddVariable("tg-redteam", 	"{lightred}");
 	CAddVariable("tg-blueteam", "{lightblue}");
@@ -185,13 +185,13 @@ public OnMapStart()
 		ClearPlayerData(i);
 		ClearPlayerEquipment(i);
 	}
-	
+
 	new String:sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof (sPath), DOWNLOADS_CONFIG);
 
 	DTC_CreateConfig(sPath, DTC_OnCreateConfig);
 	DTC_LoadConfig(sPath, DTC_OnFile);
-	
+
 	PrecacheSoundAny("buttons/blip2.wav", true);
 	PrecacheModel("models/props/cs_office/trash_can.mdl", true);
 	g_iFenceHalo = PrecacheModel(FENCE_PRECACHE_HALO);
@@ -210,7 +210,7 @@ public OnConfigsExecuted()
 	if (g_hNotifyTimer != INVALID_HANDLE) {
 		KillTimer(g_hNotifyTimer);
 		g_hNotifyTimer = INVALID_HANDLE;
-	}	
+	}
 	g_hNotifyTimer = CreateTimer(3.0, Timer_HintTeam, _, TIMER_REPEAT);
 }
 
@@ -287,20 +287,20 @@ public Action:Event_RoundEnd(Handle:hEvent, const String:sName[], bool:bDontBroa
 public Action:Hook_TraceAttack(iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType, &iAmmoType, iHitBox, iHitGroup)
 {
 	new Action:iReturnValue = Hook_PlayerAttack(true, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
-	
+
 	// if ((Client_IsIngame(iAttacker) || iAttacker == 0) && Client_IsIngame(iVictim))
 		// PrintToChatAll("Attack: %N -> %N = %d", iAttacker, iVictim, iReturnValue);
-	
+
 	return iReturnValue;
 }
 
 public Action:Hook_OnTakeDamage(iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType)
 {
 	new Action:iReturnValue = Hook_PlayerAttack(false, iVictim, iAttacker, iInflictor, fDamage, iDamageType);
-	
+
 	// if ((Client_IsIngame(iAttacker) || iAttacker == 0) && Client_IsIngame(iVictim))
 		// PrintToChatAll("Damage: %N -> %N = %d", iAttacker, iVictim, iReturnValue);
-	
+
 	return iReturnValue;
 }
 
@@ -550,7 +550,7 @@ LoadLogging()
 
 		if (!DirExists(sDirPath))
 			CreateDirectory(sDirPath, 511);
-		
+
 		if (fLogTime > 0.0) {
 			new Handle:hDirectory = OpenDirectory(sDirPath);
 
@@ -565,7 +565,7 @@ LoadLogging()
 
 			CloseHandle(hDirectory);
 		}
-		
+
 		g_bLogCvar = true;
 	} else {
 		g_bLogCvar = false;
