@@ -61,17 +61,17 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
-	
+
 	decl String:sWeapon[64];
-	
+
 	ResetPack(hDataPack);
 	ReadPackString(hDataPack, sWeapon, sizeof(sWeapon));
-	
+
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		GivePlayerItem(i, "weapon_knife");
 		GivePlayerWeaponAndAmmo(i, sWeapon);
 	}
@@ -83,7 +83,7 @@ SetWeaponMenu(iClient, const String:sID[])
 
 	SetMenuTitle(hMenu, "%t", "ChooseWeapon");
 	PushMenuString(hMenu, "_GAME_ID_", sID);
-	
+
 	switch (g_iEngVersion) {
 		case Engine_CSS: {
 			AddMenuItem(hMenu, "weapon_deagle", "Deagle");
@@ -102,7 +102,7 @@ SetWeaponMenu(iClient, const String:sID[])
 			AddMenuItem(hMenu, "weapon_m249", 			"M249 Para");
 		}
 	}
-	
+
 	SetMenuExitBackButton(hMenu, true);
 	DisplayMenu(hMenu, iClient, 30);
 }
@@ -113,14 +113,14 @@ public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	{
 		new String:sKey[64], String:sWeaponName[64], String:sID[TG_MODULE_ID_LENGTH];
 		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, sWeaponName, 64);
-		
+
 		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
 			return;
 		}
-		
+
 		new Handle:hDataPack = CreateDataPack();
 		WritePackString(hDataPack, sKey);
-		
+
 		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sWeaponName, hDataPack, true);
 		} else {

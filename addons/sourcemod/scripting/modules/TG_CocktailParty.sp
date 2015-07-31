@@ -56,14 +56,14 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 {
 	if (!StrEqual(sID, GAME_ID, true))
 		return;
-	
+
 	HookEvent("molotov_detonate", Event_MolotovDetonate);
-	
+
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		Client_GiveWeapon(i, "weapon_molotov", true);
 	}
 }
@@ -76,7 +76,7 @@ public Action:Event_MolotovDetonate(Handle:hEvent, const String:sName[], bool:bD
 	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 
 	if (TG_IsPlayerRedOrBlue(iClient)) {
-		
+
 		new iMolotov = GivePlayerItem(iClient, "weapon_molotov");
 		if (iMolotov != INVALID_ENT_REFERENCE) {
 			Client_SetActiveWeapon(iClient, iMolotov);

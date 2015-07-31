@@ -41,7 +41,7 @@ new Handle:g_hFFReduction;
 LoadConVars()
 {
 	g_fMenuPercent       	= GetConVarFloat(g_hMenuPercent);
-	
+
 	g_iSelfDamage         	= GetConVarInt(g_hSelfDamage);
 
 	g_iRoundLimit         	= GetConVarInt(g_hRoundLimit);

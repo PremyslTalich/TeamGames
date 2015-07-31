@@ -261,7 +261,7 @@ PlayerEquipmentLoad(iClient)
 GetWeaponClassName(iWeaponEntity, String:sWeaponName[], iSize)
 {
 	GetEntityClassname(iWeaponEntity, sWeaponName, iSize);
-	
+
 	if (StrEqual(sWeaponName, "weapon_m4a1") && GetEntProp(iWeaponEntity, Prop_Send, "m_iItemDefinitionIndex") == 60) {
 		strcopy(sWeaponName, iSize, "weapon_m4a1_silencer");
 	} else if (StrEqual(sWeaponName, "weapon_hkp2000") && GetEntProp(iWeaponEntity, Prop_Send, "m_iItemDefinitionIndex") == 61) {

@@ -15,7 +15,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.HEGrenades-Raska.phrases");	
+	LoadTranslations("TG.HEGrenades-Raska.phrases");
 }
 
 public OnLibraryAdded(const String:sName[])
@@ -48,14 +48,14 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 {
 	if (!StrEqual(sID, GAME_ID, true))
 		return;
-	
+
 	HookEvent("hegrenade_detonate", Event_HEGrenadeDetonate);
-	
+
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		new iGrenade = GivePlayerItem(iClient, "weapon_hegrenade");
 		if (iGrenade != INVALID_ENT_REFERENCE) {
 			Client_SetActiveWeapon(iClient, iGrenade);

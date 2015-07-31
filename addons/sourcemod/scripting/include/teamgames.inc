@@ -6,7 +6,7 @@
 #include <menus>
 #include <smlib>
 
-public SharedPlugin:__pl_teamgames = 
+public SharedPlugin:__pl_teamgames =
 {
 	name = "TeamGames",
 	file = "TeamGames.smx",
@@ -17,10 +17,6 @@ public __pl_teamgames_SetNTVOptional()
 {
 	MarkNativeAsOptional("TG_GetPlayerTeam");
 	MarkNativeAsOptional("TG_SetPlayerTeam");
-	MarkNativeAsOptional("TG_IsPlayerRedOrBlue");
-	MarkNativeAsOptional("TG_InOppositeTeams");
-	MarkNativeAsOptional("TG_GetTeamFromString");
-	MarkNativeAsOptional("TG_SwitchRandomRedToBlue");
 	MarkNativeAsOptional("TG_IsGameTypeAvailable");
 	MarkNativeAsOptional("TG_LoadPlayerWeapons");
 	MarkNativeAsOptional("TG_FenceCreate");
@@ -34,16 +30,13 @@ public __pl_teamgames_SetNTVOptional()
 	MarkNativeAsOptional("TG_RegGame");
 	MarkNativeAsOptional("TG_RemoveGame");
 	MarkNativeAsOptional("TG_GetAddedGames");
-	MarkNativeAsOptional("TG_ShowMainMenu");
-	MarkNativeAsOptional("TG_ShowGamesMenu");
-	MarkNativeAsOptional("TG_ShowTeamsMenu");
-	MarkNativeAsOptional("TG_ShowFencesMenu");
 	MarkNativeAsOptional("TG_ShowPlayerSelectMenu");
 	MarkNativeAsOptional("TG_FakeSelect");
 	MarkNativeAsOptional("TG_RegMenuItem");
 	MarkNativeAsOptional("TG_RemoveMenuItem");
 	MarkNativeAsOptional("TG_GetMenuItemName");
 	MarkNativeAsOptional("TG_IsModuleReged");
+	MarkNativeAsOptional("TG_GetRegedModules");
 	MarkNativeAsOptional("TG_StartGame");
 	MarkNativeAsOptional("TG_GetCurrentGameID");
 	MarkNativeAsOptional("TG_IsCurrentGameID");
@@ -52,14 +45,11 @@ public __pl_teamgames_SetNTVOptional()
 	MarkNativeAsOptional("TG_GetCurrentGameSettings");
 	MarkNativeAsOptional("TG_GetGameDefaultName");
 	MarkNativeAsOptional("TG_GetGameType");
-	MarkNativeAsOptional("TG_GetGameRequiredFlag");
 	MarkNativeAsOptional("TG_StopGame");
 	MarkNativeAsOptional("TG_SetModuleVisibility");
 	MarkNativeAsOptional("TG_GetModuleVisibility");
 	MarkNativeAsOptional("TG_GetGameStatus");
 	MarkNativeAsOptional("TG_IsGameStatus");
-	MarkNativeAsOptional("TG_PrintToChat");
-	MarkNativeAsOptional("TG_PrintToChatEx");
 	MarkNativeAsOptional("TG_LogMessage");
 	MarkNativeAsOptional("TG_LogRoundMessage");
 	MarkNativeAsOptional("TG_LogGameMessage");

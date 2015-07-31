@@ -22,68 +22,6 @@ public Native_SetPlayerTeam(Handle:hPlugin, iNumParams)
 	return true;
 }
 
-public Native_IsPlayerRedOrBlue(Handle:hPlugin, iNumParams)
-{
-	new iClient = GetNativeCell(1);
-
-	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_T)
-		return false;
-
-	return TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]);
-}
-
-public Native_InOppositeTeams(Handle:hPlugin, iNumParams)
-{
-	new iClient1 = GetNativeCell(1);
-	new iClient2 = GetNativeCell(2);
-
-	if (!Client_IsIngame(iClient1) || !Client_IsIngame(iClient2))
-		return false;
-
-	if (g_PlayerData[iClient1][Team] == TG_NoneTeam)
-		return false;
-
-	if (g_PlayerData[iClient2][Team] == TG_NoneTeam)
-		return false;
-
-	if (g_PlayerData[iClient1][Team] != g_PlayerData[iClient2][Team])
-		return true;
-	else
-		return false;
-}
-
-public Native_GetTeamFromString(Handle:hPlugin, iNumParams)
-{
-	decl String:iTeam[64];
-	GetNativeString(1, iTeam, sizeof(iTeam));
-
-	if (StrEqual(iTeam, "RedTeam", false) || StrEqual(iTeam, "red", false) || iTeam[0] == '1')
-		return _:TG_RedTeam;
-	else if (StrEqual(iTeam, "BlueTeam", false) || StrEqual(iTeam, "blue", false) || iTeam[0] == '2')
-		return _:TG_BlueTeam;
-	else if (StrEqual(iTeam, "NoneTeam", false) || StrEqual(iTeam, "none", false) || iTeam[0] == '0')
-		return _:TG_NoneTeam;
-	else
-		return _:TG_ErrorTeam;
-}
-
-public Native_SwitchRandomRedToBlue(Handle:hPlugin, iNumParams)
-{
-	new iClient = TG_GetRandomClient(TG_RedTeam);
-
-	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient))
-		return 0;
-
-	if (	SwitchToTeam(-1, iClient, TG_BlueTeam) != 0)
-		return (-1 * iClient);
-
-	#if defined DEBUG
-	LogMessage("[TG DEBUG] SwitchRandomRedToBlue switched player %N.", iClient);
-	#endif
-
-	return iClient;
-}
-
 public Native_IsGameTypeAvailable(Handle:hPlugin, iNumParams)
 {
 	new TG_GameType:iGameType = TG_GameType:GetNativeCell(1);
@@ -336,7 +274,7 @@ public PlayerSelectMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	// else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack)
 	// {
 		// MainMenu(iClient);
-	//}
+	// }
 }
 
 public Native_FakeSelect(Handle:hPlugin, iNumParams)
@@ -490,6 +428,30 @@ public Native_IsModuleReged(Handle:hPlugin, iNumParams)
 	}
 
 	return false;
+}
+
+public Native_GetRegedModules(Handle:hPlugin, iNumParams)
+{
+	new TG_ModuleType:iType = GetNativeCell(1);
+	new Handle:hModules = CreateArray(TG_MODULE_ID_LENGTH);
+
+	if (iType == TG_Game) {
+		for (new i = 0; i < g_iGameListEnd; i++) {
+			if (g_GameList[i][Used])
+				PushArrayString(hModules, g_GameList[i][Id]);
+		}
+
+		return _:hModules;
+	} else if (iType == TG_MenuItem) {
+		for (new i = 0; i < g_iMenuItemListEnd; i++) {
+			if (g_MenuItemList[i][Used])
+				PushArrayString(hModules, g_MenuItemList[i][Id]);
+		}
+
+		return _:hModules;
+	}
+
+	return _:INVALID_HANDLE;
 }
 
 public Native_StartGame(Handle:hPlugin, iNumParams)
@@ -1010,10 +972,6 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 {
 	CreateNative("TG_GetPlayerTeam", Native_GetPlayerTeam);
 	CreateNative("TG_SetPlayerTeam", Native_SetPlayerTeam);
-	CreateNative("TG_IsPlayerRedOrBlue", Native_IsPlayerRedOrBlue);
-	CreateNative("TG_InOppositeTeams", Native_InOppositeTeams);
-	CreateNative("TG_GetTeamFromString", Native_GetTeamFromString);
-	CreateNative("TG_SwitchRandomRedToBlue", Native_SwitchRandomRedToBlue);
 	CreateNative("TG_IsGameTypeAvailable", Native_IsGameTypeAvailable);
 
 	CreateNative("TG_LoadPlayerWeapons", Native_LoadPlayerWeapons);
@@ -1042,6 +1000,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_GetMenuItemName", Native_GetMenuItemName);
 
 	CreateNative("TG_IsModuleReged", Native_IsModuleReged);
+	CreateNative("TG_GetRegedModules", Native_GetRegedModules);
 
 	CreateNative("TG_StartGame", Native_StartGame);
 	CreateNative("TG_GetCurrentGameID", Native_GetCurrentGameID);

@@ -27,18 +27,18 @@ ClearGameStatusInfo()
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[GameSettings], TG_MODULE_NAME_LENGTH, "");
-	
+
 	if (g_Game[GameDataPack] != INVALID_HANDLE) {
 		CloseHandle(g_Game[GameDataPack]);
 		g_Game[GameDataPack] = INVALID_HANDLE;
 	}
-	
+
 	g_Game[RemoveDrops] = false;
 	g_Game[EndOnTeamEmpty] = true;
 	g_Game[GameStarter] = 0;
 	g_Game[RedTeam][0] = 0;
 	g_Game[BlueTeam][0] = 0;
-	
+
 	for (new i = 1; i <= MaxClients; i++) {
 		if (Client_IsIngame(i))
 			SDKUnhook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
@@ -148,7 +148,7 @@ bool:IsGameDisabled(const String:sID[TG_MODULE_ID_LENGTH])
 		CloseHandle(hKV);
 		return false;
 	}
-	
+
 	new bool:bDisabled = bool:KvGetNum(hKV, "Disabled", 0);
 	CloseHandle(hKV);
 
@@ -167,7 +167,7 @@ bool:IsMenuItemDisabled(const String:sID[TG_MODULE_ID_LENGTH])
 		CloseHandle(hKV);
 		return false;
 	}
-	
+
 	new bool:bDisabled = bool:KvGetNum(hKV, "Disabled", 0);
 	CloseHandle(hKV);
 
@@ -193,17 +193,17 @@ ListGames(iClient)
 	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
 	PrintToConsoleOrServer(iClient, "|     | Game ID                                                          | Default game name                                                |");
 	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
-	
+
 	new iIndex = 1;
-	
+
 	for (new i = 0; i < MAX_GAMES; i++) {
 		if (!g_GameList[i][Used])
 			continue;
-		
-		PrintToConsoleOrServer(iClient, "| #%2d | %64s | %64s", iIndex, g_GameList[i][Id], g_GameList[i][DefaultName]);		
+
+		PrintToConsoleOrServer(iClient, "| #%2d | %64s | %64s", iIndex, g_GameList[i][Id], g_GameList[i][DefaultName]);
 		iIndex++;
 	}
-	
+
 	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n");
 }
 
@@ -213,25 +213,25 @@ ListMenuItems(iClient)
 	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
 	PrintToConsoleOrServer(iClient, "|     | Menu item ID                                                     | Default menu item name                                           |");
 	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+");
-	
+
 	new iIndex = 1;
-	
+
 	for (new i = 0; i < MAX_MENU_ITEMS; i++) {
 		if (!g_MenuItemList[i][Used])
 			continue;
-		
+
 		PrintToConsoleOrServer(iClient, "| #%2d | %64s | %64s", iIndex, g_MenuItemList[i][Id], g_MenuItemList[i][DefaultName]);
 		iIndex++;
 	}
-	
+
 	PrintToConsoleOrServer(iClient, "+-----+------------------------------------------------------------------+------------------------------------------------------------------+\n");
 }
 
 PrintToConsoleOrServer(iClient, const String:format[], any:...)
 {
-	decl String:sMsg[256];	
+	decl String:sMsg[256];
 	VFormat(sMsg, sizeof(sMsg), format, 3);
-	
+
 	if (Client_IsValid(iClient))
 		PrintToConsole(iClient, sMsg);
 	else

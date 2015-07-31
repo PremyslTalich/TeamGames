@@ -28,26 +28,6 @@ native TG_Team:TG_GetPlayerTeam(client);
  */
 native TG_SetPlayerTeam(activator, client, TG_Team:iTeam);
 
-native bool:TG_IsPlayerRedOrBlue(client);
-
-/**
- * Switch a random RedTeam player to BlueTeam.
- *
- * @return				Clinet index on success, 0 = no RedTeam player found, (-1 * Clinet index) = Player could not be switched.
- */
-native TG_SwitchRandomRedToBlue();
-
-/**
- * Bool native returns if players are in different teams.
- *
- * @param client1		Client 1 index.
- * @param client2		Client 2 index.
- * @return				True on (client 1 team != client 2 team), false otherwise.
- */
-native bool:TG_InOppositeTeams(client1, client2);
-
-native TG_Team:TG_GetTeamFromString(String:team[]);
-
 native bool:TG_IsGameTypeAvailable(TG_GameType:type);
 
 /**
@@ -132,7 +112,9 @@ native bool:TG_GetTeamsLock();
  */
 native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty, const String:NameFormat[], any:...);
 
-native bool:TG_IsModuleReged(TG_ModuleType:type, const String:id[]);
+native bool:TG_IsModuleReged(TG_ModuleType:iType, const String:id[]);
+
+native Handle:TG_GetRegedModules(TG_ModuleType:type);
 
 /**
  * Unregister Game from TeamGames.

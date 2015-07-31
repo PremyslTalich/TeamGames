@@ -33,7 +33,7 @@ public OnLibraryAdded(const String:sName[])
 	if (StrEqual(sName, "TeamGames")) {
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY))
 			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
-		
+
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY))
 			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
 	}
@@ -67,14 +67,14 @@ public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[],
 {
 	if (!StrEqual(id, GAME_ID_FIFTYFIFTY) && !StrEqual(id, GAME_ID_REDONLY))
 		return;
-	
+
 	HookEvent("weapon_fire", Event_WeaponFire);
-	
+
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		GivePlayerWeaponAndAmmo(i, "weapon_taser", 1, 1);
 	}
 }
@@ -83,30 +83,30 @@ public Action:Event_WeaponFire(Handle:hEvent, const String:sName[], bool:bDontBr
 {
 	decl String:sWeapon[64];
 	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
-	
+
 	if ((TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && TG_IsPlayerRedOrBlue(iClient)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(iClient) == TG_RedTeam)) {
 		GetEventString(hEvent, "weapon", sWeapon, sizeof(sWeapon));
-		
+
 		if (StrEqual(sWeapon, "taser")) {
 			SetPlayerWeaponAmmo(iClient, Client_GetActiveWeapon(iClient), _, 1);
 		}
 	}
-	
+
 	return Plugin_Continue;
 }
 
 public TG_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger){
 	if (StrEqual(sID, GAME_ID_REDONLY) && iTeam == TG_RedTeam && TG_GetTeamCount(TG_RedTeam) == 1) {
 		new Handle:hWinners = CreateArray();
-		
+
 		for (new i = 1; i <= MaxClients; i++) {
 			if (TG_GetPlayerTeam(i) == TG_RedTeam) {
 				PushArrayCell(hWinners, i);
 				break;
 			}
 		}
-		
-		TG_StopGame(TG_RedTeam, hWinners);		
+
+		TG_StopGame(TG_RedTeam, hWinners);
 	}
 }
 

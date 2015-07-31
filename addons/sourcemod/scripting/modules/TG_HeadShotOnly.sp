@@ -29,7 +29,7 @@ public OnLibraryAdded(const String:sName[])
 	if (StrEqual(sName, "TeamGames")) {
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY))
 			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
-		
+
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY))
 			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
 	}
@@ -60,17 +60,17 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
-	
+
 	decl String:sWeapon[64];
-	
+
 	ResetPack(hDataPack);
 	ReadPackString(hDataPack, sWeapon, sizeof(sWeapon));
-	
+
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		GivePlayerWeaponAndAmmo(i, sWeapon, -1, 500);
 	}
 }
@@ -82,7 +82,7 @@ public Action:TG_OnTraceAttack(bool:ingame, victim, &attacker, &inflictor, &Floa
 			return Plugin_Handled;
 		}
 	}
-	
+
 	return Plugin_Continue;
 }
 
@@ -91,9 +91,9 @@ SetWeaponMenu(iClient, const String:sID[])
 	new Handle:hMenu = CreateMenu(SetWeaponMenu_Handler);
 
 	SetMenuTitle(hMenu, "%t:", "ChooseWeapon");
-	
+
 	PushMenuString(hMenu, "_GAME_ID_", sID);
-	
+
 	switch (g_iEngVersion) {
 		case Engine_CSS: {
 			AddMenuItem(hMenu, "weapon_deagle", "Deagle");
@@ -110,7 +110,7 @@ SetWeaponMenu(iClient, const String:sID[])
 			AddMenuItem(hMenu, "weapon_m4a1", 			"M4A4");
 		}
 	}
-	
+
 	SetMenuExitBackButton(hMenu, true);
 	DisplayMenu(hMenu, iClient, 30);
 }
@@ -121,14 +121,14 @@ public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	{
 		new String:sKey[64], String:sWeaponName[64], String:sID[TG_MODULE_ID_LENGTH];
 		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, sWeaponName, 64);
-		
+
 		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
 			return;
 		}
-		
+
 		new Handle:hDataPack = CreateDataPack();
 		WritePackString(hDataPack, sKey);
-		
+
 		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sWeaponName, hDataPack, true);
 		} else {

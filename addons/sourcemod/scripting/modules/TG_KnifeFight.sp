@@ -25,7 +25,7 @@ public OnLibraryAdded(const String:sName[])
 	if (StrEqual(sName, "TeamGames")) {
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY))
 			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
-		
+
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY))
 			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
 	}
@@ -56,15 +56,15 @@ public TG_OnGamePrepare(const String:sID[], iClient, const String:GameSettings[]
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
-	
+
 	ResetPack(DataPack);
 	new hp = ReadPackCell(DataPack);
-	
+
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		Client_GiveWeapon(i, "weapon_knife", true);
 		SetEntityHealth(i, hp);
 	}
@@ -78,9 +78,9 @@ SetHPMenu(iClient, const String:sID[])
 	AddMenuItem(hMenu, "35", "35 HP");
 	AddMenuItem(hMenu, "100", "100 HP");
 	AddMenuItem(hMenu, "300", "300 HP");
-	
+
 	PushMenuString(hMenu, "_GAME_ID_", sID);
-	
+
 	SetMenuExitBackButton(hMenu, true);
 	DisplayMenu(hMenu, iClient, 30);
 }
@@ -91,14 +91,14 @@ public SetHPMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	{
 		new String:info[64], String:sSettings[64], String:sID[TG_MODULE_ID_LENGTH];
 		GetMenuItem(hMenu, iKey, info, sizeof(info), _, sSettings, 64);
-		
+
 		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
 			return;
 		}
-		
+
 		new Handle:hDataPack = CreateDataPack();
 		WritePackCell(hDataPack, StringToInt(info));
-		
+
 		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sSettings, hDataPack);
 		} else {

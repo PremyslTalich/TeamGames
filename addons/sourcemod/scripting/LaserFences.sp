@@ -18,17 +18,17 @@ FencesMenu(iClient)
 {
 	new Float:fPos[3];
 	GetClientAbsOrigin(iClient, fPos);
-	
+
 	new Handle:hDataPack = CreateDataPack();
 	WritePackCell(hDataPack, iClient);
 	WritePackFloat(hDataPack, fPos[0]);
 	WritePackFloat(hDataPack, fPos[1]);
 	WritePackFloat(hDataPack, fPos[2]);
-	
+
 	new Handle:hTimer = CreateTimer(0.1, Timer_FenceRectanglePre, hDataPack, TIMER_REPEAT);
-	
+
 	new Handle:hSubMenu = CreateMenu(FencesMenu_Rectangle_Handler);
-	decl String:sTransMsg[256];			
+	decl String:sTransMsg[256];
 	Format(sTransMsg, sizeof(sTransMsg), "%T", "MenuFences-Confirm", iClient);
 	SetMenuTitle(hSubMenu, sTransMsg);
 	AddMenuItem(hSubMenu, "FENCES_MENU_CONFIRM", sTransMsg);
@@ -42,29 +42,29 @@ public Action:Timer_FenceRectanglePre(Handle:hTimer, Handle:hDataPack) // Rectan
 {
 	decl Float:fA[3], Float:fC[3];
 	new iClient;
-	
+
 	ResetPack(hDataPack);
 	iClient = ReadPackCell(hDataPack);
 	fA[0] = ReadPackFloat(hDataPack);
 	fA[1] = ReadPackFloat(hDataPack);
 	fA[2] = ReadPackFloat(hDataPack) + 12.0;
-	
+
 	GetClientAbsOrigin(iClient, fC);
-	
+
 	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
-	
+
 	fA[2] += 18.0;
 	if (g_fFenceHeight < fA[2])
 		return Plugin_Continue;
-	
+
 	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
-	
-	fA[2] += 18.0;	
+
+	fA[2] += 18.0;
 	if (g_fFenceHeight < fA[2])
 		return Plugin_Continue;
-	
+
 	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
-	
+
 	return Plugin_Continue;
 }
 
@@ -73,7 +73,7 @@ public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, i
 	if (iAction == MenuAction_Select) {
 		decl String:sKey[32];
 		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
-		
+
 		if (StrEqual(sKey, "FENCES_MENU_CONFIRM")) {
 			new Float:fA[3], Float:fC[3], Handle:hDataPack = INVALID_HANDLE;
 			hDataPack = Handle:GetMenuCell(hMenu, "-DATAPACK-");
@@ -82,13 +82,13 @@ public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, i
 			fA[0] = ReadPackFloat(hDataPack);
 			fA[1] = ReadPackFloat(hDataPack);
 			fA[2] = ReadPackFloat(hDataPack);
-			
-			GetClientAbsOrigin(iClient, fC);			
+
+			GetClientAbsOrigin(iClient, fC);
 			CreateFence(fA, fC, iClient);
-			
+
 			MainMenu(iClient);
 		}
-		
+
 		CloseHandle(Handle:GetMenuCell(hMenu, "-DATAPACK-"));
 		CloseHandle(Handle:GetMenuCell(hMenu, "-TIMER-"));
 	} else if (iAction == MenuAction_Cancel) {
@@ -106,7 +106,7 @@ CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 		return;
 	}
 	DestroyFence();
-	
+
 	new Action:iResult = Plugin_Continue;
 	Call_StartForward(Forward_OnLaserFenceCreate);
 	Call_PushCell(iClient);
@@ -115,37 +115,37 @@ CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 	Call_Finish(iResult);
 	if (iResult != Plugin_Continue)
 		return;
-	
+
 	Call_StartForward(Forward_OnLaserFenceCreated);
 	Call_PushCell(iClient);
 	Call_PushArray(fA, 3);
 	Call_PushArray(fC, 3);
 	Call_Finish();
-	
+
 	CreateFencePoints(fA, fC);
 	CreateBrushTrigger();
 	CreateFenceCornerModels();
 	g_bFenceRectangle = true;
-	
+
 	if (g_iFenceType == 1) {
 		fA[2] += 12.0; fC[2] += 12.0;
 		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_1_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
-		
+
 		fA[2] += 18.0; fC[2] += 18.0;
 		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_2_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
-		
+
 		fA[2] += 18.0; fC[2] += 18.0;
 		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_3_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
 	} else if (g_iFenceType == 2) {
 		fA[2] += 12.0; fC[2] += 12.0;
 		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_1_", g_sFenceMaterial, g_fFenceWidth);
-		
+
 		fA[2] += 18.0; fC[2] += 18.0;
 		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_2_", g_sFenceMaterial, g_fFenceWidth);
-		
+
 		fA[2] += 18.0; fC[2] += 18.0;
 		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_3_", g_sFenceMaterial, g_fFenceWidth);
-	}	
+	}
 }
 
 DestroyFence()
@@ -156,7 +156,7 @@ DestroyFence()
 		Call_PushArray(g_fFenceRectangleC, 3);
 		Call_Finish();
 	}
-	
+
 	g_bFenceRectangle = false;
 	DestroyBrushTriggerAndBeamRope();
 }
@@ -165,7 +165,7 @@ CreateFencePoints(Float:fA[3], Float:fC[3])
 {
 	g_fFenceRectangleA = fA;
 	g_fFenceRectangleC = fC;
-	
+
 	if (fC[0] <= fA[0] && fC[1] <= fA[1]) {
 		g_fFenceRectangleA = fC;
 		g_fFenceRectangleC = fA;
@@ -176,12 +176,12 @@ CreateFencePoints(Float:fA[3], Float:fC[3])
 		g_fFenceRectangleA[1] = fC[1];
 		g_fFenceRectangleC[1] = fA[1];
 	}
-	
+
 	g_fFenceRectangleB[0] = g_fFenceRectangleC[0];
 	g_fFenceRectangleB[1] = g_fFenceRectangleA[1];
 	g_fFenceRectangleD[0] = g_fFenceRectangleA[0];
 	g_fFenceRectangleD[1] = g_fFenceRectangleC[1];
-	
+
 	g_fFenceRectangleA[2] += 12.0;
 	g_fFenceRectangleB[2] = g_fFenceRectangleA[2];
 	g_fFenceRectangleD[2] = g_fFenceRectangleA[2];
@@ -195,21 +195,21 @@ CreateBrushTrigger()
 	fEnd = g_fFenceRectangleC;
 	fStart[2] -= 12.0;
 	fEnd[2] -= 12.0;
-	
+
 	fStart[0] += 15.0;
 	fStart[1] += 15.0;
-	
+
 	fEnd[0] -= 15.0;
 	fEnd[1] -= 15.0;
-	
+
 	new Float:fVec[3];
 	MakeVectorFromPoints(fStart, fEnd, fVec);
-	
+
 	new Float:fOrigin[3];
 	fOrigin[0] = (fStart[0] + fEnd[0]) / 2;
 	fOrigin[1] = (fStart[1] + fEnd[1]) / 2;
 	fOrigin[2] = fStart[2];
-	
+
 	new Float:fMinBounds[3], Float:fMaxBounds[3];
 	fMinBounds[0] = -1 * (fVec[0] / 2);
 	fMaxBounds[0] = fVec[0] / 2;
@@ -217,30 +217,30 @@ CreateBrushTrigger()
 	fMaxBounds[1] = fVec[1] / 2;
 	fMinBounds[2] = 0.0;
 	fMaxBounds[2] = 128.0;
-	
+
 	new iEntity = CreateEntityByName("trigger_multiple");
-	
+
 	DispatchKeyValue(iEntity, "spawnflags", "64");
 	DispatchKeyValue(iEntity, "targetname", "TG_LaserFence");
 	DispatchKeyValue(iEntity, "wait", "0");
-	
+
 	DispatchSpawn(iEntity);
 	ActivateEntity(iEntity);
 	SetEntProp(iEntity, Prop_Data, "m_spawnflags", 64);
-	
+
 	TeleportEntity(iEntity, fOrigin, NULL_VECTOR, NULL_VECTOR);
-	
+
 	SetEntityModel(iEntity, "models/props/cs_office/trash_can.mdl");
-	
+
 	SetEntPropVector(iEntity, Prop_Send, "m_vecMins", fMinBounds);
 	SetEntPropVector(iEntity, Prop_Send, "m_vecMaxs", fMaxBounds);
-	
+
 	SetEntProp(iEntity, Prop_Send, "m_nSolidType", 2);
-	
+
 	new iEntityEffect = GetEntProp(iEntity, Prop_Send, "m_fEffects");
 	iEntityEffect |= 32;
 	SetEntProp(iEntity, Prop_Send, "m_fEffects", iEntityEffect);
-	
+
 	HookSingleEntityOutput(iEntity, "OnEndTouch", Hook_LaserFenceOnEndTouch);
 }
 
@@ -256,16 +256,16 @@ CreateCornerModel(Float:fPos[3])
 {
 	if (!IsModelPrecached(g_sFenceCornerModel))
 		return;
-	
+
 	new Float:fOrigin[3];
 	fOrigin = fPos;
 	fOrigin[2] -= 12.0;
-	
+
 	new iEntity = CreateEntityByName("prop_dynamic_override");
-	
+
 	if (!IsValidEntity(iEntity))
 		return;
-	
+
 	DispatchKeyValue(iEntity, "targetname", "__TG_LaserFenceCorner__");
 	DispatchKeyValue(iEntity, "model", g_sFenceCornerModel);
 	DispatchSpawn(iEntity);
@@ -278,10 +278,10 @@ public Hook_LaserFenceOnEndTouch(const String:sOutput[], iCaller, iActivator, Fl
 {
 	if (!Client_IsIngame(iActivator) || GetClientTeam(iActivator) != CS_TEAM_T || !TG_IsTeamRedOrBlue(g_PlayerData[iActivator][Team]))
 		return;
-	
+
 	new Float:fPos[3];
 	GetClientAbsOrigin(iActivator, fPos);
-	
+
 	if (fPos[2] < g_fFenceRectangleA[2] + (g_fFenceHeight - 12.0))
 		FencePunishPlayer(iActivator);
 }
@@ -293,11 +293,11 @@ DestroyBrushTriggerAndBeamRope()
 	for (new i = MaxClients; i < iEntityCount; i++) {
 		if (!IsValidEntity(i))
 			continue;
-		
-		GetEdictClassname(i, sClassName, sizeof(sClassName));		
+
+		GetEdictClassname(i, sClassName, sizeof(sClassName));
 		if (StrEqual(sClassName, "trigger_multiple") || StrEqual(sClassName, "prop_dynamic") || StrEqual(sClassName, "move_rope") || StrEqual(sClassName, "keyframe_rope") || StrEqual(sClassName, "env_beam")) {
 			GetEntPropString(i, Prop_Data, "m_iName", sTargetName, sizeof(sTargetName));
-			
+
 			if (StrEqual(sTargetName, "TG_LaserFence")) {
 				UnhookSingleEntityOutput(i, "OnEndTouch", Hook_LaserFenceOnEndTouch);
 				AcceptEntityInput(i, "Kill");
@@ -313,33 +313,33 @@ DestroyBrushTriggerAndBeamRope()
 FencePunishPlayer(iClient, bool:CallForward = true)
 {
 	new Float:fTime = g_fFencePunishLength;
-	
+
 	if (CallForward) {
 		new Action:iResult = Plugin_Continue;
 		Call_StartForward(Forward_OnLaserFenceCrossed);
 		Call_PushCell(iClient);
 		Call_PushFloatRef(fTime);
 		Call_Finish(iResult);
-		
+
 		if (iResult == Plugin_Handled || iResult == Plugin_Stop)
 			return;
 	}
-	
+
 	if (g_iFenceNotify == 1 || (g_iFenceNotify == 2 && g_Game[GameProgress] != TG_NoGame)) {
 		decl String:sClientName[64];
 		GetClientName(iClient, sClientName, sizeof(sClientName));
 		CPrintToChatAll("%t" , "Fences-PlayerCross", sClientName);
 	}
-	
+
 	if (g_fFencePunishLength == 0.0 || (g_iFencePunishColorSettings == 0 && g_iFenceFreeze == 0))
 		return;
-	
+
 	if (!g_PlayerData[iClient][AbleToFencePunishColor])
 		return;
-	
+
 	if (g_iFencePunishColorSettings == 1 || (g_iFencePunishColorSettings == 2 && g_Game[GameProgress] != TG_NoGame)) {
 		g_PlayerData[iClient][AbleToFencePunishColor] = false;
-		
+
 		new Handle:hDataPack = CreateDataPack();
 		WritePackCell(hDataPack, iClient);
 		WritePackCell(hDataPack, GetEntData(iClient, GetEntSendPropOffs(iClient, "m_clrRender", true), 1));
@@ -349,12 +349,12 @@ FencePunishPlayer(iClient, bool:CallForward = true)
 		SetEntityRenderColor(iClient, g_iFencePunishColor[0], g_iFencePunishColor[1], g_iFencePunishColor[2], 255);
 		CreateTimer(fTime, Timer_FenceColorOff, hDataPack, 0);
 	}
-	
+
 	if (g_iFenceFreeze == 1 || (g_iFenceFreeze == 2 && g_Game[GameProgress] != TG_NoGame)) {
 		SetEntityMoveType(iClient, MOVETYPE_NONE);
 		CreateTimer(fTime, Timer_FenceFreezeOff, iClient);
 	}
-	
+
 	return;
 }
 
@@ -367,15 +367,15 @@ public Action:Timer_FenceColorOff(Handle:hTimer, Handle:hDataPack)
 	new iBlue = ReadPackCell(hDataPack);
 	new iAlpha = ReadPackCell(hDataPack);
 	CloseHandle(hDataPack);
-	
+
 	SetEntityRenderColor(iClient, iRed, iGreen, iBlue, iAlpha);
 	g_PlayerData[iClient][AbleToFencePunishColor] = true;
-	
+
 	return Plugin_Continue;
 }
 public Action:Timer_FenceFreezeOff(Handle:hTimer, any:iClient)
 {
-	SetEntityMoveType(iClient, MOVETYPE_ISOMETRIC);	
+	SetEntityMoveType(iClient, MOVETYPE_ISOMETRIC);
 	return Plugin_Continue;
 }
 
@@ -386,13 +386,13 @@ TempEnt_Square(Float:fA[3], Float:fC[3], Float:fLife, iColor[4], Float:fWidth, i
 	b = fA; b[1] = fC[1];
 	d = fA; d[0] = fC[0];
 	fC[2] = fA[2];
-	
+
 	TE_SetupBeamPoints(fA, b, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
-	TE_SendToAll();                                               
+	TE_SendToAll();
 	TE_SetupBeamPoints(b, fC, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
-	TE_SendToAll();                                               
+	TE_SendToAll();
 	TE_SetupBeamPoints(fC, d, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
-	TE_SendToAll();                                               
+	TE_SendToAll();
 	TE_SetupBeamPoints(d, fA, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
 	TE_SendToAll();
 }
@@ -400,16 +400,16 @@ TempEnt_Square(Float:fA[3], Float:fC[3], Float:fLife, iColor[4], Float:fWidth, i
 SpawnBeamSquare(Float:fA[3], Float:fC[3], const String:sNodePrefix[], const String:sBeamMaterial[] = "sprites/laserbeam.vmt", Float:fWidth = 2.0, iRGBA[4] = {255, 255, 255, 255})
 {
 	new Float:fBeams[4][3];
-	
+
 	fBeams[0] = fA;
 	fBeams[1] = fA;
 	fBeams[2] = fC;
 	fBeams[3] = fA;
-	
+
 	fBeams[1][1] = fC[1];
 	fBeams[2][2] = fA[2];
 	fBeams[3][0] = fC[0];
-	
+
 	SpawnBeamChain(fBeams, 4, sNodePrefix, sBeamMaterial, fWidth, iRGBA, true);
 }
 
@@ -417,25 +417,25 @@ SpawnBeamChain(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const 
 {
 	if (iNodeCount < 2)
 		return 0;
-	
+
 	decl String:sMaterial[PLATFORM_MAX_PATH];
 	FormatEx(sMaterial, sizeof(sMaterial), "materials/%s", sBeamMaterial);
-	
+
 	if (!IsModelPrecached(sMaterial)) {
 		return 0;
 	}
-	
+
 	new iEntity, i;
 	decl String:sNodeName[64], String:sNextNodeName[64];
-	
+
 	for (; i < iNodeCount; i++) {
 		iEntity = CreateEntityByName("env_beam");
-		
+
 		if (!IsValidEntity(iEntity))
 			return i;
-		
+
 		Format(sNodeName, sizeof(sNodeName), "%s%d", sNodePrefix, i);
-		
+
 		if (iNodeCount > i + 1) {
 			Format(sNextNodeName, sizeof(sNextNodeName), "%s%d", sNodePrefix, i + 1);
 		} else {
@@ -444,7 +444,7 @@ SpawnBeamChain(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const 
 			else
 				strcopy(sNextNodeName, sizeof(sNextNodeName), "");
 		}
-		
+
 		DispatchKeyValue(iEntity, "targetname", sNodeName);
 		DispatchKeyValue(iEntity, "texture", sMaterial);
 		DispatchKeyValueFormat(iEntity, "BoltWidth", "%f", fWidth);
@@ -456,26 +456,26 @@ SpawnBeamChain(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const 
 		DispatchKeyValue(iEntity, "LightningEnd", sNextNodeName);
 		DispatchSpawn(iEntity);
 		TeleportEntity(iEntity, fNodes[i], NULL_VECTOR, NULL_VECTOR);
-		
+
 		CreateTimer(0.1, Timer_ActivateEntity, iEntity);
 	}
-	
+
 	return i;
 }
 
 SpawnRopeSquare(Float:fA[3], Float:fC[3], const String:sNodePrefix[], const String:sRopeMaterial[] = "cable/rope.vmt", Float:fWidth = 2.0, iSlack = 0)
 {
 	new Float:fRopes[4][3];
-	
+
 	fRopes[0] = fA;
 	fRopes[1] = fA;
 	fRopes[2] = fC;
 	fRopes[3] = fA;
-	
+
 	fRopes[1][1] = fC[1];
 	fRopes[2][2] = fA[2];
 	fRopes[3][0] = fC[0];
-	
+
 	SpawnRope(fRopes, 4, sNodePrefix, sRopeMaterial, fWidth, iSlack, true);
 }
 
@@ -483,38 +483,38 @@ SpawnRope(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const Strin
 {
 	if (iNodeCount < 2)
 		return 0;
-	
+
 	decl String:sPrecachedMaterial[PLATFORM_MAX_PATH];
 	FormatEx(sPrecachedMaterial, sizeof(sPrecachedMaterial), "materials/%s", sRopeMaterial);
-	
+
 	if (!IsModelPrecached(sPrecachedMaterial))
 		return 0;
-	
+
 	new iEntity, i;
 	decl String:sNodeName[64], String:sNextNodeName[64];
-		
+
 	for (; i < iNodeCount; i++) {
 		if (i == 0) {
 			iEntity = CreateEntityByName("move_rope");
 		} else {
-			iEntity = CreateEntityByName("keyframe_rope");			
+			iEntity = CreateEntityByName("keyframe_rope");
 		}
-				
+
 		if (!IsValidEntity(iEntity))
 			return i;
-		
+
 		Format(sNodeName, sizeof(sNodeName), "%s%d", sNodePrefix, i);
-		
+
 		if (iNodeCount > i + 1) {
 			Format(sNextNodeName, sizeof(sNextNodeName), "%s%d", sNodePrefix, i + 1);
 		} else {
 			if (bLastNodeToFirst) {
 				Format(sNextNodeName, sizeof(sNextNodeName), "%s0", sNodePrefix);
 			} else {
-				strcopy(sNextNodeName, sizeof(sNextNodeName), "");			
-			}			
+				strcopy(sNextNodeName, sizeof(sNextNodeName), "");
+			}
 		}
-		
+
 		DispatchKeyValue(iEntity, "targetname", sNodeName);
 		DispatchKeyValue(iEntity, "NextKey", sNextNodeName);
 		DispatchKeyValue(iEntity, "RopeMaterial", sRopeMaterial);
@@ -531,16 +531,16 @@ SpawnRope(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const Strin
 		DispatchKeyValue(iEntity, "Barbed", "0");
 		DispatchSpawn(iEntity);
 		TeleportEntity(iEntity, fNodes[i], NULL_VECTOR, NULL_VECTOR);
-		
+
 		CreateTimer(0.1, Timer_ActivateEntity, iEntity);
 	}
-	
+
 	return i;
 }
 
 public Action:Timer_ActivateEntity(Handle:hTimer, any:iEntity)
 {
 	ActivateEntity(iEntity);
-	AcceptEntityInput(iEntity, "TurnOn"); 
+	AcceptEntityInput(iEntity, "TurnOn");
 	return Plugin_Continue;
 }

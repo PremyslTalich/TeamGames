@@ -14,17 +14,17 @@ public Plugin:myinfo =
 
 public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
 {
-	
+
 }
 
 public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
-	
+
 }
 
 public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, iWinners[], iWinnersCount, Handle:hDataPack)
 {
-	
+
 }
 
 // hráč
@@ -41,4 +41,3 @@ public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, iWinners[], iWinnersCount
 	// - 50/50 -> vítězství červení
 	// - 50/50 -> vítězství modří
 	// - nastavení
-	

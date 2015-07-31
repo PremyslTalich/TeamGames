@@ -29,7 +29,7 @@ public OnLibraryAdded(const String:sName[])
 	if (StrEqual(sName, "TeamGames")) {
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY))
 			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
-		
+
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY))
 			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
 	}
@@ -54,7 +54,7 @@ public TG_OnGameSelected(const String:sID[], iClient)
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
-	
+
 	SetWeaponMenu(iClient, sID);
 }
 
@@ -62,26 +62,26 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
-	
+
 	decl String:sWeapon[64];
-	
+
 	ResetPack(DataPack);
 	ReadPackString(DataPack, sWeapon, sizeof(sWeapon));
-	
+
 	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
-		
+
 		GivePlayerWeaponAndAmmo(i, sWeapon, -1, 900);
 		PlayerZoomLevel[i] = 90;
 		SetEntProp(i, Prop_Send, "m_iFOV", PlayerZoomLevel[i]);
 		SetEntProp(i, Prop_Send, "m_iDefaultFOV", PlayerZoomLevel[i]);
 	}
-	
+
 	HookEvent("weapon_fire", Event_WeaponFire, EventHookMode_Pre);
 	HookEvent("player_hurt", Event_PlayerHurt, EventHookMode_Post);
 	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Post);
-	
+
 	return;
 }
 
@@ -89,19 +89,19 @@ public Action:Event_WeaponFire(Handle:event, const String:name[], bool:dontBroad
 {
 	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
-	
+
 	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
-	
+
 	if (TG_IsPlayerRedOrBlue(iClient)) {
 		PlayerZoomLevel[iClient] -= 10;
-		
+
 		if (PlayerZoomLevel[iClient] < 10)
 			PlayerZoomLevel[iClient] = 10;
-		
+
 		SetEntProp(iClient, Prop_Send, "m_iFOV", PlayerZoomLevel[iClient]);
 		SetEntProp(iClient, Prop_Send, "m_iDefaultFOV", PlayerZoomLevel[iClient]);
 	}
-	
+
 	return Plugin_Continue;
 }
 
@@ -109,25 +109,25 @@ public Action:Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroad
 {
 	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
-	
+
 	new iClient = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
+
 	if (!Client_IsValid(iClient, true))
 		return Plugin_Continue;
-	
+
 	if (TG_IsPlayerRedOrBlue(iClient)) {
 		if (PlayerZoomLevel[iClient] <= 10)
 			return Plugin_Continue;
-		
+
 		PlayerZoomLevel[iClient] += 10;
-		
+
 		if (PlayerZoomLevel[iClient] > 90)
 			PlayerZoomLevel[iClient] = 90;
-		
+
 		SetEntProp(iClient, Prop_Send, "m_iFOV", PlayerZoomLevel[iClient]);
 		SetEntProp(iClient, Prop_Send, "m_iDefaultFOV", PlayerZoomLevel[iClient]);
 	}
-	
+
 	return Plugin_Continue;
 }
 
@@ -135,18 +135,18 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 {
 	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
-	
+
 	new iClient = GetClientOfUserId(GetEventInt(event, "attacker"));
-	
+
 	if (!Client_IsValid(iClient, true))
 		return Plugin_Continue;
-	
+
 	if (TG_IsPlayerRedOrBlue(iClient)) {
 		PlayerZoomLevel[iClient] = 90;
 		SetEntProp(iClient, Prop_Send, "m_iFOV", PlayerZoomLevel[iClient]);
 		SetEntProp(iClient, Prop_Send, "m_iDefaultFOV", PlayerZoomLevel[iClient]);
 	}
-	
+
 	return Plugin_Continue;
 }
 
@@ -156,7 +156,7 @@ public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, iWinners[], iWinnersCount
 		for (new i = 1; i <= MaxClients; i++) {
 			if (!TG_IsPlayerRedOrBlue(i))
 				continue;
-			
+
 			SetEntProp(i, Prop_Send, "m_iFOV", 90);
 			SetEntProp(i, Prop_Send, "m_iDefaultFOV", 90);
 		}
@@ -168,9 +168,9 @@ SetWeaponMenu(iClient, const String:sID[])
 	new Handle:hMenu = CreateMenu(SetWeaponMenu_Handler);
 
 	SetMenuTitle(hMenu, "%t", "ChooseWeapon");
-	
+
 	PushMenuString(hMenu, "_GAME_ID_", sID);
-	
+
 	switch (g_iEngVersion) {
 		case Engine_CSS: {
 			AddMenuItem(hMenu, "weapon_deagle", 	"Deagle");
@@ -188,7 +188,7 @@ SetWeaponMenu(iClient, const String:sID[])
 			AddMenuItem(hMenu, "weapon_fiveseven", 		"Five-seveN");
 		}
 	}
-	
+
 	SetMenuExitBackButton(hMenu, true);
 	DisplayMenu(hMenu, iClient, 30);
 }
@@ -198,14 +198,14 @@ public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	if (iAction == MenuAction_Select) {
 		new String:sKey[64], String:sWeaponName[64], String:sID[TG_MODULE_ID_LENGTH];
 		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, sWeaponName, 64);
-		
+
 		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
 			return;
 		}
-		
+
 		new Handle:hDataPack = CreateDataPack();
 		WritePackString(hDataPack, sKey);
-		
+
 		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sWeaponName, hDataPack, true);
 		} else {
