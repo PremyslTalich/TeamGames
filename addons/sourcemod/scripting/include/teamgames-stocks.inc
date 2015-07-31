@@ -5,12 +5,12 @@
 
 #include <cstrike>
 
-stock bool:TG_IsPlayerRedOrBlue(iClient)
+stock bool:TG_IsPlayerRedOrBlue(client)
 {
-	if (iClient < 1 || iClient > MaxClients || !IsClientInGame(iClient) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_T)
+	if (client < 1 || client > MaxClients || !IsClientInGame(client) || !IsPlayerAlive(client) || GetClientTeam(client) != CS_TEAM_T)
 		return false;
 
-	return TG_IsTeamRedOrBlue(TG_GetPlayerTeam(iClient));
+	return TG_IsTeamRedOrBlue(TG_GetPlayerTeam(client));
 }
 
 /**
@@ -20,60 +20,60 @@ stock bool:TG_IsPlayerRedOrBlue(iClient)
  * @param client2		Client 2 index.
  * @return				True on (client 1 team != client 2 team), false otherwise.
  */
-stock bool:TG_InOppositeTeams(iClient1, iClient2)
+stock bool:TG_InOppositeTeams(client1, client2)
 {
-	new TG_Team:iTeam1 = TG_GetPlayerTeam(iClient1);
-	new TG_Team:iTeam2 = TG_GetPlayerTeam(iClient2);
+	new TG_Team:team1 = TG_GetPlayerTeam(client1);
+	new TG_Team:team2 = TG_GetPlayerTeam(client2);
 
-	if (iTeam1 != TG_RedTeam && iTeam1 != TG_BlueTeam)
+	if (team1 != TG_RedTeam && team1 != TG_BlueTeam)
 		return false;
 
-	if (iTeam2 != TG_RedTeam && iTeam2 != TG_BlueTeam)
+	if (team2 != TG_RedTeam && team2 != TG_BlueTeam)
 		return false;
 
-	return (iTeam1 != iTeam2);
+	return (team1 != team2);
 }
 
 
-stock TG_Team:TG_GetTeamFromString(String:sTeam[])
+stock TG_Team:TG_GetTeamFromString(String:team[])
 {
-	if (StrEqual(sTeam, "RedTeam", false) || StrEqual(sTeam, "red", false) || sTeam[0] == '1')
+	if (StrEqual(team, "RedTeam", false) || StrEqual(team, "red", false) || team[0] == '1')
 		return TG_RedTeam;
-	else if (StrEqual(sTeam, "BlueTeam", false) || StrEqual(sTeam, "blue", false) || sTeam[0] == '2')
+	else if (StrEqual(team, "BlueTeam", false) || StrEqual(team, "blue", false) || team[0] == '2')
 		return TG_BlueTeam;
-	else if (StrEqual(sTeam, "NoneTeam", false) || StrEqual(sTeam, "none", false) || sTeam[0] == '0')
+	else if (StrEqual(team, "NoneTeam", false) || StrEqual(team, "none", false) || team[0] == '0')
 		return TG_NoneTeam;
 	else
 		return TG_ErrorTeam;
 }
 
-stock TG_Team:TG_GetOppositeTeam(TG_Team:iTeam)
+stock TG_Team:TG_GetOppositeTeam(TG_Team:team)
 {
-	if (iTeam == TG_RedTeam)
+	if (team == TG_RedTeam)
 		return TG_BlueTeam;
-	else if (iTeam == TG_BlueTeam)
+	else if (team == TG_BlueTeam)
 		return TG_RedTeam;
 	else
 		return TG_ErrorTeam;
 }
 
-stock bool:TG_IsTeamRedOrBlue(TG_Team:iTeam)
+stock bool:TG_IsTeamRedOrBlue(TG_Team:team)
 {
-	return (iTeam == TG_RedTeam || iTeam == TG_BlueTeam);
+	return (team == TG_RedTeam || team == TG_BlueTeam);
 }
 
-stock bool:TG_IsTeamValid(TG_Team:iTeam)
+stock bool:TG_IsTeamValid(TG_Team:team)
 {
-	return (TG_IsTeamRedOrBlue(iTeam) || iTeam == TG_NoneTeam);
+	return (TG_IsTeamRedOrBlue(team) || team == TG_NoneTeam);
 }
 
-stock TG_GetRandomClient(TG_Team:iTeam)
+stock TG_GetRandomClient(TG_Team:team)
 {
 	decl clients[MAXPLAYERS + 1];
 	new count = 0;
 
 	for (new i = 1; i <= MaxClients; i++) {
-		if (TG_GetPlayerTeam(i) == iTeam) {
+		if (TG_GetPlayerTeam(i) == team) {
 			clients[count] = i;
 			count++;
 		}
@@ -85,16 +85,16 @@ stock TG_GetRandomClient(TG_Team:iTeam)
 	return clients[GetRandomInt(0, count - 1)];
 }
 
-stock bool:TG_CheckModuleAccess(iClient, TG_ModuleType:iType, const String:sModuleID[])
+stock bool:TG_CheckModuleAccess(client, TG_ModuleType:type, const String:moduleID[])
 {
-	new String:sTypeID[128], iFlags;
-	Format(sTypeID, sizeof(sTypeID), "%s-%s", (iType == TG_MenuItem) ? "TG_MenuItem" : "TG_Game", sModuleID);
+	new String:typeID[128], iFlags;
+	Format(typeID, sizeof(typeID), "%s-%s", (type == TG_MenuItem) ? "TG_MenuItem" : "TG_Game", moduleID);
 
-	if (GetCommandOverride(sTypeID, Override_Command, iFlags)) {
-		return CheckCommandAccess(iClient, sTypeID, iFlags);
+	if (GetCommandOverride(typeID, Override_Command, iFlags)) {
+		return CheckCommandAccess(client, typeID, iFlags);
 	} else {
-		if (GetCommandOverride(sModuleID, Override_Command, iFlags)) {
-			return CheckCommandAccess(iClient, sModuleID, iFlags);
+		if (GetCommandOverride(moduleID, Override_Command, iFlags)) {
+			return CheckCommandAccess(client, moduleID, iFlags);
 		}
 	}
 
@@ -128,41 +128,41 @@ stock GetCmdArgFloat(argnum)
 //------------------------------------------------------------------------------------------------
 // Weapons (safe to use in both CS:S and CS:GO)
 
-stock GivePlayerWeaponAndAmmo(iClient, String:sWeapon[], iClip = -1, iAmmo = -1)
+stock GivePlayerWeaponAndAmmo(client, String:weapon[], clip = -1, ammo = -1)
 {
-	new iWeapon = GivePlayerItem(iClient, sWeapon);
+	new weaponEnt = GivePlayerItem(client, weapon);
 
-	if (iWeapon != -1) {
-		if (iClip != -1)
-			SetEntProp(iWeapon, Prop_Send, "m_iClip1", iClip);
+	if (weaponEnt != -1) {
+		if (clip != -1)
+			SetEntProp(weaponEnt, Prop_Send, "m_iClip1", clip);
 
-		if (iAmmo != -1) {
-			new iOffset = FindDataMapOffs(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iWeapon) * 4);
-			SetEntData(iClient, iOffset, iAmmo, 4, true);
+		if (ammo != -1) {
+			new iOffset = FindDataMapOffs(client, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(weaponEnt) * 4);
+			SetEntData(client, iOffset, ammo, 4, true);
 
 			if (GetEngineVersion() == Engine_CSGO) {
-				SetEntProp(iWeapon, Prop_Send, "m_iPrimaryReserveAmmoCount", iAmmo);
+				SetEntProp(weaponEnt, Prop_Send, "m_iPrimaryReserveAmmoCount", ammo);
 			}
 		}
 	}
 
-	return iWeapon;
+	return weaponEnt;
 }
 
-stock SetPlayerWeaponAmmo(iClient, iWeapon, iClip = -1, iAmmo = -1)
+stock SetPlayerWeaponAmmo(client, weaponEnt, clip = -1, ammo = -1)
 {
-	if (iWeapon == INVALID_ENT_REFERENCE)
+	if (weaponEnt == INVALID_ENT_REFERENCE)
 		return;
 
-	if (iClip != -1)
-		SetEntProp(iWeapon, Prop_Send, "m_iClip1", iClip);
+	if (clip != -1)
+		SetEntProp(weaponEnt, Prop_Send, "m_iClip1", clip);
 
-	if (iAmmo != -1) {
-		new iOffset = FindDataMapOffs(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iWeapon) * 4);
-		SetEntData(iClient, iOffset, iAmmo, 4, true);
+	if (ammo != -1) {
+		new iOffset = FindDataMapOffs(client, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(weaponEnt) * 4);
+		SetEntData(client, iOffset, ammo, 4, true);
 
 		if (GetEngineVersion() == Engine_CSGO) {
-			SetEntProp(iWeapon, Prop_Send, "m_iPrimaryReserveAmmoCount", iAmmo);
+			SetEntProp(weaponEnt, Prop_Send, "m_iPrimaryReserveAmmoCount", ammo);
 		}
 	}
 }

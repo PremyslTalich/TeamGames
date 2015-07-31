@@ -26,7 +26,7 @@ native TG_Team:TG_GetPlayerTeam(client);
  * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
  * @return				True on success, false on failure.
  */
-native TG_SetPlayerTeam(activator, client, TG_Team:iTeam);
+native TG_SetPlayerTeam(activator, client, TG_Team:team);
 
 native bool:TG_IsGameTypeAvailable(TG_GameType:type);
 
@@ -61,9 +61,9 @@ native TG_FenceDestroy();
  * @param CallForward		Call forward TG_OnLaserFenceCrossed ?.
  * @noreturn
  */
-native TG_FencePlayerCross(client, bool:CallForward = true);
+native TG_FencePlayerCross(client, bool:callForward = true);
 
-native bool:TG_SpawnMark(client, TG_Team:iTeam, Float:position[3], Float:life = 0.0, bool:fireEvent = true, bool:counter = false);
+native bool:TG_SpawnMark(client, TG_Team:team, Float:position[3], Float:life = 0.0, bool:fireEvent = true, bool:counter = false);
 
 /**
  * Get team count of connected and alive players.
@@ -71,7 +71,7 @@ native bool:TG_SpawnMark(client, TG_Team:iTeam, Float:position[3], Float:life = 
  * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
  * @return				Count (>= 0) of players in team (@param team).
  */
-native TG_GetTeamCount(TG_Team:iTeam);
+native TG_GetTeamCount(TG_Team:team);
 
 /**
  * Switch all players in team (@param team) to NoneTeam.
@@ -79,7 +79,7 @@ native TG_GetTeamCount(TG_Team:iTeam);
  * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
  * @noreturn
  */
-native TG_ClearTeam(TG_Team:iTeam);
+native TG_ClearTeam(TG_Team:team);
 
 /**
  * Set teams lock.
@@ -110,9 +110,9 @@ native bool:TG_GetTeamsLock();
  * Error - "TG_RegGame #4"		Game registration Failed! Game name "Core_NoGame" is reserved!
  * Error - "TG_RegGame #5"		Game registration Failed! Game ID "Core_NoGame" is reserved!
  */
-native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty, const String:NameFormat[], any:...);
+native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty, const StringnameFormat[], any:...);
 
-native bool:TG_IsModuleReged(TG_ModuleType:iType, const String:id[]);
+native bool:TG_IsModuleReged(TG_ModuleType:type, const String:id[]);
 
 native Handle:TG_GetRegedModules(TG_ModuleType:type);
 
@@ -134,7 +134,7 @@ native TG_RemoveGame(const String:id[]);
  */
 native TG_GetAddedGames();
 
-native TG_FakeSelect(iClient, TG_ModuleType:iType, String:sID[]);
+native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
 
 /**
  * Register (add) item to TeamGames main menu.
@@ -147,7 +147,7 @@ native TG_FakeSelect(iClient, TG_ModuleType:iType, String:sID[]);
  * Error - "TG_AddMainMenuItem #2"		Modul main menu item registration Failed! Couldn't get Arg2 (Item ID)!
  * Error - "TG_AddMainMenuItem #3"		Modul main menu item registration Failed! Item ID (Arg2) must be unique!
  */
-native TG_RegMenuItem(const String:id[64], const String:NameFormat[], any:...);
+native TG_RegMenuItem(const String:id[64], const String:nameFormat[], any:...);
 
 /**
  * Unregister (remove) item from TeamGames main menu.
@@ -173,7 +173,7 @@ native TG_GetMenuItemName(const String:id[], String:name[], size);
  *
  * Fire forwards: TG_OnGamePrepare, TG_OnGameStart (after 5 seconds) and TG_OnGameStartError (if start game failed).
  */
-native TG_StartGame(iClient, const String:sID[], const String:sGameSettings[] = "", Handle:hDataPack = INVALID_HANDLE, bool:bRemoveDroppedWeapons = false, bool:bCheckTeams = true, bool:bEndOnTeamEmpty = true);
+native TG_StartGame(client, const String:id[], const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:checkTeams = true, bool:endOnTeamEmpty = true);
 
 /**
  * Get current game id.
@@ -196,7 +196,7 @@ native Handle:TG_GetCurrentDataPack();
 
 native TG_GetCurrentStarter();
 
-native bool:TG_GetCurrentGameSettings(String:GameSettings[], size);
+native bool:TG_GetCurrentGameSettings(String:gameSettings[], size);
 
 native TG_GetGameDefaultName(const String:id[], String:name[], size);
 
@@ -218,7 +218,7 @@ native TG_GameType:TG_GetGameType(const String:id[]);
  *
  * Fire forward: TG_OnGameEnd
  */
-native TG_StopGame(TG_Team:iTeam, &Handle:hWinners = INVALID_HANDLE, bool:bClearTeams = true, bool:bReturnWeapons = true);
+native TG_StopGame(TG_Team:team, &Handle:winners = INVALID_HANDLE, bool:clearTeams = true, bool:returnWeapons = true);
 
 native bool:TG_SetModuleVisibility(TG_ModuleType:type, const String:id[], bool:visibility);
 native bool:TG_GetModuleVisibility(TG_ModuleType:type, const String:id[]);
@@ -242,6 +242,6 @@ native TG_LogMessage(const String:prefix[] = "", const String:format[] = "", any
 
 native TG_LogRoundMessage(const String:prefix[] = "", const String:format[] = "", any:...);
 
-native TG_LogGameMessage(const String:GameID[], const String:prefix[] = "", const String:format[] = "", any:...);
+native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", const String:format[] = "", any:...);
 
-native TG_ShowPlayerSelectMenu(client, TG_Team:iTeam, TG_PlayerSelectMenuHandler:function, const String:format[] = "", any:...);
+native TG_ShowPlayerSelectMenu(client, TG_Team:team, TG_PlayerSelectMenuHandler:function, const String:format[] = "", any:...);
