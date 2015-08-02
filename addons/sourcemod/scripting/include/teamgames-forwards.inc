@@ -28,7 +28,8 @@ forward Action:TG_OnPlayerRebel(client, TG_Team:team);
  * @param client		Client index.
  * @noreturn
  */
-forward Action:TG_OnLaserFenceCrossed(client, Float:freezeTime);
+forward Action:TG_OnLaserFenceCross(client, Float:freezeTime);
+forward TG_OnLaserFenceCrossed(client, Float:freezeTime);
 
 /**
  * Before fence is created.

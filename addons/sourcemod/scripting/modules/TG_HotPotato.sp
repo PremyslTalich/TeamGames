@@ -142,7 +142,7 @@ public Action:Event_BombPickUp(Handle:event, const String:name[], bool:dontBroad
 	return Plugin_Continue;
 }
 
-public Action:TG_OnLaserFenceCrossed(iClient, Float:FreezeTime)
+public Action:TG_OnLaserFenceCross(iClient, Float:FreezeTime)
 {
 	if (g_game[VictimEntity] == iClient)
 		return Plugin_Handled;

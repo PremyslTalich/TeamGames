@@ -316,13 +316,18 @@ FencePunishPlayer(iClient, bool:CallForward = true)
 
 	if (CallForward) {
 		new Action:iResult = Plugin_Continue;
-		Call_StartForward(Forward_OnLaserFenceCrossed);
+		Call_StartForward(Forward_OnLaserFenceCross);
 		Call_PushCell(iClient);
 		Call_PushFloatRef(fTime);
 		Call_Finish(iResult);
 
 		if (iResult == Plugin_Handled || iResult == Plugin_Stop)
 			return;
+
+		Call_StartForward(Forward_OnLaserFenceCrossed);
+		Call_PushCell(iClient);
+		Call_PushFloatRef(fTime);
+		Call_Finish();
 	}
 
 	if (g_iFenceNotify == 1 || (g_iFenceNotify == 2 && g_Game[GameProgress] != TG_NoGame)) {

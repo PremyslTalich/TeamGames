@@ -38,6 +38,7 @@ new Handle:Forward_OnPlayerRebel;
 new Handle:Forward_OnPlayerLeaveGame;
 new Handle:Forward_OnLaserFenceCreate;
 new Handle:Forward_OnLaserFenceCreated;
+new Handle:Forward_OnLaserFenceCross;
 new Handle:Forward_OnLaserFenceCrossed;
 new Handle:Forward_OnLaserFenceDestroyed;
 new Handle:Forward_OnMarkSpawn;
@@ -107,7 +108,7 @@ public OnPluginStart()
 	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
 	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",			"How should be teams differentiated? (0 = color, 1 = skin)");
 	g_hTeamAttack = 				CreateConVar("tg_team_attack",				"0",			"Can Ts in different teams (excluding none team) attack themselves even if there is no game? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
-	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",			"Location for notification about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud)\n\t4 = screen overlay (this might break other overlays!)");
+	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",			"Location for notification about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud\n\t4 = screen overlay (this might break other overlays!)");
 
 	g_hAllowMark = 					CreateConVar("tg_mark_allow",				"1",			"Should be marks enabled? (1 = true, 0 = false)");
 	g_hMarkLimit = 					CreateConVar("tg_mark_limit",				"20",			"How many marks can be spawned at the moment");

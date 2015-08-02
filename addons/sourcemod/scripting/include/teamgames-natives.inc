@@ -110,7 +110,7 @@ native bool:TG_GetTeamsLock();
  * Error - "TG_RegGame #4"		Game registration Failed! Game name "Core_NoGame" is reserved!
  * Error - "TG_RegGame #5"		Game registration Failed! Game ID "Core_NoGame" is reserved!
  */
-native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty, const StringnameFormat[], any:...);
+native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty, const String:nameFormat[], any:...);
 
 native bool:TG_IsModuleReged(TG_ModuleType:type, const String:id[]);
 
