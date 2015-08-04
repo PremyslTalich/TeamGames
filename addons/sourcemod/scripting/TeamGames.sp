@@ -120,10 +120,10 @@ public OnPluginStart()
 
 	g_hFenceType = 					CreateConVar("tg_fence_type",				"1",			"Fence type:\n\t0 = fence is turned off\n\t1 = beam fence\n\t2 = rope fence");
 	g_hFenceHeight = 				CreateConVar("tg_fence_height",				"72.0",			"Height of fence. (Player can jump over fence)", _, true, 12.0, true, 1024.0);
-	g_hFenceNotify = 				CreateConVar("tg_fence_notify",				"2",			"Notify in chat that player crossed laser fence?\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
+	g_hFenceNotify = 				CreateConVar("tg_fence_notify",				"2",			"Notify in chat that player crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
 	g_hFencePunishLength = 			CreateConVar("tg_fence_punishlength",		"0.75",			"Time in seconds to punish (color and freeze) player who crossed laser fence.", _, true, 0.0, true, 600.0);
 	g_hFenceFreeze = 				CreateConVar("tg_fence_freeze",				"2",			"Freeze player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
-	g_hFencePunishColorSettings = 	CreateConVar("tg_fence_color",				"1",			"Color player who crossed laser fence?\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
+	g_hFencePunishColorSettings = 	CreateConVar("tg_fence_color",				"1",			"Color player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
 	g_hFencePunishColor = 			CreateConVar("tg_fence_punishcolor",		"000000",		"RRGGBB (hex rgb) - color used on punished player");
 
 	g_hForceAutoKick = 				CreateConVar("tg_cvar_autokick",			"1",			"Force set convar \"mp_autokick 0\" every map start? (1 = true, 0 = false)");

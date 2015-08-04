@@ -149,7 +149,7 @@ bool:IsGameDisabled(const String:sID[TG_MODULE_ID_LENGTH])
 		return false;
 	}
 
-	new bool:bDisabled = bool:KvGetNum(hKV, "Disabled", 0);
+	new bool:bDisabled = bool:KvGetNum(hKV, "disabled", 0);
 	CloseHandle(hKV);
 
 	return bDisabled;
@@ -168,7 +168,7 @@ bool:IsMenuItemDisabled(const String:sID[TG_MODULE_ID_LENGTH])
 		return false;
 	}
 
-	new bool:bDisabled = bool:KvGetNum(hKV, "Disabled", 0);
+	new bool:bDisabled = bool:KvGetNum(hKV, "disabled", 0);
 	CloseHandle(hKV);
 
 	return bDisabled;
