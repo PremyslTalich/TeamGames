@@ -104,6 +104,8 @@ public OnPluginStart()
 	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
 	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",			"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
 	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",			"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");
+	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",			"Frags added when prisoner kill in TG game.");
+	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",			"Score added when prisoner kill in TG game. (Only for CS:GO)");
 
 	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
 	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",			"How should be teams differentiated? (0 = color, 1 = skin)");
@@ -533,10 +535,11 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 public Frame_AddFragsAndScore(any:iClient)
 {
 	new iFrags = GetEntProp(iClient, Prop_Data, "m_iFrags");
-	SetEntProp(iClient, Prop_Data, "m_iFrags", iFrags + 2);
-	if (g_iEngineVersion == Engine_CSGO) {
+	SetEntProp(iClient, Prop_Data, "m_iFrags", iFrags + 1 + GetConVarInt(g_hKillFrags));
+
+	if (g_iEngineVersion == Engine_CSGO && GetConVarInt(g_hKillScore)) {
 		new iScore = CS_GetClientContributionScore(iClient);
-		CS_SetClientContributionScore(iClient, iScore + 1);
+		CS_SetClientContributionScore(iClient, iScore + GetConVarInt(g_hKillScore));
 	}
 }
 

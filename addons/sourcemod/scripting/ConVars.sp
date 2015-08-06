@@ -11,6 +11,7 @@ new Handle:g_hRoundLimit, g_iRoundLimit;
 new Handle:g_hMoveSurvivors, g_iMoveSurvivors;
 new Handle:g_hSaveWeapons, g_iSaveWeapons;
 new Handle:g_hRebelAttack, g_iRebelAttack;
+new Handle:g_hKillFrags, Handle:g_hKillScore;
 
 new Handle:g_hChangeTeamDelay, Float:g_fChangeTeamDelay;
 new Handle:g_hTeamDiff, g_iTeamDiff;
