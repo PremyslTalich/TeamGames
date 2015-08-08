@@ -300,13 +300,13 @@ public Action:Command_MainMenu(iClient, iArgs)
 					UnlockCount++;
 			}
 
-			if (UnlockCount >= RoundToNearest(Team_GetClientCount(CS_TEAM_CT, CLIENTFILTER_INGAME|CLIENTFILTER_ALIVE) * g_fMenuPercent)) {
+			if (UnlockCount >= RoundToNearest(Team_GetClientCount(CS_TEAM_CT, CLIENTFILTER_INGAME|CLIENTFILTER_ALIVE) * GetConVarFloat(g_hMenuPercent))) {
 				if (g_bLockMenu)
 					CPrintToChatAll("%t", "Menu-Unlocked");
 
 				g_bLockMenu = false;
 			} else {
-				CPrintToChatAll("%t", "Menu-Locked", UnlockCount, RoundToNearest(Team_GetClientCount(CS_TEAM_CT, CLIENTFILTER_INGAME|CLIENTFILTER_ALIVE) * g_fMenuPercent));
+				CPrintToChatAll("%t", "Menu-Locked", UnlockCount, RoundToNearest(Team_GetClientCount(CS_TEAM_CT, CLIENTFILTER_INGAME|CLIENTFILTER_ALIVE) * GetConVarFloat(g_hMenuPercent)));
 			}
 		}
 

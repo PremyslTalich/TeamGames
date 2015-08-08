@@ -54,13 +54,13 @@ public Action:Timer_FenceRectanglePre(Handle:hTimer, Handle:hDataPack) // Rectan
 	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
 
 	fA[2] += 18.0;
-	if (g_fFenceHeight < fA[2])
+	if (GetConVarFloat(g_hFenceHeight) < fA[2])
 		return Plugin_Continue;
 
 	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
 
 	fA[2] += 18.0;
-	if (g_fFenceHeight < fA[2])
+	if (GetConVarFloat(g_hFenceHeight) < fA[2])
 		return Plugin_Continue;
 
 	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
@@ -102,7 +102,7 @@ public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, i
 
 CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 {
-	if (g_iFenceType == 0) {
+	if (GetConVarInt(g_hFenceType) == 0) {
 		return;
 	}
 	DestroyFence();
@@ -127,7 +127,7 @@ CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 	CreateFenceCornerModels();
 	g_bFenceRectangle = true;
 
-	if (g_iFenceType == 1) {
+	if (GetConVarInt(g_hFenceType) == 1) {
 		fA[2] += 12.0; fC[2] += 12.0;
 		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_1_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
 
@@ -136,7 +136,7 @@ CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 
 		fA[2] += 18.0; fC[2] += 18.0;
 		SpawnBeamSquare(fA, fC, "__TG_FenceBeamRope_3_", g_sFenceMaterial, g_fFenceWidth, g_iFenceColor);
-	} else if (g_iFenceType == 2) {
+	} else if (GetConVarInt(g_hFenceType) == 2) {
 		fA[2] += 12.0; fC[2] += 12.0;
 		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_1_", g_sFenceMaterial, g_fFenceWidth);
 
@@ -282,7 +282,7 @@ public Hook_LaserFenceOnEndTouch(const String:sOutput[], iCaller, iActivator, Fl
 	new Float:fPos[3];
 	GetClientAbsOrigin(iActivator, fPos);
 
-	if (fPos[2] < g_fFenceRectangleA[2] + (g_fFenceHeight - 12.0))
+	if (fPos[2] < g_fFenceRectangleA[2] + (GetConVarFloat(g_hFenceHeight) - 12.0))
 		FencePunishPlayer(iActivator);
 }
 
@@ -312,7 +312,7 @@ DestroyBrushTriggerAndBeamRope()
 
 FencePunishPlayer(iClient, bool:CallForward = true)
 {
-	new Float:fTime = g_fFencePunishLength;
+	new Float:fTime = GetConVarFloat(g_hFencePunishLength);
 
 	if (CallForward) {
 		new Action:iResult = Plugin_Continue;
@@ -330,19 +330,19 @@ FencePunishPlayer(iClient, bool:CallForward = true)
 		Call_Finish();
 	}
 
-	if (g_iFenceNotify == 1 || (g_iFenceNotify == 2 && g_Game[GameProgress] != TG_NoGame)) {
+	if (GetConVarInt(g_hFenceNotify) == 1 || (GetConVarInt(g_hFenceNotify) == 2 && g_Game[GameProgress] != TG_NoGame)) {
 		decl String:sClientName[64];
 		GetClientName(iClient, sClientName, sizeof(sClientName));
 		CPrintToChatAll("%t" , "Fences-PlayerCross", sClientName);
 	}
 
-	if (g_fFencePunishLength == 0.0 || (g_iFencePunishColorSettings == 0 && g_iFenceFreeze == 0))
+	if (GetConVarFloat(g_hFencePunishLength) == 0.0 || (GetConVarInt(g_hFencePunishColorSettings) == 0 && GetConVarInt(g_hFenceFreeze) == 0))
 		return;
 
 	if (!g_PlayerData[iClient][AbleToFencePunishColor])
 		return;
 
-	if (g_iFencePunishColorSettings == 1 || (g_iFencePunishColorSettings == 2 && g_Game[GameProgress] != TG_NoGame)) {
+	if (GetConVarInt(g_hFencePunishColorSettings) == 1 || (GetConVarInt(g_hFencePunishColorSettings) == 2 && g_Game[GameProgress] != TG_NoGame)) {
 		g_PlayerData[iClient][AbleToFencePunishColor] = false;
 
 		new Handle:hDataPack = CreateDataPack();
@@ -355,7 +355,7 @@ FencePunishPlayer(iClient, bool:CallForward = true)
 		CreateTimer(fTime, Timer_FenceColorOff, hDataPack, 0);
 	}
 
-	if (g_iFenceFreeze == 1 || (g_iFenceFreeze == 2 && g_Game[GameProgress] != TG_NoGame)) {
+	if (GetConVarInt(g_hFenceFreeze) == 1 || (GetConVarInt(g_hFenceFreeze) == 2 && g_Game[GameProgress] != TG_NoGame)) {
 		SetEntityMoveType(iClient, MOVETYPE_NONE);
 		CreateTimer(fTime, Timer_FenceFreezeOff, iClient);
 	}

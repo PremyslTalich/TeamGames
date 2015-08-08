@@ -623,9 +623,9 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 	new bool:bClear = bool:GetNativeCell(3);
 	new bool:bWeapons = bool:GetNativeCell(4);
 
-	if (g_iSaveWeapons == 1) {
+	if (GetConVarInt(g_hSaveWeapons) == 1) {
 		bWeapons = true;
-	} else if (g_iSaveWeapons == 2 && bWeapons) {
+	} else if (GetConVarInt(g_hSaveWeapons) == 2 && bWeapons) {
 		bWeapons = true;
 	}
 
@@ -749,9 +749,9 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 	}
 
 
-	if (g_iMoveSurvivors == 1) {
+	if (GetConVarInt(g_hMoveSurvivors) == 1) {
 		ClearTeams();
-	} else if (g_iMoveSurvivors == 2 && bClear) {
+	} else if (GetConVarInt(g_hMoveSurvivors) == 2 && bClear) {
 		ClearTeams();
 	}
 
@@ -791,7 +791,7 @@ static PrintImportantMessage(String:sFormat[], any:...)
 		VFormat(sMessage, sizeof(sMessage), sFormat, 2);
 
 		CPrintToChat(iClient, sMessage);
-		if (g_bImportantMsg)
+		if (GetConVarBool(g_hImportantMsg))
 			CPrintToChat(iClient, sMessage);
 	}
 }

@@ -3,36 +3,36 @@ new Handle:g_hAutoUpdate;
 
 new Handle:g_hModuleDefVisibility;
 
-new Handle:g_hMenuPercent, Float:g_fMenuPercent;
+new Handle:g_hMenuPercent;
 
-new Handle:g_hSelfDamage, g_iSelfDamage;
+new Handle:g_hSelfDamage;
 
 new Handle:g_hRoundLimit, g_iRoundLimit;
-new Handle:g_hMoveSurvivors, g_iMoveSurvivors;
-new Handle:g_hSaveWeapons, g_iSaveWeapons;
-new Handle:g_hRebelAttack, g_iRebelAttack;
+new Handle:g_hMoveSurvivors;
+new Handle:g_hSaveWeapons;
+new Handle:g_hRebelAttack;
 new Handle:g_hKillFrags, Handle:g_hKillScore;
 
-new Handle:g_hChangeTeamDelay, Float:g_fChangeTeamDelay;
-new Handle:g_hTeamDiff, g_iTeamDiff;
-new Handle:g_hTeamAttack, bool:g_bTeamAttack;
-new Handle:g_hNotifyPlayerTeam, g_iNotifyPlayerTeam, Handle:g_hNotifyTimer;
+new Handle:g_hChangeTeamDelay;
+new Handle:g_hTeamDiff;
+new Handle:g_hTeamAttack;
+new Handle:g_hNotifyPlayerTeam, Handle:g_hNotifyTimer;
 
-new Handle:g_hAllowMark, bool:g_bAllowMark;
-new Handle:g_hMarkLife, Float:g_fMarkLife;
-new Handle:g_hMarkLaser, Float:g_fMarkLaser;
-new Handle:g_hMarkLimit, g_iMarkLimit, g_iMarkLimitCounter;
+new Handle:g_hAllowMark;
+new Handle:g_hMarkLife;
+new Handle:g_hMarkLaser;
+new Handle:g_hMarkLimit, g_iMarkLimitCounter;
 
-new Handle:g_hImportantMsg, bool:g_bImportantMsg;
-new Handle:g_hAllowTeamPrefix, bool:g_bAllowTeamPrefix;
+new Handle:g_hImportantMsg;
+new Handle:g_hAllowTeamPrefix;
 
-new Handle:g_hFenceType, g_iFenceType;
-new Handle:g_hFenceHeight, Float:g_fFenceHeight;
-new Handle:g_hFenceNotify, g_iFenceNotify;
-new Handle:g_hFencePunishLength, Float:g_fFencePunishLength;
-new Handle:g_hFencePunishColorSettings, g_iFencePunishColorSettings;
+new Handle:g_hFenceType;
+new Handle:g_hFenceHeight;
+new Handle:g_hFenceNotify;
+new Handle:g_hFencePunishLength;
+new Handle:g_hFenceFreeze;
+new Handle:g_hFencePunishColorSettings;
 new Handle:g_hFencePunishColor, g_iFencePunishColor[3];
-new Handle:g_hFenceFreeze, g_iFenceFreeze;
 
 new Handle:g_hForceAutoKick;
 new Handle:g_hForceTKPunish;
@@ -41,34 +41,8 @@ new Handle:g_hFFReduction;
 
 LoadConVars()
 {
-	g_fMenuPercent       	= GetConVarFloat(g_hMenuPercent);
+	g_iRoundLimit = GetConVarInt(g_hRoundLimit);
 
-	g_iSelfDamage         	= GetConVarInt(g_hSelfDamage);
-
-	g_iRoundLimit         	= GetConVarInt(g_hRoundLimit);
-	g_iMoveSurvivors      	= GetConVarInt(g_hMoveSurvivors);
-	g_iSaveWeapons        	= GetConVarInt(g_hSaveWeapons);
-	g_iRebelAttack        	= GetConVarInt(g_hRebelAttack);
-
-	g_fChangeTeamDelay    	= GetConVarFloat(g_hChangeTeamDelay);
-	g_iTeamDiff           	= GetConVarInt(g_hTeamDiff);
-	g_bTeamAttack         	= GetConVarBool(g_hTeamAttack);
-	g_iNotifyPlayerTeam   	= GetConVarInt(g_hNotifyPlayerTeam);
-
-	g_bAllowMark          	= GetConVarBool(g_hAllowMark);
-	g_iMarkLimit          	= GetConVarInt(g_hMarkLimit);
-	g_fMarkLife           	= GetConVarFloat(g_hMarkLife);
-	g_fMarkLaser          	= GetConVarFloat(g_hMarkLaser);
-
-	g_bImportantMsg        	= GetConVarBool(g_hImportantMsg);
-	g_bAllowTeamPrefix    	= GetConVarBool(g_hAllowTeamPrefix);
-
-	g_iFenceType                = GetConVarInt(g_hFenceType);
-	g_fFenceHeight              = GetConVarFloat(g_hFenceHeight);
-	g_iFenceNotify              = GetConVarInt(g_hFenceNotify);
-	g_fFencePunishLength        = GetConVarFloat(g_hFencePunishLength);
-	g_iFenceFreeze              = GetConVarInt(g_hFenceFreeze);
-	g_iFencePunishColorSettings = GetConVarInt(g_hFencePunishColorSettings);
 	GetConVarColorToArray(g_hFencePunishColor, g_iFencePunishColor);
 
 	if (GetConVarBool(g_hForceAutoKick))

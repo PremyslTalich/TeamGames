@@ -11,7 +11,7 @@ new g_Mark[3][MarkStruct];
 
 public Action:Event_BulletImpact(Handle:hEvent,const String:sName[],bool:bDontBroadcast)
 {
-	if (g_bAllowMark == false || g_iMarkLimitCounter >= g_iMarkLimit)
+	if (!GetConVarBool(g_hAllowMark) || g_iMarkLimitCounter >= GetConVarInt(g_hMarkLimit))
 		return Plugin_Continue;
 
 	if (g_Mark[TG_RedTeam][e_Sprite] == 0 && g_Mark[TG_BlueTeam][e_Sprite] == 0)
@@ -59,7 +59,7 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 	if (fTime > 0.0)
 		fLife = fTime;
 	else
-		fLife = g_fMarkLife;
+		fLife = GetConVarFloat(g_hMarkLife);
 
 	if (bFireEvent) {
 		new Action:result = Plugin_Continue;
@@ -90,10 +90,10 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 		CreateTimer(0.01, Timer_AbleToMark, iClient);
 
 		g_iMarkLimitCounter++;
-		CreateTimer(g_fMarkLife, Timer_MarkLimit);
+		CreateTimer(GetConVarFloat(g_hMarkLife), Timer_MarkLimit);
 	}
 
-	if (g_fMarkLaser > 0.0 && Client_IsIngame(iClient) && g_Mark[iTeam][e_LaserSprite] != 0) {
+	if (GetConVarFloat(g_hMarkLaser) > 0.0 && Client_IsIngame(iClient) && g_Mark[iTeam][e_LaserSprite] != 0) {
 		new Float:fClientPos[3];
 
 		GetClientEyePosition(iClient, fClientPos);
@@ -105,7 +105,7 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 		iLaserColor[2] = g_Mark[iTeam][e_LaserColor][2];
 		iLaserColor[3] = g_Mark[iTeam][e_LaserColor][3];
 
-		TE_SetupBeamPoints(fClientPos, fPos, g_Mark[iTeam][e_LaserSprite], g_Mark[iTeam][e_LaserSprite], 0, 0, g_fMarkLaser, g_Mark[iTeam][e_LaserWidth], g_Mark[iTeam][e_LaserWidth], 1024, 0.0, iLaserColor, 0);
+		TE_SetupBeamPoints(fClientPos, fPos, g_Mark[iTeam][e_LaserSprite], g_Mark[iTeam][e_LaserSprite], 0, 0, GetConVarFloat(g_hMarkLaser), g_Mark[iTeam][e_LaserWidth], g_Mark[iTeam][e_LaserWidth], 1024, 0.0, iLaserColor, 0);
 		TE_SendToAll();
 	}
 

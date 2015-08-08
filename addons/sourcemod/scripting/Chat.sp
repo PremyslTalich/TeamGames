@@ -25,7 +25,7 @@ public Action:Hook_TextMsg(UserMsg:iMsgId, Handle:hMsg, const iPlayers[], iPlaye
 
 public Action:OnChatMessage(&iAuthor, Handle:hRecipients, String:sName[], String:sMessage[])
 {
-	if (!g_bAllowTeamPrefix)
+	if (!GetConVarBool(g_hAllowTeamPrefix))
 		return Plugin_Continue;
 
 	if (g_PlayerData[iAuthor][Team] == TG_RedTeam) {

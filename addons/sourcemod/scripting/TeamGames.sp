@@ -263,7 +263,7 @@ public Action:Event_RoundStart(Handle:hEvent, const String:sName[], bool:bDontBr
 {
 	ClearGameStatusInfo();
 
-	g_bLockMenu = (g_fMenuPercent <= 0.0) ? false : true;
+	g_bLockMenu = (GetConVarFloat(g_hMenuPercent) <= 0.0) ? false : true;
 	g_bTeamsLock = false;
 	g_iMarkLimitCounter = 0;
 
@@ -279,7 +279,7 @@ public Action:Event_RoundStart(Handle:hEvent, const String:sName[], bool:bDontBr
 
 public Action:Event_RoundEnd(Handle:hEvent, const String:sName[], bool:bDontBroadcast)
 {
-	if (g_iNotifyPlayerTeam == 4) {
+	if (GetConVarInt(g_hNotifyPlayerTeam) == 4) {
 		for (new i = 1; i <= MaxClients; i++) {
 			if (Client_IsIngame(i))
 				ClientCommand(i, "r_screenoverlay \"\"");
@@ -343,7 +343,7 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 			if (iAttackerTGTeam == TG_NoneTeam) {
 				return Plugin_Continue;
 			} else {
-				if (g_iRebelAttack == 1) {
+				if (GetConVarInt(g_hRebelAttack) == 1) {
 					MakeRebel(iAttacker);
 				}
 
@@ -357,7 +357,7 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 
 		if (g_Game[GameProgress] == TG_NoGame) {
 			if (iAttacker == iVictim) {
-				if (g_iSelfDamage > 0) {
+				if (GetConVarInt(g_hSelfDamage) > 0) {
 					return Plugin_Changed;
 				} else {
 					return Plugin_Handled;
@@ -365,11 +365,11 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 			}
 
 			// FN
-			new Action:iDefaultResult = (g_bTeamAttack && TG_InOppositeTeams(iAttacker, iVictim)) ? Plugin_Changed : Plugin_Handled;
+			new Action:iDefaultResult = (GetConVarBool(g_hTeamAttack) && TG_InOppositeTeams(iAttacker, iVictim)) ? Plugin_Changed : Plugin_Handled;
 			return CallForward_PlayerAttack(bTraceAttack, false, iDefaultResult, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
 		} else if (g_Game[GameProgress] == TG_InPreparation) {
 			if (iAttacker == iVictim) {
-				if (iAttackerTGTeam == TG_NoneTeam && g_iSelfDamage > 0) {
+				if (iAttackerTGTeam == TG_NoneTeam && GetConVarInt(g_hSelfDamage) > 0) {
 					return Plugin_Changed;
 				} else {
 					return Plugin_Handled;
@@ -384,7 +384,7 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 			}
 		} else if (g_Game[GameProgress] == TG_InProgress) {
 			if (iAttacker == iVictim) {
-				if ((iAttackerTGTeam == TG_NoneTeam && g_iSelfDamage > 0) || (iAttackerTGTeam != TG_NoneTeam && g_iSelfDamage > 1)) {
+				if ((iAttackerTGTeam == TG_NoneTeam && GetConVarInt(g_hSelfDamage) > 0) || (iAttackerTGTeam != TG_NoneTeam && GetConVarInt(g_hSelfDamage) > 1)) {
 					return Plugin_Changed;
 				} else {
 					return Plugin_Handled;
@@ -526,7 +526,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	ClearPlayerEquipment(iVictim);
 	ClearPlayerData(iVictim);
 
-	if (g_iNotifyPlayerTeam == 4)
+	if (GetConVarInt(g_hNotifyPlayerTeam) == 4)
 		ClientCommand(iVictim, "r_screenoverlay \"\"");
 
 	return Plugin_Continue;

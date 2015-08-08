@@ -11,7 +11,7 @@ new g_Overlay[3][OverlayStruct];
 
 public Action:Timer_HintTeam(Handle:hTimer)
 {
-	if (g_iNotifyPlayerTeam == 0 || g_iNotifyPlayerTeam == 4) {
+	if (GetConVarInt(g_hNotifyPlayerTeam) == 0 || GetConVarInt(g_hNotifyPlayerTeam) == 4) {
 		if (hTimer != INVALID_HANDLE) {
 			KillTimer(hTimer);
 			hTimer = INVALID_HANDLE;
@@ -118,17 +118,17 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 
 	g_PlayerData[iClient][Team] = iTeam;
 
-	if (g_fChangeTeamDelay != 0.0) {
+	if (GetConVarFloat(g_hChangeTeamDelay) != 0.0) {
 		g_PlayerData[iClient][AbleToSwitch] = false;
-		CreateTimer(g_fChangeTeamDelay, Timer_SwitchAble, iClient);
+		CreateTimer(GetConVarFloat(g_hChangeTeamDelay), Timer_SwitchAble, iClient);
 	}
 
 	Blick(iClient, iTeam);
 	NotifyPlayerTeam(iClient, iTeam, false);
 
-	if (g_iTeamDiff == 0)
+	if (GetConVarInt(g_hTeamDiff) == 0)
 		ColorPlayer(iClient, iTeam);
-	else if (g_iTeamDiff == 1)
+	else if (GetConVarInt(g_hTeamDiff) == 1)
 		ModelPlayer(iClient, iTeam);
 
 	if (Client_IsIngame(iActivator)) {
@@ -248,7 +248,7 @@ Blick(iClient, TG_Team:iTeam)
 
 NotifyPlayerTeam(iClient, TG_Team:iTeam, bool:bIgnoreNoneTeam = true)
 {
-	if (g_iNotifyPlayerTeam == 0)
+	if (GetConVarInt(g_hNotifyPlayerTeam) == 0)
 		return 1;
 
 	if (!TG_IsTeamValid(iTeam))
@@ -266,11 +266,11 @@ NotifyPlayerTeam(iClient, TG_Team:iTeam, bool:bIgnoreNoneTeam = true)
 	else if (iTeam == TG_BlueTeam)
 		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-BlueTeam", iClient);
 
-	if (g_iNotifyPlayerTeam == 1) {
+	if (GetConVarInt(g_hNotifyPlayerTeam) == 1) {
 		PrintKeyHintText(iClient, sMsg);
-	} else if (g_iNotifyPlayerTeam == 2) {
+	} else if (GetConVarInt(g_hNotifyPlayerTeam) == 2) {
 		PrintHintText(iClient, sMsg);
-	} else if (g_iNotifyPlayerTeam == 3) {
+	} else if (GetConVarInt(g_hNotifyPlayerTeam) == 3) {
 		new Handle:hHudSynchronizer = CreateHudSynchronizer();
 
 		if (hHudSynchronizer != INVALID_HANDLE) {
@@ -284,7 +284,7 @@ NotifyPlayerTeam(iClient, TG_Team:iTeam, bool:bIgnoreNoneTeam = true)
 			ShowSyncHudText(iClient, hHudSynchronizer, sMsg);
 			CloseHandle(hHudSynchronizer);
 		}
-	} else if (g_iNotifyPlayerTeam == 4) {
+	} else if (GetConVarInt(g_hNotifyPlayerTeam) == 4) {
 		if (iTeam == TG_NoneTeam)
 			ClientCommand(iClient, "r_screenoverlay \"\"");
 		else if (TG_IsTeamRedOrBlue(iTeam))
