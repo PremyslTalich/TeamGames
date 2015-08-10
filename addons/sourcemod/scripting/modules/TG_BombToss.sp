@@ -37,7 +37,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.BombToss-Raska.phrases");
+	LoadTranslations("TG.BombToss.phrases");
 
 	g_hOneBomb = CreateConVar("tg_bt_onebomb", "1", "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
 

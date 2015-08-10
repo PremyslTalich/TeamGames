@@ -49,8 +49,7 @@ public Plugin:myinfo = {
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.PermanentFeces-Raska.phrases");
-	LoadTranslations("TeamGames.settings.phrases");
+	LoadTranslations("TG.PermanentFeces.phrases");
 
 	g_hFenceType = CreateConVar("tg_pf_fence_type", "0", "0 = beam fence, 1 = rope fence");
 

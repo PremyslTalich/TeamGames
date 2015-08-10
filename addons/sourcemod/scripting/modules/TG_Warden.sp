@@ -15,7 +15,7 @@ new Handle:g_hMenuFlag, String:g_sMenuFlag[16];
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.Warden-Raska.phrases");
+	LoadTranslations("TG.Warden.phrases");
 }
 
 public OnConfigsExecuted()

@@ -15,7 +15,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.HEGrenades-Raska.phrases");
+	LoadTranslations("TG.HEGrenades.phrases");
 }
 
 public OnLibraryAdded(const String:sName[])

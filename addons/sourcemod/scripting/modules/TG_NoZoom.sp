@@ -29,7 +29,7 @@ public OnMapStart()
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.NoZoom-Raska.phrases");
+	LoadTranslations("TG.NoZoom.phrases");
 	g_iEngVersion = GetEngineVersion();
 }
 

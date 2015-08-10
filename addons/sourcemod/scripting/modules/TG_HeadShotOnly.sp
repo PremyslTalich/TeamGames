@@ -20,7 +20,7 @@ new EngineVersion:g_iEngVersion;
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.HeadShotOnly-Raska.phrases");
+	LoadTranslations("TG.HeadShotOnly.phrases");
 	g_iEngVersion = GetEngineVersion();
 }
 

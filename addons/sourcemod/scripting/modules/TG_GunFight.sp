@@ -19,7 +19,7 @@ new EngineVersion:g_iEngVersion;
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.GunFight-Raska.phrases");
+	LoadTranslations("TG.GunFight.phrases");
 	g_iEngVersion = GetEngineVersion();
 }
 

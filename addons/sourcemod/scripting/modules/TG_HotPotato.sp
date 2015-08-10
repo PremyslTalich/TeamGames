@@ -28,7 +28,7 @@ new Handle:g_hHeathColor, g_bHealthColor;
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.HotPotato-Raska.phrases");
+	LoadTranslations("TG.HotPotato.phrases");
 
 	g_hHeathColor = CreateConVar("tghp_enablecolor", "1", "Color players in shades of red according to their health level.");
 

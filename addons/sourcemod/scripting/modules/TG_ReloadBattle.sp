@@ -21,7 +21,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.ReloadBattle-Raska.phrases");
+	LoadTranslations("TG.ReloadBattle.phrases");
 	g_iEngVersion = GetEngineVersion();
 }
 

@@ -25,7 +25,7 @@ public OnMapStart()
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.Machines500HP-Raska.phrases");
+	LoadTranslations("TG.Machines.phrases");
 	g_iEngVersion = GetEngineVersion();
 }
 

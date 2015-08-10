@@ -25,7 +25,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.TaserMania-Raska.phrases");
+	LoadTranslations("TG.TaserMania.phrases");
 }
 
 public OnLibraryAdded(const String:sName[])

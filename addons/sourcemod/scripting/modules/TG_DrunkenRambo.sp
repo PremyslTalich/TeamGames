@@ -29,7 +29,7 @@ new Handle:g_hFogDistance, Float:g_fFogDistance;
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.DrunkenRambo-Raska.phrases");
+	LoadTranslations("TG.DrunkenRambo.phrases");
 	g_iEngVersion = GetEngineVersion();
 
 	g_hFogEnable = CreateConVar("tg_dr_fog_enable", "1", "Enable fog for rambo? (1 = yes, 0 = no)");

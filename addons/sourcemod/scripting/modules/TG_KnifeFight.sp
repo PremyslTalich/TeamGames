@@ -17,7 +17,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.KnifeFight-Raska.phrases");
+	LoadTranslations("TG.KnifeFight.phrases");
 }
 
 public OnLibraryAdded(const String:sName[])
