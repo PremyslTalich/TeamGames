@@ -7,4 +7,4 @@ To do list
 - [x] Add gitignore
 - [x] Rename some translations files
 - [x] Finis warden module
-- [ ] Fix warden module (check for access on menu actions) + add cvars for marks
+- [x] Fix warden module (check for access on menu actions) + add cvars for marks, fence
