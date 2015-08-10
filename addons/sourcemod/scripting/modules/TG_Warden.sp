@@ -14,23 +14,76 @@ public Plugin:myinfo =
 	url = ""
 }
 
+new Handle:g_hMark, Handle:g_hFence;
+
 public OnPluginStart()
 {
 	LoadTranslations("TG.Warden.phrases");
+
+	g_hMark = CreateConVar("sm_tg_warden_mark", "1", "Only warden can use TG marks.");
+	g_hFence = CreateConVar("sm_tg_warden_fence", "1", "Only warden can use TG fence.");
 }
 
-public Action:TG_OnMenuDisplay(iClient)
+public Action:TG_OnMenuDisplay(client)
 {
-	// admin access
-	if (CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
-		return Plugin_Continue;
-	}
-	
-	// player is not warden
-	if (!warden_iswarden(iClient)) {
-		CPrintToChat(iClient, "{error}%t", "MenuDenied");
+	if (!CheckWardenAccess(client)) {
+		CPrintToChat(client, "{error}%t", "AccessDenied");
 		return Plugin_Handled;
 	}
 
 	return Plugin_Continue;
+}
+
+public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSettings[], Handle:dataPack)
+{
+	if (!CheckWardenAccess(client)) {
+		CPrintToChat(client, "{error}%t", "AccessDenied");
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+public Action:TG_OnGameSelect(const String:id[], client)
+{
+	if (!CheckWardenAccess(client)) {
+		CPrintToChat(client, "{error}%t", "AccessDenied");
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+public Action:TG_OnMenuItemSelect(const String:id[], client)
+{
+	if (!CheckWardenAccess(client)) {
+		CPrintToChat(client, "{error}%t", "AccessDenied");
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+public Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:life)
+{
+	if (GetConVarBool(g_hMark) && !CheckWardenAccess(client)) {
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+public Action:TG_OnLaserFenceCreate(client, Float:a[3], Float:c[3])
+{
+	if (GetConVarBool(g_hFence) && !CheckWardenAccess(client)) {
+		CPrintToChat(client, "{error}%t", "AccessDenied");
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+bool:CheckWardenAccess(iClient)
+{
+	return (CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC) || warden_iswarden(iClient));
 }
