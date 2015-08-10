@@ -471,18 +471,6 @@ public Native_StartGame(Handle:hPlugin, iNumParams)
 	new bool:bCheckTeams = GetNativeCell(6);
 	new bool:bEndOnTeamEmpty = GetNativeCell(7);
 
-	new Action:iResult = Plugin_Continue;
-	Call_StartForward(Forward_OnGameStartMenu);
-	Call_PushString(sID);
-	Call_PushCell(iClient);
-	Call_PushString(sSettings);
-	Call_PushCell(hDataPack);
-	Call_Finish(iResult);
-	if (iResult != Plugin_Continue) {
-		CloseHandle(hDataPack);
-		return 1;
-	}
-
 	if (iClient == 0) {
 		TG_StartGamePreparation(iClient, sID, sSettings, hDataPack, bRemoveDropppedWeapons, bCheckTeams, bEndOnTeamEmpty);
 		return 0;
@@ -1083,12 +1071,31 @@ public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 		if (StrEqual(sKey, "START_GAME")) {
 			decl String:sSettings[TG_GAME_SETTINGS_LENGTH];
-			decl String:sGameIdStr[TG_MODULE_ID_LENGTH];
+			decl String:sGameID[TG_MODULE_ID_LENGTH];
+			new iStarter = GetMenuCell(hMenu, "-CLIENT-");
+			new Handle:hDataPack = Handle:GetMenuCell(hMenu, "-DATAPACK-");
+			new bool:bRemoveDrops = bool:GetMenuCell(hMenu, "-REMOVEDROPS-");
+			new bool:bCheckTeams = bool:GetMenuCell(hMenu, "-CHECKTEAMS-");
+			new bool:bEndOnTeamEmpty = bool:GetMenuCell(hMenu, "-ENDONTEAMEMPTY-");
 
-			GetMenuString(hMenu, "-GAMEID-", sGameIdStr, sizeof(sGameIdStr));
+			GetMenuString(hMenu, "-GAMEID-", sGameID, sizeof(sGameID));
 			GetMenuString(hMenu, "-GAMESETTINGS-", sSettings, sizeof(sSettings));
 
-			TG_StartGamePreparation(GetMenuCell(hMenu, "-CLIENT-"), sGameIdStr, sSettings, Handle:GetMenuCell(hMenu, "-DATAPACK-"), bool:GetMenuCell(hMenu, "-REMOVEDROPS-"), bool:GetMenuCell(hMenu, "-CHECKTEAMS-"), bool:GetMenuCell(hMenu, "-ENDONTEAMEMPTY-"));
+			new Action:iResult = Plugin_Continue;
+			Call_StartForward(Forward_OnGameStartMenu);
+			Call_PushString(sGameID);
+			Call_PushCell(iStarter);
+			Call_PushString(sSettings);
+			Call_PushCell(hDataPack);
+			Call_Finish(iResult);
+			if (iResult != Plugin_Continue) {
+				if (hDataPack != INVALID_HANDLE) {
+					CloseHandle(hDataPack);
+				}
+				return;
+			}
+
+			TG_StartGamePreparation(iStarter, sGameID, sSettings, hDataPack, bRemoveDrops, bCheckTeams, bEndOnTeamEmpty);
 		}
 	}
 }
