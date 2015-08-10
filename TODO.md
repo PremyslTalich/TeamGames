@@ -5,4 +5,5 @@ To do list
 - [x] Add cvars to set how many frags/score give when prisoner kills another one in game
 - [x] Remove caching for non-string cvars
 - [x] Add gitignore
-- [ ] Rename some translations files
+- [x] Rename some translations files
+- [ ] Finis warden module
