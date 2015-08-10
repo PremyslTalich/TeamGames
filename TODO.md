@@ -6,4 +6,4 @@ To do list
 - [x] Remove caching for non-string cvars
 - [x] Add gitignore
 - [x] Rename some translations files
-- [ ] Finis warden module
+- [x] Finis warden module
