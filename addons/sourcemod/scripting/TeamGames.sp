@@ -43,7 +43,6 @@ new Handle:Forward_OnLaserFenceCrossed;
 new Handle:Forward_OnLaserFenceDestroyed;
 new Handle:Forward_OnMarkSpawn;
 new Handle:Forward_OnMarkSpawned;
-new Handle:Forward_OnMenuGameDisplay;
 new Handle:Forward_OnGameSelect;
 new Handle:Forward_OnGameSelected;
 new Handle:Forward_OnGameStartMenu;
@@ -54,10 +53,10 @@ new Handle:Forward_OnGameEnd;
 new Handle:Forward_OnTeamEmpty;
 new Handle:Forward_OnMenuDisplay;
 new Handle:Forward_OnMenuDisplayed;
-new Handle:Forward_OnMenuItemDisplay;
 new Handle:Forward_OnMenuItemSelect;
 new Handle:Forward_OnMenuItemSelected;
 new Handle:Forward_OnDownloadFile;
+new Handle:Forward_AskModuleName;
 
 new EngineVersion:g_iEngineVersion;
 
@@ -104,8 +103,8 @@ public OnPluginStart()
 	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
 	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",			"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
 	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",			"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");
-	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",			"Frags added when prisoner kill in TG game.");
-	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",			"Score added when prisoner kill in TG game. (Only for CS:GO)");
+	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",			"Frags added when prisoner killed in TG game.");
+	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",			"Score added when prisoner killed in TG game. (Only for CS:GO)");
 
 	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
 	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",			"How should be teams differentiated? (0 = color, 1 = skin)");

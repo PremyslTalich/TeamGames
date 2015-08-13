@@ -110,7 +110,7 @@ native bool:TG_GetTeamsLock();
  * Error - "TG_RegGame #4"		Game registration Failed! Game name "Core_NoGame" is reserved!
  * Error - "TG_RegGame #5"		Game registration Failed! Game ID "Core_NoGame" is reserved!
  */
-native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty, const String:nameFormat[], any:...);
+native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty);
 
 native bool:TG_IsModuleReged(TG_ModuleType:type, const String:id[]);
 
@@ -147,7 +147,7 @@ native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
  * Error - "TG_AddMainMenuItem #2"		Modul main menu item registration Failed! Couldn't get Arg2 (Item ID)!
  * Error - "TG_AddMainMenuItem #3"		Modul main menu item registration Failed! Item ID (Arg2) must be unique!
  */
-native TG_RegMenuItem(const String:id[64], const String:nameFormat[], any:...);
+native TG_RegMenuItem(const String:id[64]);
 
 /**
  * Unregister (remove) item from TeamGames main menu.

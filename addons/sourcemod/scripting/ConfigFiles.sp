@@ -260,7 +260,6 @@ LoadGamesMenuConfig()
 
 			g_GameList[g_iGameListEnd][Used] = false;
 			KvGetSectionName(hKV, g_GameList[g_iGameListEnd][Id], TG_MODULE_ID_LENGTH);
-			KvGetString(hKV, "name", g_GameList[g_iGameListEnd][DefaultName], TG_MODULE_NAME_LENGTH, g_GameList[g_iGameListEnd][Id]);
 			g_GameList[g_iGameListEnd][Visible] = bool:KvGetNum(hKV, "visibility", 1);
 
 			#if defined DEBUG

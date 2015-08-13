@@ -27,10 +27,10 @@ public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_FIFTYFIFTY)) {
-			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty, "%t", "GameName-FiftyFifty");
+			TG_RegGame(GAME_ID_FIFTYFIFTY, TG_FiftyFifty);
 		}
 		if (!TG_IsModuleReged(TG_Game, GAME_ID_REDONLY)) {
-			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly, "%t", "GameName-RedOnly");
+			TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 		}
 	}
 }
@@ -41,12 +41,16 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
-public TG_OnMenuGameDisplay(const String:id[], iClient, String:name[])
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
 {
+	if (type != TG_Game) {
+		return;
+	}
+
 	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", iClient);
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", iClient);
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", client);
 	}
 }
 

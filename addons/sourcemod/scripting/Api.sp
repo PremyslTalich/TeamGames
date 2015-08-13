@@ -125,12 +125,18 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(3, "Game registration Failed! Game ID (\"%s\") must be unique! (Error - \"TG_RegGame #3\")", sID);
 	}
 
-	if (FormatNativeString(0, 3, 4, sizeof(sName), _, sName) != SP_ERROR_NONE) {
-		return ThrowNativeError(2, "Game registration Failed! Couldn't get Arg2 (Game sName)! (Error - \"TG_RegGame #2\")");
-	}
+	strcopy(sName, TG_MODULE_NAME_LENGTH, sID);
+	new TG_MenuItemStatus:iStatus;
+
+	Call_StartForward(Forward_AskModuleName);
+	Call_PushCell(TG_Game);
+	Call_PushString(sID);
+	Call_PushCell(LANG_SERVER);
+	Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushCell(iStatus);
+	Call_Finish();
 
 	new TG_GameType:iType = GetNativeCell(2);
-
 	new iIndex = GetGameIndex(sID, false);
 
 	if (iIndex == -1) {
@@ -138,7 +144,6 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 		g_iGameListEnd++;
 
 		strcopy(g_GameList[iIndex][Id], TG_MODULE_ID_LENGTH, sID);
-		strcopy(g_GameList[iIndex][DefaultName], TG_MODULE_NAME_LENGTH, sName);
 		SaveGameToConfig(sID, sName);
 
 		g_GameList[iIndex][Visible] = GetConVarBool(g_hModuleDefVisibility);
@@ -146,6 +151,7 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 
 	g_GameList[iIndex][Used] = true;
 	g_GameList[iIndex][GameType] = iType;
+	strcopy(g_GameList[iIndex][DefaultName], TG_MODULE_NAME_LENGTH, sName);
 
 	#if defined DEBUG
 	LogMessage("[TG DEBUG] Registred game index = '%d', id = '%s', defaultname = '%s, type = '%d'. (g_iGameListEnd = '%d')", iIndex, g_GameList[iIndex][Id], g_GameList[iIndex][DefaultName], g_GameList[iIndex][GameType], g_iGameListEnd);
@@ -349,9 +355,16 @@ public Native_RegMenuItem(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(3, "Main menu item registration Failed! Item ID (\"%s\") must be unique! (Error - \"TG_RegMenuItem #3\")", sItemID);
 	}
 
-	if (FormatNativeString(0, 2, 3, sizeof(sItemName), _, sItemName) != SP_ERROR_NONE) {
-		return ThrowNativeError(1, "Main menu item registration Failed! Couldn't get Arg2 (Item sName)! (Error - \"TG_RegMenuItem #1\")");
-	}
+	strcopy(sItemName, TG_MODULE_NAME_LENGTH, sItemID);
+	new TG_MenuItemStatus:iStatus;
+
+	Call_StartForward(Forward_AskModuleName);
+	Call_PushCell(TG_MenuItem);
+	Call_PushString(sItemID);
+	Call_PushCell(LANG_SERVER);
+	Call_PushStringEx(sItemName, sizeof(sItemName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushCell(iStatus);
+	Call_Finish();
 
 	new iItemIndex = GetMenuItemIndex(sItemID, false);
 
@@ -360,16 +373,16 @@ public Native_RegMenuItem(Handle:hPlugin, iNumParams)
 		g_iMenuItemListEnd++;
 
 		strcopy(g_MenuItemList[iItemIndex][Id], TG_MODULE_ID_LENGTH, sItemID);
-		strcopy(g_MenuItemList[iItemIndex][DefaultName], TG_MODULE_NAME_LENGTH, sItemName);
 		SaveMenuItemToConfig(sItemID, sItemName);
 
 		g_MenuItemList[iItemIndex][Visible] = GetConVarBool(g_hModuleDefVisibility);
 	}
 
 	g_MenuItemList[iItemIndex][Used] = true;
+	strcopy(g_MenuItemList[iItemIndex][DefaultName], TG_MODULE_NAME_LENGTH, sItemName);
 
 	#if defined DEBUG
-	LogMessage("[TG DEBUG] Registred item sID = '%s', sName = '%s'.", sItemID, sItemName);
+	LogMessage("[TG DEBUG] Registred item ID = '%s', Name = '%s'.", sItemID, sItemName);
 	#endif
 
 	return 0;
@@ -1023,7 +1036,6 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnLaserFenceDestroyed = 	CreateGlobalForward("TG_OnLaserFenceDestroyed", 		ET_Ignore, 	Param_Array, 		Param_Array);
 	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Event, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
 	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
-	Forward_OnMenuGameDisplay = 		CreateGlobalForward("TG_OnMenuGameDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_String);
 	Forward_OnGameSelect = 				CreateGlobalForward("TG_OnGameSelect",					ET_Event, 	Param_String,		Param_Cell);
 	Forward_OnGameSelected = 			CreateGlobalForward("TG_OnGameSelected",				ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
@@ -1034,10 +1046,10 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnGameEnd = 	 			CreateGlobalForward("TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell);
 	Forward_OnMenuDisplay =  			CreateGlobalForward("TG_OnMenuDisplay",					ET_Event, 	Param_Cell);
 	Forward_OnMenuDisplayed =  			CreateGlobalForward("TG_OnMenuDisplayed",				ET_Ignore, 	Param_Cell);
-	Forward_OnMenuItemDisplay = 		CreateGlobalForward("TG_OnMenuItemDisplay", 			ET_Ignore, 	Param_String,		Param_Cell, 		Param_CellByRef, 	Param_String);
 	Forward_OnMenuItemSelect = 			CreateGlobalForward("TG_OnMenuItemSelect", 				ET_Event, 	Param_String,		Param_Cell);
 	Forward_OnMenuItemSelected = 		CreateGlobalForward("TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
+	Forward_AskModuleName =				CreateGlobalForward("TG_AskModuleName", 				ET_Ignore, 	Param_Cell,			Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 
 	CreateModulesConfigFileIfNotExist();
 

@@ -21,19 +21,25 @@ GamesMenu(iClient, TG_GameType:iType = TG_All_)
 				continue;
 
 			strcopy(sName, sizeof(sName), g_GameList[i][DefaultName]);
+			new TG_MenuItemStatus:iStatus;
 
-			Call_StartForward(Forward_OnMenuGameDisplay);
+			Call_StartForward(Forward_AskModuleName);
+			Call_PushCell(TG_Game);
 			Call_PushString(g_GameList[i][Id]);
 			Call_PushCell(iClient);
 			Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushCell(iStatus);
 			Call_Finish();
+
+			if (iStatus == TG_Disabled)
+				continue;
 
 			AddSeperatorToMenu(hMenu, g_GameList[i][Separator], -1);
 
 			if (g_GameList[i][GameType] == TG_RedOnly && iType != TG_RedOnly)
 				Format(sName, sizeof(sName), "%s (%T)", sName, "MenuGames-RedOnlyHint", iClient);
 
-			if (IsGameTypeAvailable(g_GameList[i][GameType]))
+			if (IsGameTypeAvailable(g_GameList[i][GameType]) || iStatus != TG_Active)
 				AddMenuItem(hMenu, g_GameList[i][Id], sName);
 			else
 				AddMenuItem(hMenu, g_GameList[i][Id], sName, ITEMDRAW_DISABLED);

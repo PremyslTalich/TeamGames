@@ -21,7 +21,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames") && !TG_IsModuleReged(TG_Game, GAME_ID))
-		TG_RegGame(GAME_ID, TG_FiftyFifty, "%t", "GameName");
+		TG_RegGame(GAME_ID, TG_FiftyFifty);
 }
 
 public OnPluginEnd()
@@ -29,10 +29,10 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_OnMenuGameDisplay(const String:sID[], iClient, String:sName[])
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
 {
-	if (StrEqual(sID, GAME_ID))
-		Format(sName, TG_MODULE_NAME_LENGTH, "%T", "GameName", iClient);
+	if (type == TG_Game && StrEqual(id, GAME_ID))
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", client);
 }
 
 public TG_OnGameSelected(const String:sID[], iClient)

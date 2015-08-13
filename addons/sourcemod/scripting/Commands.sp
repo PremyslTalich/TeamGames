@@ -208,17 +208,41 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-FiftyFifty", iClient);
 				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_FiftyFifty);
 
+				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
-					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_FiftyFifty)
-						AddMenuItem(hSubMenu, g_GameList[i][Id], g_GameList[i][DefaultName]);
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_FiftyFifty) {
+						new TG_MenuItemStatus:iStatus;
+
+						Call_StartForward(Forward_AskModuleName);
+						Call_PushCell(TG_Game);
+						Call_PushString(g_GameList[i][Id]);
+						Call_PushCell(iClient);
+						Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+						Call_PushCell(iStatus);
+						Call_Finish();
+
+						AddMenuItem(hSubMenu, g_GameList[i][Id], sName);
+					}
 				}
 			} else {
 				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-RedOnly", iClient);
 				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_RedOnly);
 
+				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
-					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_RedOnly)
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_RedOnly) {
+						new TG_MenuItemStatus:iStatus;
+
+						Call_StartForward(Forward_AskModuleName);
+						Call_PushCell(TG_MenuItem);
+						Call_PushString(g_GameList[i][Id]);
+						Call_PushCell(iClient);
+						Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+						Call_PushCell(iStatus);
+						Call_Finish();
+
 						AddMenuItem(hSubMenu, g_GameList[i][Id], g_GameList[i][DefaultName]);
+					}
 				}
 			}
 
@@ -414,13 +438,14 @@ MainMenu(iClient)
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 		} else {
 			strcopy(sMenuItemName, sizeof(sMenuItemName), g_MenuItemList[i][DefaultName]);
+			new TG_MenuItemStatus:iStatus;
 
-			new TG_MenuItemStatus:iStatus = TG_Active;
-			Call_StartForward(Forward_OnMenuItemDisplay);
+			Call_StartForward(Forward_AskModuleName);
+			Call_PushCell(TG_MenuItem);
 			Call_PushString(g_MenuItemList[i][Id]);
 			Call_PushCell(iClient);
-			Call_PushCellRef(iStatus);
 			Call_PushStringEx(sMenuItemName, sizeof(sMenuItemName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushCell(iStatus);
 			Call_Finish();
 
 			if (iStatus == TG_Disabled)

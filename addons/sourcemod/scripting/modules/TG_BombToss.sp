@@ -48,8 +48,8 @@ public OnPluginStart()
 public OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "TeamGames") && !TG_IsModuleReged(TG_MenuItem, MENU_ITEM_ID_SPAWNBOMB)) {
-		TG_RegMenuItem(MENU_ITEM_ID_SPAWNBOMB, "%t", "SpawnBomb", g_iMaxBombs - g_iBombCounter);
-		TG_RegMenuItem(MENU_ITEM_ID_TARGET, "%t", "SpawnTarget");
+		TG_RegMenuItem(MENU_ITEM_ID_SPAWNBOMB);
+		TG_RegMenuItem(MENU_ITEM_ID_TARGET);
 	}
 }
 
@@ -101,8 +101,12 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	RemoveTarget();
 }
 
-public TG_OnMenuItemDisplay(const String:id[], iClient, &TG_MenuItemStatus:status, String:name[])
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
 {
+	if (type != TG_MenuItem) {
+		return;
+	}
+
 	if (StrEqual(id, MENU_ITEM_ID_SPAWNBOMB)) {
 		if (g_iBombCounter < g_iMaxBombs) {
 			status = TG_Active;
@@ -110,9 +114,9 @@ public TG_OnMenuItemDisplay(const String:id[], iClient, &TG_MenuItemStatus:statu
 			status = TG_Inactive;
 		}
 
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnBomb", iClient, g_iMaxBombs - g_iBombCounter);
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnBomb", client, g_iMaxBombs - g_iBombCounter);
 	} else if (StrEqual(id, MENU_ITEM_ID_TARGET)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnTarget", iClient);
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnTarget", client);
 	}
 }
 

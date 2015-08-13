@@ -53,7 +53,7 @@ forward TG_OnLaserFenceDestroyed(Float:a[3], Float:c[3]);
 forward Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:life);
 forward TG_OnMarkSpawned(client, TG_Team:team, Float:position[3], Float:life);
 
-forward TG_OnMenuGameDisplay(const String:id[], client, String:name[]);
+// forward TG_OnMenuGameDisplay(const String:id[], client, String:name[]);
 
 /**
  * When the player selected game in games TeamGames menu.
@@ -153,6 +153,6 @@ forward TG_OnMenuDisplayed(client);
 forward Action:TG_OnMenuItemSelect(const String:id[], client);
 forward TG_OnMenuItemSelected(const String:id[], client);
 
-forward TG_OnMenuItemDisplay(const String:id[], client, &TG_MenuItemStatus:status, String:name[]);
-
 forward TG_OnDownloadFile(String:file[], String:prefixName[], Handle:args, &bool:known);
+
+forward TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status);

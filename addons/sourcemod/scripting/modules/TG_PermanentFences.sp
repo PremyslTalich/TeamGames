@@ -59,8 +59,8 @@ public OnPluginStart()
 public OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "TeamGames") && !TG_IsModuleReged(TG_MenuItem, MENU_ITEM_ID_CREATE)) {
-		TG_RegMenuItem(MENU_ITEM_ID_CREATE, "%t", "CreateFence");
-		TG_RegMenuItem(MENU_ITEM_ID_DELETE, "%t", "DeleteFence");
+		TG_RegMenuItem(MENU_ITEM_ID_CREATE);
+		TG_RegMenuItem(MENU_ITEM_ID_DELETE);
 	}
 }
 
@@ -202,20 +202,16 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	}
 }
 
-public TG_OnMenuItemDisplay(const String:id[], iClient, &TG_MenuItemStatus:status, String:name[])
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
 {
+	if (type != TG_MenuItem) {
+		return;
+	}
+
 	if (StrEqual(id, MENU_ITEM_ID_CREATE)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "CreateFence", iClient);
-
-		if (!g_bEnabled) {
-			status = TG_Disabled;
-		}
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "CreateFence", client);
 	} else if (StrEqual(id, MENU_ITEM_ID_DELETE)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "DeleteFence", iClient);
-
-		if (!g_bEnabled) {
-			status = TG_Disabled;
-		}
+		Format(name, TG_MODULE_NAME_LENGTH, "%T", "DeleteFence", client);
 	}
 }
 
