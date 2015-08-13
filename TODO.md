@@ -8,4 +8,4 @@ To do list
 - [x] Rename some translations files
 - [x] Finis warden module
 - [x] Fix warden module (check for access on menu actions) + add cvars for marks, fence
-- [ ] Add forward TG_AskModuleName and fix module names
+- [x] Add forward TG_AskModuleName and fix module names
