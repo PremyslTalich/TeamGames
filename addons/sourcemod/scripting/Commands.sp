@@ -99,10 +99,19 @@ Command_VisibleSubMenu(iClient, TG_ModuleType:iType)
 			if (!g_MenuItemList[i][Used])
 				continue;
 
-			if (!g_MenuItemList[i][Visible])
-				AddMenuItemFormat(hMenu, g_MenuItemList[i][Id], _, "[] %s", g_MenuItemList[i][DefaultName]);
-			else
-				AddMenuItemFormat(hMenu, g_MenuItemList[i][Id], _, "[X] %s", g_MenuItemList[i][DefaultName]);
+			new String:sName[TG_MODULE_NAME_LENGTH];
+			strcopy(sName, sizeof(sName), g_MenuItemList[i][DefaultName]);
+			new TG_MenuItemStatus:iStatus;
+
+			Call_StartForward(Forward_AskModuleName);
+			Call_PushCell(TG_MenuItem);
+			Call_PushString(g_MenuItemList[i][Id]);
+			Call_PushCell(iClient);
+			Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushCell(iStatus);
+			Call_Finish();
+
+			AddMenuItemFormat(hMenu, g_MenuItemList[i][Id], _, "%s %s", (g_MenuItemList[i][Visible]) ? "[X]" : "[ ]", sName);
 		}
 	} else if (iType == TG_Game) {
 		SetMenuTitle(hMenu, "%T", "MenuVisibility-SubTitle", iClient);
@@ -111,10 +120,19 @@ Command_VisibleSubMenu(iClient, TG_ModuleType:iType)
 			if (!g_GameList[i][Used])
 				continue;
 
-			if (!g_GameList[i][Visible])
-				AddMenuItemFormat(hMenu, g_GameList[i][Id], _, "[] %s", g_GameList[i][DefaultName]);
-			else
-				AddMenuItemFormat(hMenu, g_GameList[i][Id], _, "[X] %s", g_GameList[i][DefaultName]);
+			new String:sName[TG_MODULE_NAME_LENGTH];
+			strcopy(sName, sizeof(sName), g_GameList[i][DefaultName]);
+			new TG_MenuItemStatus:iStatus;
+
+			Call_StartForward(Forward_AskModuleName);
+			Call_PushCell(TG_Game);
+			Call_PushString(g_GameList[i][Id]);
+			Call_PushCell(iClient);
+			Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushCell(iStatus);
+			Call_Finish();
+
+			AddMenuItemFormat(hMenu, g_GameList[i][Id], _, "%s %s", (g_GameList[i][Visible]) ? "[X]" : "[ ]", sName);
 		}
 	}
 

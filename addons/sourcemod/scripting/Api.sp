@@ -759,14 +759,31 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 	if (g_Game[GameType] == TG_FiftyFifty) {
 		PrintImportantMessage("%t", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie");
 	} else if (g_Game[GameType] == TG_RedOnly) {
-		if (iWinnersCount == 1) {
-			new String:sWinner[64];
-			GetClientName(iWinners[0], sWinner, sizeof(sWinner));
-			PrintImportantMessage("%t", "TeamWins-Winner", sWinner, g_Game[DefaultName]);
-		} else if (iWinnersCount > 1) {
-			PrintImportantMessage("%t", "TeamWins-Winners", sWinners, g_Game[DefaultName]);
+		if (iWinnersCount > 0) {
+			new bool:bOnlyOneWinner = (iWinnersCount == 1);
+
+			for (new iUser = 1; iUser <= MaxClients; iUser++) {
+				if (!IsClientInGame(iUser)) {
+					continue;
+				}
+
+				new String:sGameName[TG_MODULE_NAME_LENGTH];
+				new TG_MenuItemStatus:iStatus;
+
+				Call_StartForward(Forward_AskModuleName);
+				Call_PushCell(TG_Game);
+				Call_PushString(g_Game[GameID]);
+				Call_PushCell(iUser);
+				Call_PushStringEx(sGameName, sizeof(sGameName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+				Call_PushCell(iStatus);
+				Call_Finish();
+
+				for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
+					CPrintToChat(iUser, "%T", (bOnlyOneWinner) ? "TeamWins-Winner" : "TeamWins-Winners", iUser, sWinners, sGameName);
+				}
+			}
 		} else {
-			PrintImportantMessage("%t", "TeamWins-Tie");
+			PrintImportantMessage("%t", "GameEnd");
 		}
 	}
 
@@ -1181,10 +1198,29 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 	if (g_iRoundLimit > 0)
 		g_iRoundLimit--;
 
-	if (sSettings[0] == '\0') {
-		PrintImportantMessage("%t", "GamePreparation", g_Game[DefaultName]);
-	} else {
-		PrintImportantMessage("%t", "GamePreparation-Settings", g_Game[DefaultName], sSettings);
+	for (new iUser = 1; iUser <= MaxClients; iUser++) {
+		if (!IsClientInGame(iUser)) {
+			continue;
+		}
+
+		new String:sGameName[TG_MODULE_NAME_LENGTH];
+		new TG_MenuItemStatus:iStatus;
+
+		Call_StartForward(Forward_AskModuleName);
+		Call_PushCell(TG_Game);
+		Call_PushString(sID);
+		Call_PushCell(iUser);
+		Call_PushStringEx(sGameName, sizeof(sGameName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+		Call_PushCell(iStatus);
+		Call_Finish();
+
+		for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
+			if (sSettings[0] == '\0') {
+				CPrintToChat(iUser, "%T", "GamePreparation", iUser, sGameName);
+			} else {
+				CPrintToChat(iUser, "%T", "GamePreparation-Settings", iUser, sGameName, sSettings);
+			}
+		}
 	}
 
 	for (new i = 1; i <= MaxClients; i++) {
@@ -1301,7 +1337,6 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 				SetEntityMoveType(i, MoveType:MOVETYPE_ISOMETRIC);
 		}
 
-		new iGameIndex = GetGameIndex(g_Game[GameID]);
 		decl String:sSettings[TG_GAME_SETTINGS_LENGTH];
 		new iActivator = -1;
 		ResetPack(hDataPack);
@@ -1309,10 +1344,29 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 		iActivator = ReadPackCell(hDataPack);
 		CloseHandle(hDataPack);
 
-		if (sSettings[0] == '\0') {
-			PrintImportantMessage("%t", "GameStart", g_GameList[iGameIndex][DefaultName]);
-		} else {
-			PrintImportantMessage("%t", "GameStart-Settings", g_GameList[iGameIndex][DefaultName], sSettings);
+		for (new iUser = 1; iUser <= MaxClients; iUser++) {
+			if (!IsClientInGame(iUser)) {
+				continue;
+			}
+
+			new String:sGameName[TG_MODULE_NAME_LENGTH];
+			new TG_MenuItemStatus:iStatus;
+
+			Call_StartForward(Forward_AskModuleName);
+			Call_PushCell(TG_Game);
+			Call_PushString(g_Game[GameID]);
+			Call_PushCell(iUser);
+			Call_PushStringEx(sGameName, sizeof(sGameName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+			Call_PushCell(iStatus);
+			Call_Finish();
+
+			for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
+				if (sSettings[0] == '\0') {
+					CPrintToChat(iUser, "%T", "GameStart", iUser, sGameName);
+				} else {
+					CPrintToChat(iUser, "%T", "GameStart-Settings", iUser, sGameName, sSettings);
+				}
+			}
 		}
 
 		if (g_iFriendlyFire == 2)

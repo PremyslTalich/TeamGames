@@ -5,13 +5,13 @@
 	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
+		"en"		"{1} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
 		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
 	}
 	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
+		"en"		"{1} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
 		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
 	}
 	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
@@ -36,12 +36,12 @@
 // Player team hints
 	"TeamHud-RedTeam" // hint msg for player in team red
 	{
-		"en"		"You are in team red !"
+		"en"		"You are in red team!"
 		"cze"		"Jsi v teamu červených !"
-	}	
+	}
 	"TeamHud-BlueTeam" // hint msg for player in team blue
 	{
-		"en"		"You are in team blue !"
+		"en"		"You are in blue team!"
 		"cze"		"Jsi v teamu modrých !"
 	}
 	"TeamHud-NoneTeam" // hint msg for player moved out of team
@@ -90,8 +90,8 @@
 	"GameStop" // msg for all players when someone stop the game ({1} = player name)
 	{
 		"#format"	"{1:s}"
-		"en"		"Player {tg-module}{1}{default} stopped the game !!!"
-		"cze"		"Hráč {tg-module}{1}{default} zastavil hru !!!"
+		"en"		"Player {player}{1}{default} stopped the game !!!"
+		"cze"		"Hráč {player}{1}{default} zastavil hru !!!"
 	}
 	"GameEnd"
 	{
@@ -113,12 +113,12 @@
 	}
 	"TeamWins-RedTeam" // msg for all players that team red wins
 	{
-		"en"		"Team{tg-redteam} red{default} wins !!!"
+		"en"		"{tg-redteam}Red{default} team wins !!!"
 		"cze"		"Vyhrál team{tg-redteam} červených{default} !!!"
 	}
 	"TeamWins-BlueTeam" // msg for all players that team blue wins
 	{
-		"en"		"Team{tg-blueteam} blue{default} wins !!!"
+		"en"		"{tg-blueteam}Blue{default} team wins !!!"
 		"cze"		"Vyhrál team{tg-blueteam} modrých{default} !!!"
 	}
 	"TeamWins-Tie" // msg for all players that teams tied
@@ -364,17 +364,17 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Games list
-	"GamesList-Title" // header line of games list (command !list)
-	{
-		"en"		"{highlight}List of games:"
-		"cze"		"{highlight}Seznam her:"
-	}
-	"GamesList-Line" // format of line in games list ({1} = n, {2} = game name)
-	{
-		"#format"	"{1:d},{2:s}"
-		"en"		"{highlight}{1}){default} {2}"
-		"cze"		"{highlight}{1}){default} {2}"
-	}
+	// "GamesList-Title" // header line of games list (command !list)
+	// {
+		// "en"		"{highlight}List of games:"
+		// "cze"		"{highlight}Seznam her:"
+	// }
+	// "GamesList-Line" // format of line in games list ({1} = n, {2} = game name)
+	// {
+		// "#format"	"{1:d},{2:s}"
+		// "en"		"{highlight}{1}){default} {2}"
+		// "cze"		"{highlight}{1}){default} {2}"
+	// }
 //------------------------------------------------------------------------------------------------
 // Rebel
 	"Rebel-AliveTOnly"

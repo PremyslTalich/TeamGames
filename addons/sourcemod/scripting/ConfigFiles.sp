@@ -210,7 +210,6 @@ LoadMenuItemsConfig()
 			g_MenuItemList[g_iMenuItemListEnd][Separator] = GetSeparatorType(sKey);
 
 			KvGetSectionName(hKV, g_MenuItemList[g_iMenuItemListEnd][Id], TG_MODULE_ID_LENGTH);
-			KvGetString(hKV, "name", g_MenuItemList[g_iMenuItemListEnd][DefaultName], TG_MODULE_NAME_LENGTH, g_MenuItemList[g_iMenuItemListEnd][Id]);
 			g_MenuItemList[g_iMenuItemListEnd][Visible] = bool:KvGetNum(hKV, "visibility", 1);
 
 			if (StrContains(g_MenuItemList[g_iMenuItemListEnd][Id], "Core_", false) == 0)

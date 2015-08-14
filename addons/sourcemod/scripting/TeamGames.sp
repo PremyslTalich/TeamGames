@@ -169,7 +169,7 @@ public OnPluginStart()
 
 	CAddVariable("tg-noneteam", "{default}");
 	CAddVariable("tg-redteam", 	"{lightred}");
-	CAddVariable("tg-blueteam", "{lightblue}");
+	CAddVariable("tg-blueteam", "{blue}");
 	CAddVariable("tg-settings", "{green}");
 	CAddVariable("tg-module", 	"{green}");
 }
