@@ -30,5 +30,6 @@ TeamGames is modular system for JailBreak servers with many features:
 - Taser mania
 
 ##Non-game modules
+- Warden
 - Bomb toss
 - Permanent fences
