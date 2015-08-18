@@ -1,4 +1,4 @@
-Need tester ! - create new [Issue](https://github.com/isaacs/github/issues/new?title=I%20wanna%20help%20testing%20TG)
+Need tester ! - create new [Issue](https://github.com/KissLick/TeamGames/issues/new?title=I%20wanna%20help%20testing%20TG)
 ==============
 
 TeamGames is modular system for JailBreak servers with many features:
