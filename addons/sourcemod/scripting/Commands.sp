@@ -100,16 +100,7 @@ Command_VisibleSubMenu(iClient, TG_ModuleType:iType)
 				continue;
 
 			new String:sName[TG_MODULE_NAME_LENGTH];
-			strcopy(sName, sizeof(sName), g_MenuItemList[i][DefaultName]);
-			new TG_MenuItemStatus:iStatus;
-
-			Call_StartForward(Forward_AskModuleName);
-			Call_PushCell(TG_MenuItem);
-			Call_PushString(g_MenuItemList[i][Id]);
-			Call_PushCell(iClient);
-			Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(iStatus);
-			Call_Finish();
+			Call_AskModuleName(g_MenuItemList[i][Id], TG_MenuItem, iClient, sName, sizeof(sName), _, g_MenuItemList[i][DefaultName]);
 
 			AddMenuItemFormat(hMenu, g_MenuItemList[i][Id], _, "%s %s", (g_MenuItemList[i][Visible]) ? "[X]" : "[ ]", sName);
 		}
@@ -121,16 +112,7 @@ Command_VisibleSubMenu(iClient, TG_ModuleType:iType)
 				continue;
 
 			new String:sName[TG_MODULE_NAME_LENGTH];
-			strcopy(sName, sizeof(sName), g_GameList[i][DefaultName]);
-			new TG_MenuItemStatus:iStatus;
-
-			Call_StartForward(Forward_AskModuleName);
-			Call_PushCell(TG_Game);
-			Call_PushString(g_GameList[i][Id]);
-			Call_PushCell(iClient);
-			Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(iStatus);
-			Call_Finish();
+			Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName), _, g_GameList[i][DefaultName]);
 
 			AddMenuItemFormat(hMenu, g_GameList[i][Id], _, "%s %s", (g_GameList[i][Visible]) ? "[X]" : "[ ]", sName);
 		}
@@ -229,15 +211,7 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
 					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_FiftyFifty) {
-						new TG_MenuItemStatus:iStatus;
-
-						Call_StartForward(Forward_AskModuleName);
-						Call_PushCell(TG_Game);
-						Call_PushString(g_GameList[i][Id]);
-						Call_PushCell(iClient);
-						Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-						Call_PushCell(iStatus);
-						Call_Finish();
+						Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName));
 
 						AddMenuItem(hSubMenu, g_GameList[i][Id], sName);
 					}
@@ -249,15 +223,7 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
 					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_RedOnly) {
-						new TG_MenuItemStatus:iStatus;
-
-						Call_StartForward(Forward_AskModuleName);
-						Call_PushCell(TG_MenuItem);
-						Call_PushString(g_GameList[i][Id]);
-						Call_PushCell(iClient);
-						Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-						Call_PushCell(iStatus);
-						Call_Finish();
+						Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName));
 
 						AddMenuItem(hSubMenu, g_GameList[i][Id], g_GameList[i][DefaultName]);
 					}
@@ -278,10 +244,18 @@ public GamesListSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	switch (iAction) {
 		case MenuAction_Select: {
 			new String:sGameID[TG_MODULE_ID_LENGTH], String:sGameName[TG_MODULE_NAME_LENGTH], String:sClientName[64];
-			GetMenuItem(hMenu, iKey, sGameID, sizeof(sGameID), _, sGameName, sizeof(sGameName));
+			new TG_GameType:iType = TG_GameType:GetMenuCell(hMenu, "Core_-GameType-");
+			GetMenuItem(hMenu, iKey, sGameID, sizeof(sGameID));
 			GetClientName(iClient, sClientName, sizeof(sClientName));
 
-			CPrintToChatAll("%t", (TG_GameType:GetMenuCell(hMenu, "Core_-GameType-") == TG_FiftyFifty) ? "MenuGamesList-Chosen-FiftyFifty" : "MenuGamesList-Chosen-RedOnly", sClientName, sGameName);
+			for (new iUser = 1; iUser <= MaxClients; iUser++) {
+				if (!IsClientInGame(iUser)) {
+					continue;
+				}
+
+				Call_AskModuleName(sGameID, TG_Game, iUser, sGameName, sizeof(sGameName));
+				CPrintToChat(iUser, "%T", (iType == TG_FiftyFifty) ? "MenuGamesList-Chosen-FiftyFifty" : "MenuGamesList-Chosen-RedOnly", iUser, sClientName, sGameName);
+			}
 		}
 		case MenuAction_Cancel: {
 			if (iKey == MenuCancel_ExitBack) {
@@ -455,16 +429,7 @@ MainMenu(iClient)
 			AddMenuItem(hMenu, "Core_Separator", "Core_Separator", ITEMDRAW_SPACER);
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 		} else {
-			strcopy(sMenuItemName, sizeof(sMenuItemName), g_MenuItemList[i][DefaultName]);
-			new TG_MenuItemStatus:iStatus;
-
-			Call_StartForward(Forward_AskModuleName);
-			Call_PushCell(TG_MenuItem);
-			Call_PushString(g_MenuItemList[i][Id]);
-			Call_PushCell(iClient);
-			Call_PushStringEx(sMenuItemName, sizeof(sMenuItemName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(iStatus);
-			Call_Finish();
+			new TG_MenuItemStatus:iStatus = Call_AskModuleName(g_MenuItemList[i][Id], TG_MenuItem, iClient, sMenuItemName, sizeof(sMenuItemName), _ ,g_MenuItemList[i][DefaultName]);
 
 			if (iStatus == TG_Disabled)
 				continue;

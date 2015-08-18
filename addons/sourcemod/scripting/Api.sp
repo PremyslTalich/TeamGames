@@ -125,16 +125,7 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(3, "Game registration Failed! Game ID (\"%s\") must be unique! (Error - \"TG_RegGame #3\")", sID);
 	}
 
-	strcopy(sName, TG_MODULE_NAME_LENGTH, sID);
-	new TG_MenuItemStatus:iStatus;
-
-	Call_StartForward(Forward_AskModuleName);
-	Call_PushCell(TG_Game);
-	Call_PushString(sID);
-	Call_PushCell(LANG_SERVER);
-	Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-	Call_PushCell(iStatus);
-	Call_Finish();
+	Call_AskModuleName(sID, TG_Game, LANG_SERVER, sName, sizeof(sName));
 
 	new TG_GameType:iType = GetNativeCell(2);
 	new iIndex = GetGameIndex(sID, false);
@@ -355,17 +346,7 @@ public Native_RegMenuItem(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(3, "Main menu item registration Failed! Item ID (\"%s\") must be unique! (Error - \"TG_RegMenuItem #3\")", sItemID);
 	}
 
-	strcopy(sItemName, TG_MODULE_NAME_LENGTH, sItemID);
-	new TG_MenuItemStatus:iStatus;
-
-	Call_StartForward(Forward_AskModuleName);
-	Call_PushCell(TG_MenuItem);
-	Call_PushString(sItemID);
-	Call_PushCell(LANG_SERVER);
-	Call_PushStringEx(sItemName, sizeof(sItemName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-	Call_PushCell(iStatus);
-	Call_Finish();
-
+	Call_AskModuleName(sItemID, TG_MenuItem, LANG_SERVER, sItemName, sizeof(sItemName));
 	new iItemIndex = GetMenuItemIndex(sItemID, false);
 
 	if (iItemIndex == -1) {
@@ -768,15 +749,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				}
 
 				new String:sGameName[TG_MODULE_NAME_LENGTH];
-				new TG_MenuItemStatus:iStatus;
-
-				Call_StartForward(Forward_AskModuleName);
-				Call_PushCell(TG_Game);
-				Call_PushString(g_Game[GameID]);
-				Call_PushCell(iUser);
-				Call_PushStringEx(sGameName, sizeof(sGameName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-				Call_PushCell(iStatus);
-				Call_Finish();
+				Call_AskModuleName(g_Game[GameID], TG_Game, iUser, sGameName, sizeof(sGameName));
 
 				for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
 					CPrintToChat(iUser, "%T", (bOnlyOneWinner) ? "TeamWins-Winner" : "TeamWins-Winners", iUser, sWinners, sGameName);
@@ -1066,7 +1039,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnMenuItemSelect = 			CreateGlobalForward("TG_OnMenuItemSelect", 				ET_Event, 	Param_String,		Param_Cell);
 	Forward_OnMenuItemSelected = 		CreateGlobalForward("TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
-	Forward_AskModuleName =				CreateGlobalForward("TG_AskModuleName", 				ET_Ignore, 	Param_Cell,			Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_AskModuleName =				CreateGlobalForward("TG_AskModuleName", 				ET_Ignore, 	Param_Cell,			Param_String,		Param_Cell, 		Param_String, 		Param_CellByRef);
 
 	CreateModulesConfigFileIfNotExist();
 
@@ -1204,15 +1177,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 		}
 
 		new String:sGameName[TG_MODULE_NAME_LENGTH];
-		new TG_MenuItemStatus:iStatus;
-
-		Call_StartForward(Forward_AskModuleName);
-		Call_PushCell(TG_Game);
-		Call_PushString(sID);
-		Call_PushCell(iUser);
-		Call_PushStringEx(sGameName, sizeof(sGameName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-		Call_PushCell(iStatus);
-		Call_Finish();
+		Call_AskModuleName(sID, TG_Game, iUser, sGameName, sizeof(sGameName));
 
 		for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
 			if (sSettings[0] == '\0') {
@@ -1350,15 +1315,7 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 			}
 
 			new String:sGameName[TG_MODULE_NAME_LENGTH];
-			new TG_MenuItemStatus:iStatus;
-
-			Call_StartForward(Forward_AskModuleName);
-			Call_PushCell(TG_Game);
-			Call_PushString(g_Game[GameID]);
-			Call_PushCell(iUser);
-			Call_PushStringEx(sGameName, sizeof(sGameName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(iStatus);
-			Call_Finish();
+			Call_AskModuleName(g_Game[GameID], TG_Game, iUser, sGameName, sizeof(sGameName));
 
 			for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
 				if (sSettings[0] == '\0') {
@@ -1383,4 +1340,24 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 	}
 
 	return Plugin_Continue;
+}
+
+TG_MenuItemStatus:Call_AskModuleName(const String:sID[], TG_ModuleType:iType, iClient, String:sName[], iNameSize, TG_MenuItemStatus:iStatus = TG_Active, const String:sDefaultName[] = "")
+{
+	if (sDefaultName[0] != '\0') {
+		strcopy(sName, iNameSize, sDefaultName);
+	} else {
+		strcopy(sName, iNameSize, sID);
+	}
+	new TG_MenuItemStatus:m_iStatus = iStatus;
+
+	Call_StartForward(Forward_AskModuleName);
+	Call_PushCell(iType);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_PushStringEx(sName, iNameSize, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushCellRef(m_iStatus);
+	Call_Finish();
+
+	return m_iStatus;
 }

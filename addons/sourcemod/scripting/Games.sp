@@ -20,16 +20,7 @@ GamesMenu(iClient, TG_GameType:iType = TG_All_)
 			if (!TG_CheckModuleAccess(iClient, TG_Game, g_GameList[i][Id]))
 				continue;
 
-			strcopy(sName, sizeof(sName), g_GameList[i][DefaultName]);
-			new TG_MenuItemStatus:iStatus;
-
-			Call_StartForward(Forward_AskModuleName);
-			Call_PushCell(TG_Game);
-			Call_PushString(g_GameList[i][Id]);
-			Call_PushCell(iClient);
-			Call_PushStringEx(sName, sizeof(sName), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(iStatus);
-			Call_Finish();
+			new TG_MenuItemStatus:iStatus = Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName), _, g_GameList[i][DefaultName]);
 
 			if (iStatus == TG_Disabled)
 				continue;

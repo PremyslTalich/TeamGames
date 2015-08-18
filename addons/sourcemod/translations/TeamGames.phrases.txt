@@ -363,19 +363,6 @@
 		"cze"		"Jako mrtvý nemůžeš spouštět hry!"
 	}
 //------------------------------------------------------------------------------------------------
-// Games list
-	// "GamesList-Title" // header line of games list (command !list)
-	// {
-		// "en"		"{highlight}List of games:"
-		// "cze"		"{highlight}Seznam her:"
-	// }
-	// "GamesList-Line" // format of line in games list ({1} = n, {2} = game name)
-	// {
-		// "#format"	"{1:d},{2:s}"
-		// "en"		"{highlight}{1}){default} {2}"
-		// "cze"		"{highlight}{1}){default} {2}"
-	// }
-//------------------------------------------------------------------------------------------------
 // Rebel
 	"Rebel-AliveTOnly"
 	{
