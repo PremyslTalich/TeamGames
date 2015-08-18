@@ -9,3 +9,4 @@ To do list
 - [x] Finis warden module
 - [x] Fix warden module (check for access on menu actions) + add cvars for marks, fence
 - [x] Add forward TG_AskModuleName and fix module names
+- [ ] Add native TG_GetModuleName
