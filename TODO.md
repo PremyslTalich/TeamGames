@@ -10,3 +10,4 @@ To do list
 - [x] Fix warden module (check for access on menu actions) + add cvars for marks, fence
 - [x] Add forward TG_AskModuleName and fix module names
 - [x] Add native TG_GetModuleName
+- [ ] Add sounds to extras
