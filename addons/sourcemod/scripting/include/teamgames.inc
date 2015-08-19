@@ -15,44 +15,10 @@ public SharedPlugin:__pl_teamgames =
 
 public __pl_teamgames_SetNTVOptional()
 {
-	MarkNativeAsOptional("TG_GetPlayerTeam");
-	MarkNativeAsOptional("TG_SetPlayerTeam");
-	MarkNativeAsOptional("TG_IsGameTypeAvailable");
-	MarkNativeAsOptional("TG_LoadPlayerWeapons");
-	MarkNativeAsOptional("TG_FenceCreate");
-	MarkNativeAsOptional("TG_FenceDestroy");
-	MarkNativeAsOptional("TG_FencePlayerCross");
-	MarkNativeAsOptional("TG_SpawnMark");
-	MarkNativeAsOptional("TG_GetTeamCount");
-	MarkNativeAsOptional("TG_ClearTeam");
-	MarkNativeAsOptional("TG_SetTeamsLock");
-	MarkNativeAsOptional("TG_GetTeamsLock");
-	MarkNativeAsOptional("TG_RegGame");
-	MarkNativeAsOptional("TG_RemoveGame");
-	MarkNativeAsOptional("TG_GetAddedGames");
-	MarkNativeAsOptional("TG_ShowPlayerSelectMenu");
-	MarkNativeAsOptional("TG_FakeSelect");
-	MarkNativeAsOptional("TG_RegMenuItem");
-	MarkNativeAsOptional("TG_RemoveMenuItem");
-	MarkNativeAsOptional("TG_GetMenuItemName");
-	MarkNativeAsOptional("TG_IsModuleReged");
-	MarkNativeAsOptional("TG_GetRegedModules");
-	MarkNativeAsOptional("TG_StartGame");
-	MarkNativeAsOptional("TG_GetCurrentGameID");
-	MarkNativeAsOptional("TG_IsCurrentGameID");
-	MarkNativeAsOptional("TG_GetCurrentDataPack");
-	MarkNativeAsOptional("TG_GetCurrentStarter");
-	MarkNativeAsOptional("TG_GetCurrentGameSettings");
-	MarkNativeAsOptional("TG_GetGameDefaultName");
-	MarkNativeAsOptional("TG_GetGameType");
-	MarkNativeAsOptional("TG_StopGame");
-	MarkNativeAsOptional("TG_SetModuleVisibility");
-	MarkNativeAsOptional("TG_GetModuleVisibility");
-	MarkNativeAsOptional("TG_GetGameStatus");
-	MarkNativeAsOptional("TG_IsGameStatus");
-	MarkNativeAsOptional("TG_LogMessage");
-	MarkNativeAsOptional("TG_LogRoundMessage");
-	MarkNativeAsOptional("TG_LogGameMessage");
+	// MarkNativeAsOptional("TG_GetPlayerTeam");
+	// .
+	// .
+	// .
 }
 
 //------------------------------------------------------------------------------------------------

@@ -132,8 +132,6 @@ native TG_RemoveGame(const String:id[]);
  *
  * @return				Handle to dynamic array with game IDs. YOU MUST CLOSE THAT HANDLE !!!
  */
-native TG_GetAddedGames();
-
 native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
 
 /**
@@ -160,7 +158,7 @@ native TG_RegMenuItem(const String:id[64]);
  */
 native TG_RemoveMenuItem(const String:id[]);
 
-native TG_GetMenuItemName(const String:id[], String:name[], size);
+native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:name[], size);
 
 /**
  * Start game (preparation for game and then game) with game id = @param id. And lock teams.
@@ -197,8 +195,6 @@ native Handle:TG_GetCurrentDataPack();
 native TG_GetCurrentStarter();
 
 native bool:TG_GetCurrentGameSettings(String:gameSettings[], size);
-
-native TG_GetGameDefaultName(const String:id[], String:name[], size);
 
 /**
  *	Get game type.

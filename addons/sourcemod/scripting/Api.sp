@@ -170,22 +170,6 @@ public Native_RemoveGame(Handle:hPlugin, iNumParams)
 	return 0;
 }
 
-public Native_GetAddedGames(Handle:hPlugin, iNumParams)
-{
-	new Handle:hGames = INVALID_HANDLE;
-
-	hGames = CreateArray(TG_MODULE_ID_LENGTH);
-
-	for (new i = 0; i < MAX_GAMES; i++) {
-		if (!g_GameList[i][Used])
-			continue;
-
-		PushArrayString(hGames, g_GameList[i][Id]);
-	}
-
-	return _:hGames;
-}
-
 public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 {
 	new iClient = GetNativeCell(1);
@@ -388,25 +372,6 @@ public Native_RemoveMenuItem(Handle:hPlugin, iNumParams)
 	return 0;
 }
 
-public Native_GetMenuItemName(Handle:hPlugin, iNumParams)
-{
-	new iLength = GetNativeCell(3);
-
-	if (iLength < TG_MODULE_NAME_LENGTH)
-		return 1;
-
-	decl String:sName[TG_MODULE_NAME_LENGTH], String:sID[TG_MODULE_ID_LENGTH];
-	GetNativeString(1, sID, sizeof(sID));
-
-	if (!ExistMenuItem(sID))
-		return 2;
-
-	strcopy(sName, TG_MODULE_NAME_LENGTH, g_MenuItemList[GetMenuItemIndex(sID)][DefaultName]);
-	SetNativeString(2, sName, TG_MODULE_NAME_LENGTH);
-
-	return 0;
-}
-
 public Native_IsModuleReged(Handle:hPlugin, iNumParams)
 {
 	decl String:sID[TG_MODULE_ID_LENGTH];
@@ -446,6 +411,20 @@ public Native_GetRegedModules(Handle:hPlugin, iNumParams)
 	}
 
 	return _:INVALID_HANDLE;
+}
+
+public Native_GetModuleName(Handle:hPlugin, iNumParams)
+{
+	new String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODULE_ID_LENGTH];
+	new TG_ModuleType:iType = GetNativeCell(1);
+	new iClient = GetNativeCell(3);
+	new iSize = GetNativeCell(5);
+
+	if (GetNativeString(2, sID, sizeof(sID)) != SP_ERROR_NONE)
+		ThrowNativeError(1, "Bad module ID");
+
+	Call_AskModuleName(sID, iType, iClient, sName, iSize);
+	SetNativeString(4, sName, TG_MODULE_NAME_LENGTH);
 }
 
 public Native_StartGame(Handle:hPlugin, iNumParams)
@@ -544,27 +523,6 @@ public Native_GetCurrentGameSettings(Handle:hPlugin, iNumParams)
 	}
 
 	return true;
-}
-
-public Native_GetGameDefaultName(Handle:hPlugin, iNumParams)
-{
-	new iLength = GetNativeCell(3);
-
-	if (iLength < TG_MODULE_NAME_LENGTH)
-		return 1;
-
-	decl String:sName[TG_MODULE_NAME_LENGTH], String:sID[TG_MODULE_ID_LENGTH];
-
-	GetNativeString(1, sID, sizeof(sID));
-
-	if (!ExistGame(sID))
-		return 2;
-
-	strcopy(sName, TG_MODULE_NAME_LENGTH, g_GameList[GetGameIndex(sID)][DefaultName]);
-
-	SetNativeString(2, sName, TG_MODULE_NAME_LENGTH);
-
-	return 0;
 }
 
 public Native_GetGameType(Handle:hPlugin, iNumParams)
@@ -963,7 +921,6 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 {
 	CreateNative("TG_GetPlayerTeam", Native_GetPlayerTeam);
 	CreateNative("TG_SetPlayerTeam", Native_SetPlayerTeam);
-	CreateNative("TG_IsGameTypeAvailable", Native_IsGameTypeAvailable);
 
 	CreateNative("TG_LoadPlayerWeapons", Native_LoadPlayerWeapons);
 
@@ -978,36 +935,31 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_SetTeamsLock", Native_SetTeamsLock);
 	CreateNative("TG_GetTeamsLock", Native_GetTeamsLock);
 
-	CreateNative("TG_RegGame", Native_RegGame);
-	CreateNative("TG_RemoveGame", Native_RemoveGame);
-	CreateNative("TG_GetAddedGames", Native_GetAddedGames);
-
-	CreateNative("TG_ShowPlayerSelectMenu", Native_ShowPlayerSelectMenu);
-
+	CreateNative("TG_IsModuleReged", Native_IsModuleReged);
+	CreateNative("TG_GetRegedModules", Native_GetRegedModules);
+	CreateNative("TG_GetModuleName", Native_GetModuleName);
 	CreateNative("TG_FakeSelect", Native_FakeSelect);
+	CreateNative("TG_SetModuleVisibility", Native_SetModuleVisibility);
+	CreateNative("TG_GetModuleVisibility", Native_GetModuleVisibility);
 
 	CreateNative("TG_RegMenuItem", Native_RegMenuItem);
 	CreateNative("TG_RemoveMenuItem", Native_RemoveMenuItem);
-	CreateNative("TG_GetMenuItemName", Native_GetMenuItemName);
 
-	CreateNative("TG_IsModuleReged", Native_IsModuleReged);
-	CreateNative("TG_GetRegedModules", Native_GetRegedModules);
-
+	CreateNative("TG_RegGame", Native_RegGame);
+	CreateNative("TG_RemoveGame", Native_RemoveGame);
 	CreateNative("TG_StartGame", Native_StartGame);
 	CreateNative("TG_GetCurrentGameID", Native_GetCurrentGameID);
 	CreateNative("TG_IsCurrentGameID", Native_IsCurrentGameID);
 	CreateNative("TG_GetCurrentDataPack", Native_GetCurrentDataPack);
 	CreateNative("TG_GetCurrentStarter", Native_GetCurrentStarter);
 	CreateNative("TG_GetCurrentGameSettings", Native_GetCurrentGameSettings);
-	CreateNative("TG_GetGameDefaultName", Native_GetGameDefaultName);
 	CreateNative("TG_GetGameType", Native_GetGameType);
 	CreateNative("TG_StopGame", Native_StopGame);
-
-	CreateNative("TG_SetModuleVisibility", Native_SetModuleVisibility);
-	CreateNative("TG_GetModuleVisibility", Native_GetModuleVisibility);
-
 	CreateNative("TG_GetGameStatus", Native_GetGameStatus);
 	CreateNative("TG_IsGameStatus", Native_IsGameStatus);
+	CreateNative("TG_IsGameTypeAvailable", Native_IsGameTypeAvailable);
+
+	CreateNative("TG_ShowPlayerSelectMenu", Native_ShowPlayerSelectMenu);
 
 	CreateNative("TG_LogMessage", Native_LogMessage);
 	CreateNative("TG_LogRoundMessage", Native_LogRoundMessage);
