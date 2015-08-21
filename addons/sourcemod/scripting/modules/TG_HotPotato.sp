@@ -211,7 +211,7 @@ ModuleSetTypeGameMenu(iClient)
 {
 	new Handle:menu = CreateMenu(ModuleSetTypeGameMenu_Handler);
 
-	SetMenuTitle(menu, "%T", "Menu-Title", iClient, "GameName");
+	SetMenuTitle(menu, "%T - %T", "GameName", iClient, "Menu-Title", iClient);
 	AddMenuItemFormat(menu, "Menu-OneDeath", _, "%T", "Menu-OneDeath", iClient);
 	AddMenuItemFormat(menu, "Menu-LastManStanding", _, "%T", "Menu-LastManStanding", iClient);
 	SetMenuExitBackButton(menu, true);

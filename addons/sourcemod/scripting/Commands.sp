@@ -225,7 +225,7 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_RedOnly) {
 						Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName));
 
-						AddMenuItem(hSubMenu, g_GameList[i][Id], g_GameList[i][DefaultName]);
+						AddMenuItem(hSubMenu, g_GameList[i][Id], sName);
 					}
 				}
 			}

@@ -129,13 +129,13 @@
 	"TeamWins-Winner" // msg for all players that teams tied
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"Player {tg-redteam}{1} {default}wins the game {tg-module}{2}!"
+		"en"		"Player {tg-redteam}{1} {default}won the game {tg-module}{2}!"
 		"cze"		"Hráč {tg-redteam}{1} {default}vyhrál hru {tg-module}{2}!"
 	}
 	"TeamWins-Winners" // msg for all players that teams tied
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"Players {tg-redteam}{1} {default}wins the game {tg-module}{2}!"
+		"en"		"Players {tg-redteam}{1} {default}won the game {tg-module}{2}!"
 		"cze"		"Hráči {tg-redteam}{1} {default}vyhráli hru {tg-module}{2}!"
 	}
 //------------------------------------------------------------------------------------------------

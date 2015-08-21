@@ -7,9 +7,8 @@
 	}
 	"Menu-Title"
 	{
-		"#format"	"{1:t}"
-		"en"		"{1} - Choose game type:"
-		"cze"		"{1} - vyberte typ hry:"
+		"en"		"Choose game type:"
+		"cze"		"vyberte typ hry:"
 	}
 	"Menu-OneDeath"
 	{
