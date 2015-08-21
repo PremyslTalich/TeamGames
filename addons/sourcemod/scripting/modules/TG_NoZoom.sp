@@ -182,7 +182,7 @@ SetWeaponMenu(iClient, const String:sID[])
 {
 	new Handle:hMenu = CreateMenu(SetWeaponMenu_Handler);
 
-	SetMenuTitle(hMenu, "%t", "ChooseWeapon");
+	SetMenuTitle(hMenu, "%T", "ChooseWeapon", iClient);
 	PushMenuString(hMenu, "_GAME_ID_", sID);
 
 	switch (g_iEngVersion) {

@@ -432,12 +432,10 @@ public Native_StartGame(Handle:hPlugin, iNumParams)
 	new iClient, Handle:hDataPack;
 	iClient = GetNativeCell(1);
 
-	new String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODULE_NAME_LENGTH], String:sSettings[TG_MODULE_NAME_LENGTH], String:sMenuItemStartGame[64], String:sMenuTitle[64];
+	new String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODULE_NAME_LENGTH], String:sSettings[TG_MODULE_NAME_LENGTH];
 	GetNativeString(2, sID, sizeof(sID));
-
-	strcopy(sName, sizeof(sName), g_GameList[GetGameIndex(sID)][DefaultName]);
-
 	GetNativeString(3, sSettings, sizeof(sSettings));
+	Call_AskModuleName(sID, TG_Game, iClient, sName, sizeof(sName));
 
 	hDataPack = Handle:GetNativeCell(4);
 	new bool:bRemoveDropppedWeapons = GetNativeCell(5);
@@ -449,12 +447,9 @@ public Native_StartGame(Handle:hPlugin, iNumParams)
 		return 0;
 	}
 
-	Format(sMenuTitle, sizeof(sMenuTitle), "%T", "MenuGames-Start-Title", iClient, sName);
-	Format(sMenuItemStartGame, sizeof(sMenuItemStartGame), "%T", "MenuGames-Start", iClient);
-
 	new Handle:hMenu = CreateMenu(GameStartMenu_Handler);
-	SetMenuTitle(hMenu, sMenuTitle);
-	AddMenuItem(hMenu, "START_GAME", sMenuItemStartGame);
+	SetMenuTitle(hMenu, "%T", "MenuGames-Start-Title", iClient, sName);
+	AddMenuItemFormat(hMenu, "START_GAME",_ , "%T", "MenuGames-Start", iClient);
 	PushMenuCell(hMenu, "-CLIENT-", iClient);
 	PushMenuString(hMenu, "-GAMEID-", sID);
 	PushMenuString(hMenu, "-GAMESETTINGS-", sSettings);

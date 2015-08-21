@@ -77,7 +77,7 @@ SetHPMenu(iClient, const String:sID[])
 {
 	new Handle:hMenu = CreateMenu(SetHPMenu_Handler);
 
-	SetMenuTitle(hMenu, "%t:", "ChooseHP");
+	SetMenuTitle(hMenu, "%T", "ChooseHP", iClient);
 	AddMenuItem(hMenu, "35", "35 HP");
 	AddMenuItem(hMenu, "100", "100 HP");
 	AddMenuItem(hMenu, "300", "300 HP");
