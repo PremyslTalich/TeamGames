@@ -1,4 +1,4 @@
-Need tester ! - create new [Issue](https://github.com/KissLick/TeamGames/issues/new?title=I%20wanna%20help%20testing%20TG)
+Need testers ! - create new [Issue](https://github.com/KissLick/TeamGames/issues/new?title=I%20wanna%20help%20testing%20TG)
 ==============
 
 Hey cloners! Report bugs! - create new [Issue](https://github.com/KissLick/TeamGames/issues/new?title=Bug%20report)
