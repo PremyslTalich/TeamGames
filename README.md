@@ -1,6 +1,10 @@
 Need tester ! - create new [Issue](https://github.com/KissLick/TeamGames/issues/new?title=I%20wanna%20help%20testing%20TG)
 ==============
 
+Hey cloners! Report bugs! - create new [Issue](https://github.com/KissLick/TeamGames/issues/new?title=Bug%20report)
+==========================
+
+
 TeamGames is modular system for JailBreak servers with many features:
 - Two [teams](https://raw.githubusercontent.com/KissLick/TeamGames/master/extras/screenshots/teams.jpg), red and blue
 - Team based games
