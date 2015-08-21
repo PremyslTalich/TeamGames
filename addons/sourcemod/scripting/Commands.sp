@@ -283,8 +283,12 @@ public Action:Command_StopTG(iClient, iArgs)
 public Action:Command_Rebel(iClient, iArgs)
 {
 	if (Client_IsValid(iClient)) {
-		if (GetClientTeam(iClient) != CS_TEAM_T || !IsPlayerAlive(iClient) || !TG_IsPlayerRedOrBlue(iClient)) {
-			CPrintToChat(iClient, "%t", "Rebel-AliveTOnly");
+		if (GetClientTeam(iClient) != CS_TEAM_T) {
+			CPrintToChat(iClient, "%t", "Rebel-PrisonersOnly");
+		} else if (!IsPlayerAlive(iClient)) {
+			CPrintToChat(iClient, "%t", "Rebel-AliveOnly");
+		} else if (!TG_IsPlayerRedOrBlue(iClient)) {
+			CPrintToChat(iClient, "%t", "Rebel-InTeamOnly");
 		} else {
 			MakeRebel(iClient);
 		}

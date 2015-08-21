@@ -364,10 +364,20 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Rebel
-	"Rebel-AliveTOnly"
+	"Rebel-PrisonersOnly"
 	{
-		"en"	"Only alive prisoners can use this command!"
+		"en"	"Only prisoners can use this command!"
+		"cze"	"Pouze vězni mohou použít tento příkaz!"
+	}
+	"Rebel-AliveOnly"
+	{
+		"en"	"Only living prisoners can use this command!"
 		"cze"	"Pouze živý vězni mohou použít tento příkaz!"
+	}
+	"Rebel-InTeamOnly"
+	{
+		"en"	"Only prisoners in TG team can use this command!"
+		"cze"	"Pouze vězni v TG teamu mohou použít tento příkaz!"
 	}
 	"Rebel-NoGame"
 	{

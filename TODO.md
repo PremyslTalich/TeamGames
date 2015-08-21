@@ -12,4 +12,4 @@ To do list
 - [x] Add native TG_GetModuleName
 - [ ] Add sounds to extras
 - [x] Fix disabling fences on certain maps - wasn't bug
-- [ ] Improve !rebel check messages
+- [x] Improve !rebel check messages
