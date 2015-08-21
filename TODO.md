@@ -11,4 +11,4 @@ To do list
 - [x] Add forward TG_AskModuleName and fix module names
 - [x] Add native TG_GetModuleName
 - [ ] Add sounds to extras
-- [ ] Fix disabling fences on certain maps
+- [x] Fix disabling fences on certain maps - wasn't bug
