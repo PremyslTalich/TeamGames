@@ -13,3 +13,5 @@ To do list
 - [ ] Add sounds to extras
 - [x] Fix disabling fences on certain maps - wasn't bug
 - [x] Improve !rebel check messages
+- [ ] Separate translations by langs
+- [ ] Check posiible bug in ChickenHunt about spawning chickens
