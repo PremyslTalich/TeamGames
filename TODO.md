@@ -6,7 +6,7 @@ To do list
 - [x] Remove caching for non-string cvars
 - [x] Add gitignore
 - [x] Rename some translations files
-- [x] Finis warden module
+- [x] Finish warden module
 - [x] Fix warden module (check for access on menu actions) + add cvars for marks, fence
 - [x] Add forward TG_AskModuleName and fix module names
 - [x] Add native TG_GetModuleName
@@ -14,4 +14,4 @@ To do list
 - [x] Fix disabling fences on certain maps - wasn't bug
 - [x] Improve !rebel check messages
 - [ ] Separate translations by langs
-- [ ] Check posiible bug in ChickenHunt about spawning chickens
+- [ ] Check possible bug in ChickenHunt about spawning chickens
