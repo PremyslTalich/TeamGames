@@ -23,17 +23,17 @@ TeamGames is modular system for JailBreak servers with many features:
 **FiftyFifty:**
 - HE grenades
 - Machines + 500 HP
-- Cocktail party (CS:GO only)
+- Cocktail party *(CS:GO only)*
 
 **Both:**
-- Chicken hunt (CS:GO only)
+- Chicken hunt *(CS:GO only)*
 - Gun fight
 - HeadShot only
 - Knife fight
 - No zoom
 - Pistol zoom battle
 - Reload battle
-- Taser mania (CS:GO only)
+- Taser mania *(CS:GO only)*
 
 ##Non-game modules
 - Warden
