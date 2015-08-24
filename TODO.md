@@ -14,4 +14,5 @@ To do list
 - [x] Fix disabling fences on certain maps - wasn't bug
 - [x] Improve !rebel check messages
 - [ ] Separate translations by langs
-- [ ] Check possible bug in ChickenHunt about spawning chickens
+- [ ] Fix bug in ChickenHunt about spawning chickens
+- [ ] Fix bug about console winning redonly game
