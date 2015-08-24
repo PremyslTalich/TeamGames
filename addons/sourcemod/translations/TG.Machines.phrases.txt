@@ -3,6 +3,5 @@
 	"GameName"
 	{
 		"en"		"Machines + 500 HP"
-		"cze"		"Prasečák + 500 HP"
 	}
 }

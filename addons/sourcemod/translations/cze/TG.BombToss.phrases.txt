@@ -1,0 +1,23 @@
+"Phrases"
+{
+	"SpawnBomb"
+	{
+		"cze"		"Spawnout bombu ({1})"
+	}
+	"SpawnTarget"
+	{
+		"cze"		"Spawnout cíl"
+	}
+	"BombInfo"
+	{
+		"cze"		"Zahodil: {1}"
+	}
+	"BombInfoWithTarget"
+	{
+		"cze"		"Zahodil: {1} ({2})"
+	}
+	"TargetInfo"
+	{
+		"cze"		"Nejblíž: {1} ({2})\nNejdál: {3} ({4})"
+	}
+}

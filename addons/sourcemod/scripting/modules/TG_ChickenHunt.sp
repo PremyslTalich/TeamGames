@@ -195,21 +195,20 @@ bool:SpawnChickenWave()
 	new Float:fClientPos[3];
 	g_hChickens = CreateArray();
 
-	for (new iClient = 1; iClient <= MaxClients; iClient++) {
-		if ((g_bFiftyFifty && !TG_IsPlayerRedOrBlue(iClient)) || (!g_bFiftyFifty && TG_GetPlayerTeam(iClient) != TG_RedTeam)) {
+	for (new i = 1; i <= MaxClients; i++) {
+		if ((g_bFiftyFifty && !TG_IsPlayerRedOrBlue(i)) || (!g_bFiftyFifty && TG_GetPlayerTeam(i) != TG_RedTeam)) {
 			continue;
 		}
 
-		GetClientAbsOrigin(iClient, fClientPos);
+		GetClientAbsOrigin(i, fClientPos);
 		fClientPos[2] += 8.0;
 
 		for (new n = 0; n < 2; n++) {
 			SpawnChicken(fClientPos);
 		}
 
-		EventWeaponFire(iClient);
+		EventWeaponFire(i);
 		SpawnParticles(fClientPos);
-		break;
 	}
 
 	if (g_sChickenSpawnSound[0] != '\0' && g_iWaveCount != WAVE_COUNT - 1) {

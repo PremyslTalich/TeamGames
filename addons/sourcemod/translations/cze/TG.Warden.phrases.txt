@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"AccessDenied"
+	{
+		"cze"		"TeamGames je dostupné pouze pro wardena!"
+	}
+}

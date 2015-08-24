@@ -3,16 +3,13 @@
 	"GameName-FiftyFifty"
 	{
 		"en"		"NoZoom battle"
-		"cze"		"NoZoom"
 	}
 	"GameName-RedOnly"
 	{
 		"en"		"NoZoom battle"
-		"cze"		"NoZoom"
 	}
 	"ChooseWeapon"
 	{
 		"en"		"choose weapon"
-		"cze"		"vyberte zbraň"
 	}
 }

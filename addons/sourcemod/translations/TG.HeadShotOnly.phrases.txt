@@ -3,16 +3,13 @@
 	"GameName-FiftyFifty"
 	{
 		"en"		"HeadShot only battle"
-		"cze"		"HeadShot only"
 	}
 	"GameName-RedOnly"
 	{
 		"en"		"HeadShot only battle"
-		"cze"		"HeadShot only"
 	}
 	"ChooseWeapon"
 	{
 		"en"		"choose weapon"
-		"cze"		"vyberte zbraň"
 	}
 }

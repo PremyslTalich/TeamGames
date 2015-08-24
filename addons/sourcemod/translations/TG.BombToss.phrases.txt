@@ -4,29 +4,24 @@
 	{
 		"#format"	"{1:d}"
 		"en"		"Spawn bomb ({1})"
-		"cze"		"Spawnout bombu ({1})"
 	}
 	"SpawnTarget"
 	{
 		"en"		"Spawn target"
-		"cze"		"Spawnout cíl"
 	}
 	"BombInfo"
 	{
 		"#format"	"{1:s}"
 		"en"		"Droped: {1}"
-		"cze"		"Zahodil: {1}"
 	}
 	"BombInfoWithTarget"
 	{
 		"#format"	"{1:s},{2:f}"
 		"en"		"Droped: {1} ({2})"
-		"cze"		"Zahodil: {1} ({2})"
 	}
 	"TargetInfo"
 	{
 		"#format"	"{1:s},{2:f},{3:s},{4:f}"
 		"en"		"Nearest: {1} ({2})\nFarthest: {3} ({4})"
-		"cze"		"Nejblíž: {1} ({2})\nNejdál: {3} ({4})"
 	}
 }

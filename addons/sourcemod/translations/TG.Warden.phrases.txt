@@ -3,6 +3,5 @@
 	"AccessDenied"
 	{
 		"en"		"You must be warden to use TeamGames!"
-		"cze"		"TeamGames je dostupné pouze pro wardena!"
 	}
 }

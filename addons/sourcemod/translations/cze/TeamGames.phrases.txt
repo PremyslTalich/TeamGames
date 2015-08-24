@@ -4,322 +4,300 @@
 // Player moved to team
 	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"{1} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
+		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
 	}
 	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"{1} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
+		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
 	}
 	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
 	{
-		"#format"	"{1:s}"
-		"en"		"{1} is not in a team anymore!"
+		"cze"		"{1} už není v žádném teamu!"
 	}
 	"PlayerMove-RedTeam-Game"
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
+		"cze"		"Hra {highlight}{1}{default} přesunula hráče{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
 	}
 	"PlayerMove-BlueTeam-Gamee"
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
+		"cze"		"Hra {highlight}{1}{default} přesunula hráče{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
 	}
 //------------------------------------------------------------------------------------------------
 // Player team hints
 	"TeamHud-RedTeam" // hint msg for player in team red
 	{
-		"en"		"You are in red team!"
+		"cze"		"Jsi v teamu červených !"
 	}
 	"TeamHud-BlueTeam" // hint msg for player in team blue
 	{
-		"en"		"You are in blue team!"
+		"cze"		"Jsi v teamu modrých !"
 	}
 	"TeamHud-NoneTeam" // hint msg for player moved out of team
 	{
-		"en"		"You are not in a team !"
+		"cze"		"Nejsi v žádném teamu !"
 	}
 //------------------------------------------------------------------------------------------------
 // Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
 	"TeamPrefix-RedTeam" // player prefix in chat (team red)
 	{
-		"en"		"[red]"
+		"cze"		"[červený]"
 	}
 	"TeamPrefix-BlueTeam" // player prefix in chat (team blue)
 	{
-		"en"		"[blue]"
+		"cze"		"[modrý]"
 	}
 //------------------------------------------------------------------------------------------------
 // Game progress
 	"GamePreparation" // msg for all players when started preparation for game ({1} = game name)
 	{
-		"#format"	"{1:s}"
-		"en"		"Preparation for game {tg-module}{1}{default} !!!"
+		"cze"		"Příprava na hru{tg-module} {1}{default} !!!"
 	}
 	"GamePreparation-Settings" // msg for all players when started preparation for game ({1} = game name, {2} = game settings)
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Preparation for game {tg-module}{1}{default} - {tg-settings}{2}{default} !!!"
+		"cze"		"Příprava na hru{tg-module} {1}{default} - {tg-settings}{2}{default} !!!"
 	}
 	"GameStart" // msg for all players when GameStart ({1} = game name)
 	{
-		"#format"	"{1:s}"
-		"en"		"Game {tg-module}{1}{default} started !!!"
+		"cze"		"Začala hra{tg-module} {1}{default} !!!"
 	}
 	"GameStart-Settings" // msg for all players when GameStart ({1} = game name, {2} = game settings)
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Game {tg-module}{1}{default} - {tg-settings}{2}{default} started !!!"
+		"cze"		"Začala hra {tg-module}{1}{default} - {tg-settings}{2}{default} !!!"
 	}
 	"GameStop" // msg for all players when someone stop the game ({1} = player name)
 	{
-		"#format"	"{1:s}"
-		"en"		"Player {player}{1}{default} stopped the game !!!"
+		"cze"		"Hráč {player}{1}{default} zastavil hru !!!"
 	}
 	"GameEnd"
 	{
-		"#format"	"{1:s}"
-		"en"		"Game {tg-module}{1}{default} is over !!!"
+		"cze"		"Skončila hra {tg-module}{1}{default} !!!"
 	}
 	"PlayerDeath-RedTeam" // msg for all players that player from team red died ({1} = red player name)
 	{
-		"#format"	"{1:s}"
-		"en"		"Died {1} from{tg-redteam} red {default}team !"
+		"cze"		"Zemřel {1} z teamu{tg-redteam} červených {default}!"
 	}
 	"PlayerDeath-BlueTeam" // msg for all players that player from team blue died ({1} = blue player name)
 	{
-		"#format"	"{1:s}"
-		"en"		"Died {1} from team{tg-blueteam} blue{default} !"
+		"cze"		"Zemřel {1} z teamu{tg-blueteam} modrých {default}!"
 	}
 	"TeamWins-RedTeam" // msg for all players that team red wins
 	{
-		"en"		"{tg-redteam}Red{default} team wins !!!"
+		"cze"		"Vyhrál team{tg-redteam} červených{default} !!!"
 	}
 	"TeamWins-BlueTeam" // msg for all players that team blue wins
 	{
-		"en"		"{tg-blueteam}Blue{default} team wins !!!"
+		"cze"		"Vyhrál team{tg-blueteam} modrých{default} !!!"
 	}
 	"TeamWins-Tie" // msg for all players that teams tied
 	{
-		"en"		"Teams tied !!!"
+		"cze"		"Remíza !!!"
 	}
 	"TeamWins-Winner" // msg for all players that teams tied
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Player {tg-redteam}{1} {default}won the game {tg-module}{2}!"
+		"cze"		"Hráč {tg-redteam}{1} {default}vyhrál hru {tg-module}{2}!"
 	}
 	"TeamWins-Winners" // msg for all players that teams tied
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Players {tg-redteam}{1} {default}won the game {tg-module}{2}!"
+		"cze"		"Hráči {tg-redteam}{1} {default}vyhráli hru {tg-module}{2}!"
 	}
 //------------------------------------------------------------------------------------------------
 // Main menu - lock/unlock
 	"Menu-AliveOnly" // msg for dead CT player trying open main menu
 	{
-		"en"		"Only alive players can use teams and games !"
+		"cze"		"Pouze živí hráči mohou určovat teamy a vybírat hry !"
 	}
 	"Menu-CTOnly" // msg for T player trying open main menu
 	{
-		"en"		"Only CT players can use teams and games !"
+		"cze"		"Pouze CT hráči mohou určovat teamy a vybírat hry !"
 	}
 	"Menu-Locked" // msg for all players if somebody (must be CT and alive) try to open main menu and main menu is locked
 	{
-		"#format"	"{1:d},{2:d}"
-		"en"		"{highlight}{1}/{2}{default} required{highlight} !tg{default} for unlock."
+		"cze"		"{highlight}{1}/{2}{default} požadovaných{highlight} !tg{default} pro odemčení."
 	}
 	"Menu-Unlocked" // msg for all players when main menu is unlocked
 	{
-		"en"		"{default}!tg menu{highlight} is unlocked !"
+		"cze"		"{default}!tg menu{highlight} odemčeno !"
 	}
 //------------------------------------------------------------------------------------------------
 // Main menu
 	"Menu-Title"
 	{
-		"en"		"TeamGames:"
+		"cze"		"TeamGames:"
 	}
 	"Menu-Teams"
 	{
-		"en"		"Distribute to teams"
+		"cze"		"Rozdělit do teamů"
 	}
 	"Menu-Games"
 	{
-		"en"		"Choose game"
+		"cze"		"Vybrat hru"
 	}
 	"Menu-Games-FiftyFifty"
 	{
-		"en"		"Choose game (Fifty fifty)"
+		"cze"		"Vybrat hru (Fifty fifty)"
 	}
 	"Menu-Games-RedOnly"
 	{
-		"en"		"Choose game (Red only)"
+		"cze"		"Vybrat hru (Pouze červení)"
 	}
 	"Menu-CreateFence"
 	{
-		"en"		"Create fence"
+		"cze"		"Vytvořit plot"
 	}
 	"Menu-StopGame"
 	{
-		"en"		"Stop current game !"
+		"cze"		"Ukončit probíhající hru !"
 	}
 	"Menu-CountGamesInfo"
 	{
-		"#format"	"{1:d}"
-		"en"		"You can play {1} games in this round."
+		"cze"		"V tomto kole můžete spustit ještě {1} hry."
 	}
 	"Menu-NoMoreGames"
 	{
-		"en"		"You can't play any game at this moment."
+		"cze"		"Už není možné spustit hru."
 	}
 //------------------------------------------------------------------------------------------------
 // Teams menu
 	"MenuTeams-Title"
 	{
-		"en"		"Move player to:"
+		"cze"		"Přesunout hráče do:"
 	}
 	"MenuTeams-RedTeam"
 	{
-		"en"		"Red team"
+		"cze"		"Teamu červených"
 	}
 	"MenuTeams-BlueTeam"
 	{
-		"en"		"Blue team"
+		"cze"		"Teamu modrých"
 	}
 	"MenuTeams-NoneTeam"
 	{
-		"en"		"Out of team"
+		"cze"		"Odebrat z teamu"
 	}
 	"MenuTeams-NoneTeamAll"
 	{
-		"en"		"Everyone out of team"
+		"cze"		"Všechny hráče odebrat z teamů"
 	}
 //------------------------------------------------------------------------------------------------
 // Games menu
 	"MenuGames-Title"
 	{
-		"en"		"Choose game:"
+		"cze"		"Vyberte hru:"
 	}
 	"MenuGames-Start-Title" // {1} = game name
 	{
-		"#format"	"{1:s}"
-		"en"		"{1}"
+		"cze"		"{1}"
 	}
 	"MenuGames-Start"
 	{
-		"en"		"Play game*"
+		"cze"		"Začít hru*"
 	}
 	"MenuGames-RedOnlyHint"
 	{
-		"en"		"Red Only"
+		"cze"		"Pouze červení"
 	}
 //------------------------------------------------------------------------------------------------
 // Games list menu
 	"MenuGamesList-Title"
 	{
-		"en"		"Choose game type:"
+		"cze"		"Vyberte typ hry:"
 	}
 	"MenuGamesList-FiftyFifty"
 	{
-		"en"		"FiftyFifty - Red vs. Blue"
+		"cze"		"FiftyFifty - Červení proti Modrým"
 	}
 	"MenuGamesList-RedOnly"
 	{
-		"en"		"RedOnly - Red vs. Red"
+		"cze"		"RedOnly - Červení proti Červeným"
 	}
 	"MenuGamesList-Title-FiftyFifty"
 	{
-		"en"		"Red'N'Blue games"
+		"cze"		"Hry pro červené proti modrým"
 	}
 	"MenuGamesList-Title-RedOnly"
 	{
-		"en"		"RedOnly games"
+		"cze"		"Hry pouze pro červené"
 	}
 	"MenuGamesList-Chosen-FiftyFifty"
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Player {1} has chosen game {tg-module}{2}"
+		"cze"		"Hráč {1} si vybral hru {tg-module}{2}"
 	}
 	"MenuGamesList-Chosen-RedOnly"
 	{
-		"#format"	"{1:s},{2:s}"
-		"en"		"Player {1} has chosen game {tg-module}{2} {tg-redteam}(RedOnly)"
+		"cze"		"Hráč {1} si vybral hru {tg-module}{2} {tg-redteam}(pouze pro červené)"
 	}
 //------------------------------------------------------------------------------------------------
 // Fences menu
 	"MenuFences-Confirm"
 	{
-		"en"		"Confirm fence"
+		"cze"		"Potvrdit plot"
 	}
 	"Fences-PlayerCross"
 	{
-		"#format"	"{1:s}"
-		"en"		"Player {1} crossed laser fence !"
+		"cze"		"Hráč {1} překročil laserový plot !"
 	}
 //------------------------------------------------------------------------------------------------
 // Player select menu
 	"MenuPlayerSelect-Title"
 	{
-		"en"		"Choose player:"
+		"cze"		"Vyberte hráče:"
 	}
 	"MenuPlayerSelect-Random"
 	{
-		"en"		"*Random player"
+		"cze"		"*Náhodný hráč"
 	}
 //------------------------------------------------------------------------------------------------
 // Visibility menu
 	"MenuVisibility-Title"
 	{
-		"en"		"Choose module type:"
+		"cze"		"Vyberte typ modulu:"
 	}
 	"MenuVisibility-MenuItems"
 	{
-		"en"		"Menu items"
+		"cze"		"Položky tg menu"
 	}
 	"MenuVisibility-Games"
 	{
-		"en"		"Games"
+		"cze"		"Hry"
 	}
 	"MenuVisibility-SubTitle"
 	{
-		"en"		"Checked are visible:"
+		"cze"		"Zaškrtnuté jsou viditelné:"
 	}
 //------------------------------------------------------------------------------------------------
 // Game start errors
 	"StartGame-AnotherGameInProgress"
 	{
-		"en"		"Another game in progress!"
+		"cze"		"Již hra běží!"
 	}
 	"StartGame-BadTeamRatio"
 	{
-		"en"		"Bad teams ratio!"
+		"cze"		"Špatný poměr teamů!"
 	}
 	"StartGame-AliveOnly"
 	{
-		"en"		"Only alive player can start game!"
+		"cze"		"Jako mrtvý nemůžeš spouštět hry!"
 	}
 //------------------------------------------------------------------------------------------------
 // Rebel
 	"Rebel-PrisonersOnly"
 	{
-		"en"	"Only prisoners can use this command!"
+		"cze"	"Pouze vězni mohou použít tento příkaz!"
 	}
 	"Rebel-AliveOnly"
 	{
-		"en"	"Only living prisoners can use this command!"
+		"cze"	"Pouze živý vězni mohou použít tento příkaz!"
 	}
 	"Rebel-InTeamOnly"
 	{
-		"en"	"Only prisoners in TG team can use this command!"
+		"cze"	"Pouze vězni v TG teamu mohou použít tento příkaz!"
 	}
 	"Rebel-NoGame"
 	{
-		"en"	"You can't use this command during game!"
+		"cze"	"Během hry nelze tento pžíkaz použít!"
 	}
 	"Rebel-Become"
 	{
-		"#format"	"{1:s}"
-		"en"	"Player {highlight}{1}{default} become a rebel!"
+		"cze"	"Hráč {highlight}{1}{default} se stal rebelem!"
 	}
 }

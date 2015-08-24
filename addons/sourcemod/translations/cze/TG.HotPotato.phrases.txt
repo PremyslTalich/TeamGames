@@ -1,0 +1,23 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"cze"		"Horká brambora"
+	}
+	"Menu-Title"
+	{
+		"cze"		"vyberte typ hry:"
+	}
+	"Menu-OneDeath"
+	{
+		"cze"		"Pouze jedna mrtvola"
+	}
+	"Menu-LastManStanding"
+	{
+		"cze"		"Do posledního muže"
+	}
+	"Menu-ChooseFirstPotato"
+	{
+		"cze"		"Zvolte první oběť"
+	}
+}

@@ -2,6 +2,6 @@
 {
 	"GameName"
 	{
-		"en"		"HE Grenades"
+		"cze"		"Cocktail párty"
 	}
 }

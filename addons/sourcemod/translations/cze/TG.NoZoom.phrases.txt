@@ -2,14 +2,14 @@
 {
 	"GameName-FiftyFifty"
 	{
-		"en"		"Pistol zoom battle"
+		"cze"		"NoZoom"
 	}
 	"GameName-RedOnly"
 	{
-		"en"		"Pistol zoom battle"
+		"cze"		"NoZoom"
 	}
 	"ChooseWeapon"
 	{
-		"en"		"choose weapon"
+		"cze"		"vyberte zbraň"
 	}
 }

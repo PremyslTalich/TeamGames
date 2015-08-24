@@ -3,26 +3,21 @@
 	"GameName"
 	{
 		"en"		"Hot Potato"
-		"cze"		"Horká brambora"
 	}
 	"Menu-Title"
 	{
 		"en"		"Choose game type:"
-		"cze"		"vyberte typ hry:"
 	}
 	"Menu-OneDeath"
 	{
 		"en"		"Only one death"
-		"cze"		"Pouze jedna mrtvola"
 	}
 	"Menu-LastManStanding"
 	{
 		"en"		"Last man standing"
-		"cze"		"Do posledního muže"
 	}
 	"Menu-ChooseFirstPotato"
 	{
 		"en"		"Choose first victim"
-		"cze"		"Zvolte první oběť"
 	}
 }

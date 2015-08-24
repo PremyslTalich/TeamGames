@@ -1,0 +1,19 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"cze"		"Chicken hunt"
+	}
+	"GameName-RedOnly"
+	{
+		"cze"		"Chicken hunt"
+	}
+	"ScoreBoard-FiftyFifty"
+	{
+		"cze"		"<u>Zbývajících respawnů: {1}</u>\n<font color='#DC143C'><b>Červení:</b></font> {2}\n<font color='#1E90FF'><b>Modří:</b></font> {3}"
+	}
+	"ScoreBoard-RedOnly"
+	{
+		"cze"		"<u>Zbývajících respawnů: {1}</u>\n<b>{2}:</b> {3}\n<b>{4}:</b> {5}"
+	}
+}
