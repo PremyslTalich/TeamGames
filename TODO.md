@@ -13,6 +13,6 @@ To do list
 - [ ] Add sounds to extras
 - [x] Fix disabling fences on certain maps - wasn't bug
 - [x] Improve !rebel check messages
-- [ ] Separate translations by langs
-- [ ] Fix bug in ChickenHunt about spawning chickens
+- [x] Separate translations by langs
+- [x] Fix bug in ChickenHunt about spawning chickens
 - [ ] Fix bug about console winning redonly game
