@@ -145,9 +145,15 @@ public TG_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigg
 	if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 		TG_StopGame(TG_GetOppositeTeam(iTeam));
 	} else if (StrEqual(sID, GAME_ID_REDONLY) && iTeam == TG_RedTeam) {
-		new Handle:hWinner = CreateArray();
-		PushArrayCell(hWinner, Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1));
-		TG_StopGame(TG_RedTeam, hWinner);
+		new iWinner = Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1);
+
+		if (g_iPlayerScore[iWinner] > 0) {
+			new Handle:hWinner = CreateArray();
+			PushArrayCell(hWinner, iWinner);
+			TG_StopGame(TG_RedTeam, hWinner);
+		} else {
+			TG_StopGame(TG_RedTeam);
+		}
 	}
 }
 
@@ -254,9 +260,15 @@ public Hook_ChickenDeath(const String: sOutput[], iChicken, iClient, Float: fDel
 				if (g_bFiftyFifty) {
 					TG_StopGame((g_iTeamScore[TG_RedTeam] == g_iTeamScore[TG_BlueTeam]) ? TG_NoneTeam : (g_iTeamScore[TG_RedTeam] > g_iTeamScore[TG_BlueTeam]) ? TG_RedTeam : TG_BlueTeam);
 				} else {
-					new Handle:hWinner = CreateArray();
-					PushArrayCell(hWinner, Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1));
-					TG_StopGame(TG_RedTeam, hWinner);
+					new iWinner = Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1);
+
+					if (g_iPlayerScore[iWinner] > 0) {
+						new Handle:hWinner = CreateArray();
+						PushArrayCell(hWinner, iWinner);
+						TG_StopGame(TG_RedTeam, hWinner);
+					} else {
+						TG_StopGame(TG_RedTeam);
+					}
 				}
 			}
 		}

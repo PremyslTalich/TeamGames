@@ -15,5 +15,6 @@ To do list
 - [x] Improve !rebel check messages
 - [x] Separate translations by langs
 - [x] Fix bug in ChickenHunt about spawning chickens
-- [ ] Fix bug about console winning redonly game
-- [ ] Fix some log messages
+- [x] Fix some log messages
+- [x] Fix bug about console winning redonly game
+

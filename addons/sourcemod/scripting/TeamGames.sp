@@ -233,7 +233,7 @@ public OnClientPutInServer(iClient)
 public OnClientDisconnect(iClient)
 {
 	if (g_Game[GameProgress] != TG_NoGame && TG_IsPlayerRedOrBlue(iClient)) {
-		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (team %d) (reason = 'Disconnect')", iClient, _:g_PlayerData[iClient][Team]);
+		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
 		Call_StartForward(Forward_OnPlayerLeaveGame);
 		Call_PushString(g_Game[GameID]);
@@ -244,7 +244,7 @@ public OnClientDisconnect(iClient)
 	}
 
 	if (TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]) && GetCountPlayersInTeam(g_PlayerData[iClient][Team]) == 0) {
-		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (team %d) (reason = 'Disconnect')", iClient, _:g_PlayerData[iClient][Team]);
+		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
 		Call_StartForward(Forward_OnTeamEmpty);
 		Call_PushString(g_Game[GameID]);
@@ -499,9 +499,9 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 		Call_PushCell(TG_PlayerTrigger:TG_Death);
 		Call_Finish();
 
-		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (team %d) killed \"%L\" (team %d)", iAttacker, _:g_PlayerData[iAttacker][Team], iVictim, _:g_PlayerData[iVictim][Team]);
+		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	} else {
-		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (team %d) killed \"%L\" (team %d)", iAttacker, _:g_PlayerData[iAttacker][Team], iVictim, _:g_PlayerData[iVictim][Team]);
+		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	}
 
 	if (g_PlayerData[iVictim][Team] == TG_RedTeam) {
@@ -511,7 +511,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	}
 
 	if (GetCountPlayersInTeam(g_PlayerData[iVictim][Team]) == 0) {
-		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (team %d) (reason = 'Death')", iVictim, _:g_PlayerData[iVictim][Team]);
+		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (%s) (reason = \"Death\")", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
 		Call_StartForward(Forward_OnTeamEmpty);
 		Call_PushString(g_Game[GameID]);
