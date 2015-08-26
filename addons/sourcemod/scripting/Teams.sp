@@ -152,7 +152,7 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 			if (g_Game[GameProgress] != TG_NoGame)
 				TG_LogGameMessage(g_Game[GameID], "SetPlayerTeam", "\"%L\" was moved to \"%s\"", iClient, (iTeam == TG_RedTeam) ? "RedTeam" : (iTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 			else
-				TG_LogGameMessage("Core_NoGame", "SetPlayerTeam", "\"%L\" was moved to \"%s\"", iClient, (iTeam == TG_RedTeam) ? "RedTeam" : (iTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+				TG_LogRoundMessage("SetPlayerTeam", "\"%L\" was moved to \"%s\"", iClient, (iTeam == TG_RedTeam) ? "RedTeam" : (iTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 	}
 
@@ -168,7 +168,11 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 	}
 
 	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
-		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		if (g_Game[GameProgress] != TG_NoGame) {
+			TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		} else {
+			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		}
 
 		Call_StartForward(Forward_OnTeamEmpty);
 		Call_PushString(g_Game[GameID]);
@@ -341,7 +345,7 @@ bool:MakeRebel(iClient)
 		EmitSoundToAllAny(g_sRebelSound);
 
 	if (g_Game[GameProgress] != TG_NoGame) {
-		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (iTeam %d) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
 		Call_StartForward(Forward_OnPlayerLeaveGame);
 		Call_PushString(g_Game[GameID]);
@@ -352,7 +356,11 @@ bool:MakeRebel(iClient)
 	}
 
 	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
-		TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (iTeam %d) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		if (g_Game[GameProgress] != TG_NoGame) {
+			TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		} else {
+			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		}
 
 		Call_StartForward(Forward_OnTeamEmpty);
 		Call_PushString(g_Game[GameID]);
