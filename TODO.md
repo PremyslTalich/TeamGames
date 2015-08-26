@@ -18,4 +18,3 @@ To do list
 - [x] Fix some log messages
 - [x] Fix bug about console winning redonly game
 - [ ] Fix updater link & file - not yet
-- 
