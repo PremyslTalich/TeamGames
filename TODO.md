@@ -17,4 +17,5 @@ To do list
 - [x] Fix bug in ChickenHunt about spawning chickens
 - [x] Fix some log messages
 - [x] Fix bug about console winning redonly game
-
+- [ ] Fix updater link & file - not yet
+- 
