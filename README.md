@@ -10,7 +10,7 @@ Modular SourceMod plugin system for JailBreak servers with many features:
 - Keep [logs](https://github.com/KissLick/TeamGames/wiki/Logs) of TeamGames activities
 - Wide API for plugin developers
 
-###Games
+##Games
 
 **RedOnly:**
 - Hot popato
@@ -31,7 +31,7 @@ Modular SourceMod plugin system for JailBreak servers with many features:
 - Reload battle
 - Taser mania *(CS:GO only)*
 
-###Non-game modules
+##Non-game modules
 - Warden
 - Bomb toss
 - Permanent fences
