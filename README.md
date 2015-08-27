@@ -1,3 +1,7 @@
+#TeamGames
+
+##General
+
 TeamGames is modular system for JailBreak servers with many features:
 - Two [teams](https://raw.githubusercontent.com/KissLick/TeamGames/master/extras/screenshots/teams.jpg), red and blue
 - Team based games
@@ -8,7 +12,7 @@ TeamGames is modular system for JailBreak servers with many features:
 - Keep [logs](https://github.com/KissLick/TeamGames/wiki/Logs) of TeamGames activities
 - Wide API for plugin developers
 
-##Games
+###Games
 
 **RedOnly:**
 - Hot popato
@@ -29,7 +33,7 @@ TeamGames is modular system for JailBreak servers with many features:
 - Reload battle
 - Taser mania *(CS:GO only)*
 
-##Non-game modules
+###Non-game modules
 - Warden
 - Bomb toss
 - Permanent fences
