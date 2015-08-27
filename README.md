@@ -6,7 +6,8 @@ Modular SourceMod plugin system for JailBreak servers with many features:
 - Two different [marks](https://github.com/KissLick/TeamGames/wiki/Marks) (each for one team)
 - [Fences](https://github.com/KissLick/TeamGames/wiki/Fences) (reacts only to prisoners and according to server settings)
 - Fully in translations files and using [ColorVariables](https://github.com/KissLick/ColorVariables)
-- Using [SourceMod override system](https://wiki.alliedmods.net/Overriding_Command_Access_%28SourceMod%29) to [restrict module access](https://github.com/KissLick/TeamGames/wiki/Module-config#overriding-menu-items-access) player by player
+- Use [SourceMod override system](https://wiki.alliedmods.net/Overriding_Command_Access_%28SourceMod%29) to [restrict module access](https://github.com/KissLick/TeamGames/wiki/Module-config#overriding-menu-items-access) player by player
+- Customize [TeamGames menu](https://github.com/KissLick/TeamGames/wiki/Module-config) as you wish
 - Keep [logs](https://github.com/KissLick/TeamGames/wiki/Logs) of TeamGames activities
 - Wide API for plugin developers
 
