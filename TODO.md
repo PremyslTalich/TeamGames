@@ -19,3 +19,5 @@ To do list
 - [x] Fix bug about console winning redonly game
 - [ ] Fix updater link & file - not yet
 - [x] Add missing download lists to extras
+- [ ] Finish wiki
+- [ ] Finish API docs
