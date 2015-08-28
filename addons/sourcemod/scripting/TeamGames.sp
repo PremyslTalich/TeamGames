@@ -15,7 +15,7 @@
 #include <lastrequest>
 
 // Modifying defines might cause problems... Do not modify them, unless you exactly know, what you are doing.
-#define UPDATE_URL			"http://teamgames.tk/plugin/TeamGames_UpdateFile.txt"
+#define UPDATE_URL			""
 
 #define PLUGIN_CONFIG		"sourcemod/teamgames"
 #define LOGS_DIRECTORY		"logs/teamgames"
@@ -73,13 +73,15 @@ new EngineVersion:g_iEngineVersion;
 #include "Commands.sp"
 #include "Api.sp"
 
-#define PLUGIN_VERSION "0.6.2"
+// major.minor.patch.build
+#define _PLUGIN_VERSION "0.6.2.6"
+
 public Plugin:myinfo =
 {
 	name        = "TeamGames",
 	author      = "Raska",
 	description = "Platform (core plugin) for team based games for prisoners and non-game modules + provides a few useful things for wardens. Supports only CS:S and CS:GO.",
-	version     = PLUGIN_VERSION,
+	version     = _PLUGIN_VERSION,
 	url         = ""
 }
 
@@ -88,7 +90,7 @@ public OnPluginStart()
 	LoadTranslations("common.phrases");
 	LoadTranslations("TeamGames.phrases");
 
-	CreateConVar("tg_version", PLUGIN_VERSION, "TeamGames core version (not changeable)", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_DONTRECORD);
+	CreateConVar("tg_version", _PLUGIN_VERSION, "TeamGames core version (not changeable)", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_DONTRECORD);
 
 	g_hAutoUpdate = 				CreateConVar("tg_autoupdate", 				"1", 			"Should TeamGames use plugin Updater? (https://forums.alliedmods.net/showthread.php?t=169095) (1 = true, 0 = false)");
 	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 		"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are hold forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
@@ -100,6 +102,7 @@ public OnPluginStart()
 	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow sefl damage, even in game");
 
 	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 			"How many games can be played in one round. (-1 = no limit)");
+	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"1", 			"Check teams before starting FiftyFifty game.");
 	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
 	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",			"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
 	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",			"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");

@@ -1052,12 +1052,13 @@ public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettings[TG_GAME_SETTINGS_LENGTH], Handle:hGameCustomDataPack, bool:bRemoveDropppedWeapons, bool:bCheckTeams, bool:bEndOnTeamEmpty)
 {
 	new String:sName[TG_MODULE_NAME_LENGTH], String:sTeam1[4096], String:sTeam2[4096];
+	new iGameIndex = GetGameIndex(g_Game[GameID]);
 	new iCount1, iCount2;
 
 	decl String:sErrorDescription[512];
 	new iErrorCode = 0;
 
-	strcopy(sName, TG_MODULE_NAME_LENGTH, g_GameList[GetGameIndex(sID)][DefaultName]);
+	strcopy(sName, TG_MODULE_NAME_LENGTH, g_GameList[iGameIndex][DefaultName]);
 
 	if (g_Game[GameProgress] == TG_InProgress || g_Game[GameProgress] == TG_InPreparation) {
 		CPrintToChat(iClient, "%t", "StartGame-AnotherGameInProgress");
@@ -1066,11 +1067,13 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 		iErrorCode = 1;
 	}
 
-	if (bCheckTeams && !IsGameTypeAvailable(g_GameList[GetGameIndex(sID)][GameType])) {
-		CPrintToChat(iClient, "%t", "StartGame-BadTeamRatio");
-		Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Bad teams ratio\")", 2, iClient, sName, sID);
+	if (g_GameList[iGameIndex][GameType] != TG_FiftyFifty || (g_GameList[iGameIndex][GameType] == TG_FiftyFifty && GetConVarBool(g_hCheckTeams))) {
+		if (bCheckTeams && !IsGameTypeAvailable(g_GameList[iGameIndex][GameType])) {
+			CPrintToChat(iClient, "%t", "StartGame-BadTeamRatio");
+			Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Bad teams ratio\")", 2, iClient, sName, sID);
 
-		iErrorCode = 2;
+			iErrorCode = 2;
+		}
 	}
 
 	if (!IsPlayerAlive(iClient) && !CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
@@ -1110,7 +1113,6 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 	g_bTeamsLock = true;
 
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, sID);
-	new iGameIndex = GetGameIndex(g_Game[GameID]);
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, g_GameList[iGameIndex][DefaultName]);
 
 	g_Game[GameType] = g_GameList[iGameIndex][GameType];

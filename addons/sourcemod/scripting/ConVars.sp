@@ -7,6 +7,7 @@ new Handle:g_hMenuPercent;
 
 new Handle:g_hSelfDamage;
 
+new Handle:g_hCheckTeams;
 new Handle:g_hRoundLimit, g_iRoundLimit;
 new Handle:g_hMoveSurvivors;
 new Handle:g_hSaveWeapons;
