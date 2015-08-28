@@ -21,3 +21,4 @@ To do list
 - [x] Add missing download lists to extras
 - [ ] Finish wiki
 - [ ] Finish API docs
+- [ ] Add ConVar tg_game_checkteams
