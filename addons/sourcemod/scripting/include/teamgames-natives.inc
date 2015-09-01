@@ -2,12 +2,6 @@
   #endinput
 #endif
 #define _teamgames_natives_included_
-//------------------------------------------------------------------------------------------------
-// All natives
-//------------------------------------------------------------------------------------------------
-/*
-*/
-//------------------------------------------------------------------------------------------------
 
 /**
  * Get client team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), client must be valid and connected.
@@ -168,8 +162,6 @@ native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:na
  * @param CustomGameName	Custom game name to print in phrases "GAME_PREPARATION" and "GAME_STARTED".
  * @param DataPack			Datapack to pass in forwards TG_OnGamePrepare and TG_OnGameStart. If start game failed, datapack handle would be closed.
  * @noreturn
- *
- * Fire forwards: TG_OnGamePrepare, TG_OnGameStart (after 5 seconds) and TG_OnGameStartError (if start game failed).
  */
 native TG_StartGame(client, const String:id[], const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:checkTeams = true, bool:endOnTeamEmpty = true);
 
@@ -211,8 +203,6 @@ native TG_GameType:TG_GetGameType(const String:id[]);
  * @param ClearTeams		Clear teams? (move all players in RedTeam or BlueTeam to NoneTeam) (True/False)
  * @param ReturnWeapons		Should players recieve striped weapons in game preparation? (True/False)
  * @noreturn
- *
- * Fire forward: TG_OnGameEnd
  */
 native TG_StopGame(TG_Team:team, &Handle:winners = INVALID_HANDLE, bool:clearTeams = true, bool:returnWeapons = true);
 
@@ -241,3 +231,5 @@ native TG_LogRoundMessage(const String:prefix[] = "", const String:format[] = ""
 native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", const String:format[] = "", any:...);
 
 native TG_ShowPlayerSelectMenu(client, TG_Team:team, TG_PlayerSelectMenuHandler:function, const String:format[] = "", any:...);
+
+functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);

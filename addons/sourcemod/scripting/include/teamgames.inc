@@ -75,10 +75,6 @@ enum TG_PlayerTrigger
 };
 
 //------------------------------------------------------------------------------------------------
-// Func tags
-functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
-
-//------------------------------------------------------------------------------------------------
 // TeamGames includes
 #include <teamgames-natives>
 #include <teamgames-forwards>
