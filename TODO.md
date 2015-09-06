@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Wrap forwards
 - [x] Add ConVar `tg_game_checkteams`
 - [ ] Finish API docs
 - [ ] Finish wiki
