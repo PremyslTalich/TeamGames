@@ -4,24 +4,35 @@
 #define _teamgames_natives_included_
 
 /**
- * Get client team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), client must be valid and connected.
+ * Get client TeamGames team.
  *
  * @param client		Client index.
- * @return				{0, 1, 2} on success (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), -1 on failure.
+ * @return				TG team.
  */
 native TG_Team:TG_GetPlayerTeam(client);
 
 /**
- * Set client team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam), client and activator must be valid and connected.
- * This native use phrases "PLAYER_MOVED_TO_NONE", "PLAYER_MOVED_TO_RED" and "PLAYER_MOVED_TO_BLUE".
+ * Set client TeamGames team
  *
- * @param activator		Activator client index (use non valid client index for set client team without an activator - doesn't use any phrase).
- * @param client		Client index.
- * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
+ * @param activator		Activator client index (use non valid client index for set client team without the activator).
+ *
+ * 						valid client index = Checks teams lock and move delay. Uses phrases PlayerMove-NoneTeam|RedTeam|BlueTeam.
+ *
+ * 						0 = Checks teams lock and move delay. No phrase in chat.
+ *
+ * 						-1 = No lock or delay checks. Uses phrases PlayerMove-RedTeam|BlueTeam-Game (only if there is running game).
+ * @param client		Client index to move.
+ * @param team			TG team to move to.
  * @return				True on success, false on failure.
  */
-native TG_SetPlayerTeam(activator, client, TG_Team:team);
+native bool:TG_SetPlayerTeam(activator, client, TG_Team:team);
 
+/**
+ * Check if the given game type is available depending on TeamGames teams population.
+ *
+ * @param type			Game type.
+ * $return 				True on success, false on failure.
+ */
 native bool:TG_IsGameTypeAvailable(TG_GameType:type);
 
 /**
@@ -33,44 +44,55 @@ native bool:TG_IsGameTypeAvailable(TG_GameType:type);
 native bool:TG_LoadPlayerWeapons(client);
 
 /**
- * Create fence from two points (a, c)
+ * Create fence from two points (a, c) on diagonale.
  *
  * @param a			Array with x,y,z coordinates of point a.
  * @param c			Array with x,y,z coordinates of point c.
- * @noreturn
+ * @return			True on success, false on failure.
  */
-native TG_FenceCreate(Float:a[3], Float:c[3]);
+native bool:TG_FenceCreate(Float:a[3], Float:c[3]);
 
 /**
- * Destroy existed fence.
+ * Destroy existing fence.
  *
  * @noreturn
  */
 native TG_FenceDestroy();
 
 /**
- * Punish player due to cross the laser fence.
+ * Punish player for crossing the laser fence.
  *
  * @param client			Client index.
- * @param CallForward		Call forward TG_OnLaserFenceCrossed ?.
+ * @param CallForward		Call forward TG_OnLaserFenceCrossed ?
  * @noreturn
  */
 native TG_FencePlayerCross(client, bool:callForward = true);
 
-native bool:TG_SpawnMark(client, TG_Team:team, Float:position[3], Float:life = 0.0, bool:fireEvent = true, bool:counter = false);
+/**
+ * Spawn mark.
+ *
+ * @param client 		Client index of who spawned the mark. Use 0 for no client.
+ * @param team 			TG team who owns the mark.
+ * @param position 		Mark's position.
+ * @param life 			Mark's life.
+ * @param callForward 	Call forward TG_OnMarkSpawn?
+ * @param counter 		Use marks counter (works only for valid clients).
+ * @return 				True on success, false on failure.
+ */
+native bool:TG_SpawnMark(client, TG_Team:team, Float:position[3], Float:life = 0.0, bool:callForward = true, bool:counter = false);
 
 /**
- * Get team count of connected and alive players.
+ * Get count of players in the given TeamGames team.
  *
- * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
- * @return				Count (>= 0) of players in team (@param team).
+ * @param team			TG team to count players in.
+ * @return				Count (>= 0) of players in the given team.
  */
 native TG_GetTeamCount(TG_Team:team);
 
 /**
- * Switch all players in team (@param team) to NoneTeam.
+ * Remove all players from the given TeamGames team.
  *
- * @param team			Team index (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
+ * @param team			TG team
  * @noreturn
  */
 native TG_ClearTeam(TG_Team:team);
@@ -86,7 +108,6 @@ native TG_SetTeamsLock(bool:lock);
 /**
  * Get teams lock.
  *
- * @param lock			True or false (true = lock teams, false = unlock teams).
  * @return				True or false (true = teams are locked, false = teams are unlocked).
  */
 native bool:TG_GetTeamsLock();
@@ -96,35 +117,42 @@ native bool:TG_GetTeamsLock();
  *
  * @param name			Game name (showed in games menu via TG_ShowGamesMenu).
  * @param id			Game ID (!!! MUST BE UNIQUE !!!).
- * @return				0 on success, otherwise on failure (1 = TG_RegGame #1, 2 = TG_RegGame #2, 3 = TG_RegGame #3).
- *
- * Error - "TG_RegGame #1"		Game registration Failed! Couldn't get Arg1 (Game name)!
- * Error - "TG_RegGame #2"		Game registration Failed! Couldn't get Arg2 (Game ID)!
- * Error - "TG_RegGame #3"		Game registration Failed! Game ID (Arg2) must be unique!
- * Error - "TG_RegGame #4"		Game registration Failed! Game name "Core_NoGame" is reserved!
- * Error - "TG_RegGame #5"		Game registration Failed! Game ID "Core_NoGame" is reserved!
+ * @return				0 on success, otherwise on failure.
  */
 native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty);
 
+/**
+ * Check if the given module is registred.
+ *
+ * @param type			Module type
+ * @param id			Module ID
+ * @return				True if the given module is registred, false otherwise.
+ */
 native bool:TG_IsModuleReged(TG_ModuleType:type, const String:id[]);
 
+/**
+ * Retrieves all registred modules of the given type.
+ *
+ * @param type 			Module type
+ * @return 				Handle to adt array with module ids on success, INVALID_HANDLE otherwise.
+ */
 native Handle:TG_GetRegedModules(TG_ModuleType:type);
 
 /**
- * Unregister Game from TeamGames.
+ * Unregister (remove) game from TeamGames.
  *
  * @param id			Game ID.
- * @return				0 on success, otherwise on failure (1 = TG_RegGame #1, 2 = TG_RegGame #2).
- *
- * Error - "TG_RegGame #1"		Game unregistration Failed! Couldn't get Arg1 (Game ID)!
- * Error - "TG_RegGame #2"		Game unregistration Failed! No game with "Game ID" = (Arg2) found!
+ * @return				0 on success, otherwise on failure.
  */
 native TG_RemoveGame(const String:id[]);
 
 /**
- * Get all registred game IDs.
+ * Fake player select in TeamGames menu
  *
- * @return				Handle to dynamic array with game IDs. YOU MUST CLOSE THAT HANDLE !!!
+ * @param client 		Client index
+ * @param type 			Module type
+ * @param id 			Module ID
+ * @noreturn
  */
 native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
 
@@ -133,11 +161,7 @@ native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
  *
  * @param name			Item name (showed in main menu via TG_ShowMainMenu).
  * @param id			Item ID (!!! MUST BE UNIQUE !!!).
- * @return				0 on success, otherwise on failure (1 = TG_AddMainMenuItem #1, 2 = TG_AddMainMenuItem #2, 3 = TG_AddMainMenuItem #3).
- *
- * Error - "TG_AddMainMenuItem #1"		Modul main menu item registration Failed! Couldn't get Arg1 (Item name)!
- * Error - "TG_AddMainMenuItem #2"		Modul main menu item registration Failed! Couldn't get Arg2 (Item ID)!
- * Error - "TG_AddMainMenuItem #3"		Modul main menu item registration Failed! Item ID (Arg2) must be unique!
+ * @return				0 on success, otherwise on failure.
  */
 native TG_RegMenuItem(const String:id[64]);
 
@@ -145,13 +169,20 @@ native TG_RegMenuItem(const String:id[64]);
  * Unregister (remove) item from TeamGames main menu.
  *
  * @param id			Item ID.
- * @return				0 on success, otherwise on failure (1 = TG_RemoveMainMenuItem #1, 2 = TG_RemoveMainMenuItem #2).
- *
- * Error - "TG_RegGame #1"		Modul main menu item unregistration Failed! Couldn't get Arg1 (Item ID)!
- * Error - "TG_RegGame #2"		Modul main menu item unregistration Failed! No menu item with "Item ID" = (Arg2) found!
+ * @return				0 on success, otherwise on failure.
  */
 native TG_RemoveMenuItem(const String:id[]);
 
+/**
+ * Retrieves module name.
+ *
+ * @param type			Module type.
+ * @param id			Module ID.
+ * @param client		Client used as translation target. Use LANG_SERVER for default name.
+ * @param name			Buffer to store the name.
+ * @param size			Buffer max size.
+ * @return				Returns game type of the given game id.
+ */
 native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:name[], size);
 
 /**
@@ -166,70 +197,140 @@ native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:na
 native TG_StartGame(client, const String:id[], const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:checkTeams = true, bool:endOnTeamEmpty = true);
 
 /**
- * Get current game id.
+ * Retrieves current game id.
  *
  * @param id			Buffer for game id
  * @param size			Size of buffer.
- * @return				True on success, false on failure (buffer is smaller then 64).
+ * @return				True on success, false on failure (buffer is smaller then TG_MODULE_ID_LENGTH).
  */
 native TG_GetCurrentGameID(String:id[], size);
 
 /**
- * Is current game id.
+ * Check if current game id is also the given game id.
  *
- * @param id			Tested game id.
- * @return				True if "id" = "current game id", false otherwise.
+ * @param id			Game id.
+ * @return				True on success, false otherwise.
  */
 native bool:TG_IsCurrentGameID(const String:id[]);
 
+/**
+ * Retrieves current game DataPack.
+ *
+ * @return				DataPack Handle on success, INVALID_HANDLE otherwise (no DataPack or no running game).
+ */
 native Handle:TG_GetCurrentDataPack();
 
+/**
+ * Retrieves current game starter (Player who started the game).
+ *
+ * @return				Client index on success, 0 otherwise (no starter or no running game).
+ */
 native TG_GetCurrentStarter();
 
+/**
+ * Retrieves current game settings.
+ *
+ * @param id			Game ID.
+ * @return				True on success, false otherwise (no settings or no running game).
+ */
 native bool:TG_GetCurrentGameSettings(String:gameSettings[], size);
 
 /**
- *	Get game type.
+ * Retrieves game type.
  *
  * @param id			Game ID.
- * @return				Return game type of the game with given Game ID.
+ * @return				Returns game type of the given game id.
  */
 native TG_GameType:TG_GetGameType(const String:id[]);
 
 /**
- * Stop game with game id = @param id. And unlock teams.
+ * Stops current game.
  *
- * @param team				Team index of winner team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).
- * @param ClearTeams		Clear teams? (move all players in RedTeam or BlueTeam to NoneTeam) (True/False)
- * @param ReturnWeapons		Should players recieve striped weapons in game preparation? (True/False)
+ * @param team				Winner team.
+ * @param winners			Adt array of winners. If INVALID_HANDLE, living players from winner team are used.
+ * @param ClearTeams		Clear teams.
+ * @param ReturnWeapons		Return weapons striped in game preparation.
  * @noreturn
  */
 native TG_StopGame(TG_Team:team, &Handle:winners = INVALID_HANDLE, bool:clearTeams = true, bool:returnWeapons = true);
 
+/**
+ * Set module visibility.
+ *
+ * @param type			Module type
+ * @param id			Module ID
+ * @param visibility	Module visibility
+ * @return 				True on success, false otherwise.
+ */
 native bool:TG_SetModuleVisibility(TG_ModuleType:type, const String:id[], bool:visibility);
+
+/**
+ * Retrieves module visibility.
+ *
+ * @param type			Module type
+ * @param id			Module ID
+ * @return 				Module visibility.
+ */
 native bool:TG_GetModuleVisibility(TG_ModuleType:type, const String:id[]);
 
 /**
- * Get game status (TG_Enum_GameProgress).
+ * Retrieves game status.
  *
- * @return				TG_GameProgress:status
+ * @return 				Game status.
  */
 native TG_GameProgress:TG_GetGameStatus();
 
 /**
- * Is current game status (TG_Enum_GameProgress).
+ * Checks if the given status is also the current status.
  *
- * @param status		Game status to check (TG_Enum_GameProgress:status).
+ * @param status		Game status to check.
  * @return				True on success, false otherwise.
  */
 native bool:TG_IsGameStatus(TG_GameProgress:status);
 
+/**
+ * Logs a module message to the TeamGames logs.
+ *
+ * @param prefix		Messge prefix.
+ * @param format		String format.
+ * @param ...			Format arguments.
+ * @noreturn
+ */
 native TG_LogMessage(const String:prefix[] = "", const String:format[] = "", any:...);
 
+/**
+ * Logs a module round message to the TeamGames logs.
+ *
+ * @param prefix		Messge prefix.
+ * @param format		String format.
+ * @param ...			Format arguments.
+ * @noreturn
+ */
 native TG_LogRoundMessage(const String:prefix[] = "", const String:format[] = "", any:...);
 
+/**
+ * Logs a game message to the TeamGames logs.
+ *
+ * @param gameID		Game ID.
+ * @param prefix		Messge prefix.
+ * @param format		String format.
+ * @param ...			Format arguments.
+ * @noreturn
+ */
 native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", const String:format[] = "", any:...);
 
-native TG_ShowPlayerSelectMenu(client, TG_Team:team, TG_PlayerSelectMenuHandler:function, const String:format[] = "", any:...);
 
-functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
+native TG_ShowPlayerSelectMenu(client, TG_Team:team, TG_PlayerSelectMenuHandler:callBack, const String:format[] = "", any:...);
+
+// functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
+
+
+/**
+ * Prototype for TG_ShowPlayerSelectMenu callback.
+ *
+ * @param activator 	Activator's client index (who used select menu).
+ * @param client 		Client index of chosen player.
+ * @param IsRandom 		True if activator chosed random player, false otherwise.
+ * @noreturn
+ */
+typedef TG_PlayerSelectMenuHandler = function void (activator, client, bool:IsRandom);

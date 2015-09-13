@@ -100,10 +100,10 @@ public FencesMenu_Rectangle_Handler(Handle:hMenu, MenuAction:iAction, iClient, i
 	}
 }
 
-CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
+bool:CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 {
 	if (GetConVarInt(g_hFenceType) == 0) {
-		return;
+		return false;
 	}
 	DestroyFence();
 
@@ -114,7 +114,7 @@ CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 	Call_PushArray(fC, 3);
 	Call_Finish(iResult);
 	if (iResult != Plugin_Continue)
-		return;
+		return false;
 
 	Call_StartForward(Forward_OnLaserFenceCreated);
 	Call_PushCell(iClient);
@@ -146,6 +146,8 @@ CreateFence(Float:fA[3], Float:fC[3], iClient = 0)
 		fA[2] += 18.0; fC[2] += 18.0;
 		SpawnRopeSquare(fA, fC, "__TG_FenceBeamRope_3_", g_sFenceMaterial, g_fFenceWidth);
 	}
+
+	return true;
 }
 
 DestroyFence()

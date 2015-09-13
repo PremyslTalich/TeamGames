@@ -76,18 +76,16 @@ public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bo
 	}
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", client);
+		Format(name, maxSize, "%T", "GameName", client);
 }
 
-public TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
-	if (!StrEqual(sID, GAME_ID, true))
-		return;
-
-	TG_ShowPlayerSelectMenu(iClient, TG_RedTeam, SelectPlayerHandeler, "%T", "ChooseRambo", iClient);
+	if (type == TG_Game && StrEqual(sID, GAME_ID))
+		TG_ShowPlayerSelectMenu(iClient, TG_RedTeam, SelectPlayerHandeler, "%T", "ChooseRambo", iClient);
 }
 
 public SelectPlayerHandeler(iActivator, iClient, bool:bIsRandom)

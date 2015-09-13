@@ -101,7 +101,7 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	RemoveTarget();
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type != TG_MenuItem) {
 		return;
@@ -114,14 +114,18 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 			status = TG_Inactive;
 		}
 
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnBomb", client, g_iMaxBombs - g_iBombCounter);
+		Format(name, maxSize, "%T", "SpawnBomb", client, g_iMaxBombs - g_iBombCounter);
 	} else if (StrEqual(id, MENU_ITEM_ID_TARGET)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "SpawnTarget", client);
+		Format(name, maxSize, "%T", "SpawnTarget", client);
 	}
 }
 
-public TG_OnMenuItemSelected(const String:id[], iClient) // somebody selected BombToss item in menu
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient) // somebody selected BombToss item in menu
 {
+	if (type != TG_MenuItem) {
+		return;
+	}
+
 	if (StrEqual(id, MENU_ITEM_ID_SPAWNBOMB, true)) {
 		if (g_iBombCounter >= g_iMaxBombs){
 			return;

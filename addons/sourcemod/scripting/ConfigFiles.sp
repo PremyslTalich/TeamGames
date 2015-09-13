@@ -277,7 +277,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 {
 	decl String:m_sFile[PLATFORM_MAX_PATH];
 	strcopy(m_sFile, sizeof(m_sFile), sFile);
-	new bKnown = true;
+	new bool:bKnown = true;
 
 	#if defined DEBUG
 	LogMessage("[TG DEBUG] Download '%s' '%s'", sPrefixName, sFile);
@@ -299,7 +299,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
-			LogError("Bad file prefix argument \"%d\" (file: \"%s\") !", 1, m_sFile);
+			LogError("Bad file prefix argument \"%d\" (file: \"%s\", prefix: \"%s\") !", 1, m_sFile, sPrefixName);
 			return;
 		}
 
@@ -311,7 +311,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
-			LogError("Bad file prefix argument \"%d\" (file: \"%s\") !", 1, m_sFile);
+			LogError("Bad file prefix argument \"%d\" (file: \"%s\", prefix: \"%s\") !", 1, m_sFile, sPrefixName);
 			return;
 		}
 
@@ -321,7 +321,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
-			LogError("Bad file prefix argument \"%d\" (file: \"%s\") !", 1, m_sFile);
+			LogError("Bad file prefix argument \"%d\" (file: \"%s\", prefix: \"%s\") !", 1, m_sFile, sPrefixName);
 			return;
 		}
 
@@ -332,7 +332,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
-			LogError("Bad file prefix argument \"%d\" (file: \"%s\") !", 1, m_sFile);
+			LogError("Bad file prefix argument \"%d\" (file: \"%s\", prefix: \"%s\") !", 1, m_sFile, sPrefixName);
 			return;
 		}
 
@@ -346,7 +346,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
-			LogError("Bad file prefix argument \"%d\" (file: \"%s\") !", 1, m_sFile);
+			LogError("Bad file prefix argument \"%d\" (file: \"%s\", prefix: \"%s\") !", 1, m_sFile, sPrefixName);
 			return;
 		}
 
@@ -390,14 +390,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		bKnown = false;
 	}
 
-	Call_StartForward(Forward_OnDownloadFile);
-	Call_PushString(m_sFile);
-	Call_PushString(sPrefixName);
-	Call_PushCell(hArgs);
-	Call_PushCellRef(bKnown);
-	Call_Finish();
-
-	if (!bKnown && sPrefixName[0] != '\0')
+	if (!Call_OnDownloadFile(m_sFile, sPrefixName, hArgs, bKnown) && sPrefixName[0] != '\0')
 		LogError("Unknown file prefix \"%s\" (file: \"%s\") !", sPrefixName, m_sFile);
 }
 

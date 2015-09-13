@@ -131,6 +131,13 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 	else if (GetConVarInt(g_hTeamDiff) == 1)
 		ModelPlayer(iClient, iTeam);
 
+	Call_StartForward(Forward_OnPlayerTeamPost);
+	Call_PushCell(iClient);
+	Call_PushCell(iActivator);
+	Call_PushCell(g_PlayerData[iClient][Team]);
+	Call_PushCell(iTeam);
+	Call_Finish();
+
 	if (Client_IsIngame(iActivator)) {
 		if (iTeam == TG_NoneTeam)
 			CPrintToChatAll("%t", "PlayerMove-NoneTeam", sClientName);
@@ -322,10 +329,12 @@ ClearTeams()
 
 bool:MakeRebel(iClient)
 {
+	new TG_Team:iOldTeam = TG_GetPlayerTeam(iClient);
+
 	new Action:iResult = Plugin_Continue;
 	Call_StartForward(Forward_OnPlayerRebel);
 	Call_PushCell(iClient);
-	Call_PushCell(TG_GetPlayerTeam(iClient));
+	Call_PushCell(iOldTeam);
 	Call_Finish(iResult);
 	if (iResult != Plugin_Continue)
 		return false;
@@ -333,9 +342,13 @@ bool:MakeRebel(iClient)
 	if (g_Game[GameProgress] == TG_InPreparation || g_Game[GameProgress] == TG_InProgress)
 		PlayerEquipmentLoad(iClient);
 
-	new TG_Team:iOldTeam = TG_GetPlayerTeam(iClient);
 	ChangeRebelStatus(iClient, true);
 	SwitchToTeam(-1, iClient, TG_NoneTeam);
+
+	Call_StartForward(Forward_OnPlayerRebelPost);
+	Call_PushCell(iClient);
+	Call_PushCell(iOldTeam);
+	Call_Finish();
 
 	decl String:sName[TG_MODULE_NAME_LENGTH];
 	GetClientName(iClient, sName, sizeof(sName));

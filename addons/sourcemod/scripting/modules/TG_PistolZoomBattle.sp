@@ -41,25 +41,23 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type != TG_Game) {
 		return;
 	}
 
 	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", client);
+		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", client);
+		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
 }
 
-public TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
-		return;
-
-	SetWeaponMenu(iClient, sID);
+	if ((StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
+		SetWeaponMenu(iClient, sID);
 }
 
 public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
@@ -154,15 +152,12 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 	return Plugin_Continue;
 }
 
-public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, iWinners[], iWinnersCount, Handle:DataPack)
+public TG_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
 	if (StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) {
-		for (new i = 1; i <= MaxClients; i++) {
-			if (!TG_IsPlayerRedOrBlue(i))
-				continue;
-
-			SetEntProp(i, Prop_Send, "m_iFOV", 90);
-			SetEntProp(i, Prop_Send, "m_iDefaultFOV", 90);
+		if (TG_IsTeamRedOrBlue(iTeam) && Client_IsIngame(iClient)) {
+			SetEntProp(iClient, Prop_Send, "m_iFOV", 90);
+			SetEntProp(iClient, Prop_Send, "m_iDefaultFOV", 90);
 		}
 	}
 }

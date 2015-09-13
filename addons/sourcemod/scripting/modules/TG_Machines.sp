@@ -40,18 +40,16 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", client);
+		Format(name, maxSize, "%T", "GameName", client);
 }
 
-public TG_OnGameSelected(const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 {
-	if (!StrEqual(id, GAME_ID, true))
-		return;
-
-	TG_StartGame(iClient, GAME_ID, _, _, true);
+	if (StrEqual(id, GAME_ID) && type == TG_Game)
+		TG_StartGame(iClient, GAME_ID, _, _, true);
 }
 
 public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)

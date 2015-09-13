@@ -22,7 +22,6 @@
 #define FENCES_CONFIGS 		"configs/teamgames/fences"
 #define DOWNLOADS_CONFIG 	"configs/teamgames/downloads.cfg"
 #define MODULES_CONFIG 		"configs/teamgames/modules.cfg" // lowercase only!
-
 #define MODCONF_GAMES		"GamesMenu"
 #define MODCONF_MENUITEMS	"MainMenu"
 
@@ -34,7 +33,9 @@ new Handle:Forward_OnTraceAttack;
 new Handle:Forward_OnPlayerDamage;
 new Handle:Forward_OnPlayerDeath;
 new Handle:Forward_OnPlayerTeam;
+new Handle:Forward_OnPlayerTeamPost;
 new Handle:Forward_OnPlayerRebel;
+new Handle:Forward_OnPlayerRebelPost;
 new Handle:Forward_OnPlayerLeaveGame;
 new Handle:Forward_OnLaserFenceCreate;
 new Handle:Forward_OnLaserFenceCreated;
@@ -43,9 +44,8 @@ new Handle:Forward_OnLaserFenceCrossed;
 new Handle:Forward_OnLaserFenceDestroyed;
 new Handle:Forward_OnMarkSpawn;
 new Handle:Forward_OnMarkSpawned;
-new Handle:Forward_OnGameSelect;
-new Handle:Forward_OnGameSelected;
 new Handle:Forward_OnGameStartMenu;
+new Handle:Forward_OnGamePreparePre;
 new Handle:Forward_OnGamePrepare;
 new Handle:Forward_OnGameStart;
 new Handle:Forward_OnGameStartError;
@@ -53,10 +53,10 @@ new Handle:Forward_OnGameEnd;
 new Handle:Forward_OnTeamEmpty;
 new Handle:Forward_OnMenuDisplay;
 new Handle:Forward_OnMenuDisplayed;
-new Handle:Forward_OnMenuItemSelect;
-new Handle:Forward_OnMenuItemSelected;
-new Handle:Forward_OnDownloadFile;
+new Handle:Forward_OnMenuSelect;
+new Handle:Forward_OnMenuSelected;
 new Handle:Forward_AskModuleName;
+new Handle:Forward_OnDownloadFile;
 
 new EngineVersion:g_iEngineVersion;
 
@@ -74,7 +74,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.6.2.6"
+#define _PLUGIN_VERSION "0.7.0.24"
 
 public Plugin:myinfo =
 {

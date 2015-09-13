@@ -50,10 +50,10 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName", client);
+		Format(name, maxSize, "%T", "GameName", client);
 }
 
 public OnConfigsExecuted()
@@ -61,12 +61,10 @@ public OnConfigsExecuted()
 	g_bHealthColor = GetConVarBool(g_hHeathColor);
 }
 
-public TG_OnGameSelected(const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 {
-	if (!StrEqual(id, GAME_ID, true))
-		return;
-
-	ModuleSetTypeGameMenu(iClient);
+	if (StrEqual(id, GAME_ID) && type == TG_Game)
+		ModuleSetTypeGameMenu(iClient);
 }
 
 public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)

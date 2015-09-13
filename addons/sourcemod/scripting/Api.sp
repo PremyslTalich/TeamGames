@@ -260,7 +260,7 @@ public PlayerSelectMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 public Native_FakeSelect(Handle:hPlugin, iNumParams)
 {
-	new iStarter = GetNativeCell(1);
+	new iClient = GetNativeCell(1);
 	new TG_ModuleType:iType = GetNativeCell(2);
 	decl String:sID[TG_MODULE_ID_LENGTH];
 
@@ -268,36 +268,13 @@ public Native_FakeSelect(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(1, "Fake select failed! Couldn't get Arg3 (Module ID)!");
 	}
 
-	if (iType == TG_Game) {
-		new Action:iResult = Plugin_Continue;
-		Call_StartForward(Forward_OnGameSelect);
-		Call_PushString(sID);
-		Call_PushCell(iStarter);
-		Call_Finish(iResult);
-		if (iResult != Plugin_Continue)
-			return 0;
+	if (Call_OnMenuSelect(iType, sID, iClient) != Plugin_Continue)
+		return 0;
 
-		Call_StartForward(Forward_OnGameSelected);
-		Call_PushString(sID);
-		Call_PushCell(iStarter);
-		Call_Finish();
-	} else if (iType == TG_MenuItem) {
-		new Action:iResult = Plugin_Continue;
-		Call_StartForward(Forward_OnMenuItemSelect);
-		Call_PushString(sID);
-		Call_PushCell(iStarter);
-		Call_Finish(iResult);
-		if (iResult != Plugin_Continue)
-			return 0;
+	Call_OnMenuSelected(iType, sID, iClient);
 
-		Call_StartForward(Forward_OnMenuItemSelected);
-		Call_PushString(sID);
-		Call_PushCell(iStarter);
-		Call_Finish();
-
-		if (StrContains(sID, "Core_", false) == 0) {
-			CoreMenuItemsActions(iStarter, sID);
-		}
+	if (iType == TG_MenuItem && StrContains(sID, "Core_", false) == 0) {
+		CoreMenuItemsActions(iClient, sID);
 	}
 
 	return 0;
@@ -962,9 +939,11 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 
 	Forward_OnTraceAttack = 	 		CreateGlobalForward("TG_OnTraceAttack", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, Param_CellByRef, 	Param_Cell, Param_Cell);
 	Forward_OnPlayerDamage = 	 		CreateGlobalForward("TG_OnPlayerDamage", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, Param_CellByRef, 	Param_Cell, Param_Cell);
-	Forward_OnPlayerDeath = 	 		CreateGlobalForward("TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 	 Param_String, 		Param_Cell, Param_String);
+	Forward_OnPlayerDeath = 	 		CreateGlobalForward("TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_String, 		Param_Cell, Param_String);
 	Forward_OnPlayerTeam = 	 			CreateGlobalForward("TG_OnPlayerTeam", 					ET_Event, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
+	Forward_OnPlayerTeamPost = 	 		CreateGlobalForward("TG_OnPlayerTeamPost", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnPlayerRebel = 	 		CreateGlobalForward("TG_OnPlayerRebel", 				ET_Event, 	Param_Cell, 		Param_Cell);
+	Forward_OnPlayerRebelPost = 	 	CreateGlobalForward("TG_OnPlayerRebelPost", 			ET_Ignore, 	Param_Cell, 		Param_Cell);
 	Forward_OnPlayerLeaveGame = 	 	CreateGlobalForward("TG_OnPlayerLeaveGame", 			ET_Event, 	Param_String, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnLaserFenceCreate = 		CreateGlobalForward("TG_OnLaserFenceCreate", 			ET_Event, 	Param_Cell,			Param_Array, 		Param_Array);
 	Forward_OnLaserFenceCreated = 		CreateGlobalForward("TG_OnLaserFenceCreated", 			ET_Ignore, 	Param_Cell,			Param_Array, 		Param_Array);
@@ -973,9 +952,8 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnLaserFenceDestroyed = 	CreateGlobalForward("TG_OnLaserFenceDestroyed", 		ET_Ignore, 	Param_Array, 		Param_Array);
 	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Event, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
 	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
-	Forward_OnGameSelect = 				CreateGlobalForward("TG_OnGameSelect",					ET_Event, 	Param_String,		Param_Cell);
-	Forward_OnGameSelected = 			CreateGlobalForward("TG_OnGameSelected",				ET_Ignore, 	Param_String,		Param_Cell);
 	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGamePreparePre =  		CreateGlobalForward("TG_OnGamePreparePre",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGamePrepare =  			CreateGlobalForward("TG_OnGamePrepare",					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGameStart = 	 			CreateGlobalForward("TG_OnGameStart", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGameStartError = 			CreateGlobalForward("TG_OnGameStartError",				ET_Ignore, 	Param_String,		Param_Cell, 		Param_Cell, 		Param_String);
@@ -983,10 +961,10 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnGameEnd = 	 			CreateGlobalForward("TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell);
 	Forward_OnMenuDisplay =  			CreateGlobalForward("TG_OnMenuDisplay",					ET_Event, 	Param_Cell);
 	Forward_OnMenuDisplayed =  			CreateGlobalForward("TG_OnMenuDisplayed",				ET_Ignore, 	Param_Cell);
-	Forward_OnMenuItemSelect = 			CreateGlobalForward("TG_OnMenuItemSelect", 				ET_Event, 	Param_String,		Param_Cell);
-	Forward_OnMenuItemSelected = 		CreateGlobalForward("TG_OnMenuItemSelected", 			ET_Ignore, 	Param_String,		Param_Cell);
+	Forward_OnMenuSelect = 				CreateGlobalForward("TG_OnMenuSelect", 					ET_Event, 	Param_Cell, 		Param_String,		Param_Cell);
+	Forward_OnMenuSelected = 			CreateGlobalForward("TG_OnMenuSelected", 				ET_Ignore, 	Param_Cell, 		Param_String,		Param_Cell);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
-	Forward_AskModuleName =				CreateGlobalForward("TG_AskModuleName", 				ET_Ignore, 	Param_Cell,			Param_String,		Param_Cell, 		Param_String, 		Param_CellByRef);
+	Forward_AskModuleName =				CreateGlobalForward("TG_AskModuleName", 				ET_Ignore, 	Param_Cell,			Param_String,		Param_Cell, 		Param_String, 		Param_Cell, 		Param_CellByRef);
 
 	CreateModulesConfigFileIfNotExist();
 
@@ -1051,8 +1029,23 @@ public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettings[TG_GAME_SETTINGS_LENGTH], Handle:hGameCustomDataPack, bool:bRemoveDropppedWeapons, bool:bCheckTeams, bool:bEndOnTeamEmpty)
 {
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnGamePreparePre);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_PushString(sSettings);
+	Call_PushCell(hGameCustomDataPack);
+	Call_Finish(iResult);
+
+	if (iResult != Plugin_Continue) {
+		if (hGameCustomDataPack != INVALID_HANDLE) {
+			CloseHandle(hGameCustomDataPack);
+		}
+		return 0;
+	}
+
 	new String:sName[TG_MODULE_NAME_LENGTH], String:sTeam1[4096], String:sTeam2[4096];
-	new iGameIndex = GetGameIndex(g_Game[GameID]);
+	new iGameIndex = GetGameIndex(sID);
 	new iCount1, iCount2;
 
 	decl String:sErrorDescription[512];
@@ -1173,14 +1166,10 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 			PrintToConsole(i, "\n// ----------\n\t[TeamGames] %N started preparation for game \"%s\"\n// ----------\n", iClient, sName);
 	}
 
-	new Handle:hDataPack = CreateDataPack();
-	WritePackString(hDataPack, sSettings);
-	WritePackCell(hDataPack, iClient);
-
 	Call_StartForward(Forward_OnGamePrepare);
 	Call_PushString(g_Game[GameID]);
-	Call_PushCell(iClient);
-	Call_PushString(sSettings);
+	Call_PushCell(g_Game[GameStarter]);
+	Call_PushString(g_Game[GameSettings]);
 	Call_PushCell(g_Game[GameDataPack]);
 	Call_Finish();
 
@@ -1203,6 +1192,10 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 
 	if (IsSoundPrecached(g_sGamePrepare[5]))
 		EmitSoundToAllAny(g_sGamePrepare[5]);
+
+	new Handle:hDataPack = CreateDataPack();
+	WritePackString(hDataPack, sSettings);
+	WritePackCell(hDataPack, iClient);
 
 	g_iTimer_CountDownGamePrepare_counter = 4;
 	g_hTimer_CountDownGamePrepare = CreateTimer(1.0, Timer_CountDownGamePrepare, hDataPack, TIMER_REPEAT);
@@ -1305,8 +1298,43 @@ TG_MenuItemStatus:Call_AskModuleName(const String:sID[], TG_ModuleType:iType, iC
 	Call_PushString(sID);
 	Call_PushCell(iClient);
 	Call_PushStringEx(sName, iNameSize, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_PushCell(iNameSize);
 	Call_PushCellRef(m_iStatus);
 	Call_Finish();
 
 	return m_iStatus;
+}
+
+bool:Call_OnDownloadFile(String:sFile[], String:sPrefix[], Handle:hArgs, bool:bKnown)
+{
+	new bool:m_bKnown = bKnown;
+
+	Call_StartForward(Forward_OnDownloadFile);
+	Call_PushString(sFile);
+	Call_PushString(sPrefix);
+	Call_PushCell(hArgs);
+	Call_PushCellRef(m_bKnown);
+	Call_Finish();
+
+	return m_bKnown;
+}
+
+Call_OnMenuSelected(TG_ModuleType:iType, const String:sID[], iClient)
+{
+	Call_StartForward(Forward_OnMenuSelected);
+	Call_PushCell(iType);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_Finish();
+}
+
+Action:Call_OnMenuSelect(TG_ModuleType:iType, const String:sID[], iClient)
+{
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnMenuSelect);
+	Call_PushCell(iType);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_Finish(iResult);
+	return iResult;
 }

@@ -475,18 +475,10 @@ public MainMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				return;
 			}
 
-			new Action:iResult = Plugin_Continue;
-			Call_StartForward(Forward_OnMenuItemSelect);
-			Call_PushString(sKey);
-			Call_PushCell(iClient);
-			Call_Finish(iResult);
-			if (iResult != Plugin_Continue)
+			if (Call_OnMenuSelect(TG_MenuItem, sKey, iClient) != Plugin_Continue)
 				return;
 
-			Call_StartForward(Forward_OnMenuItemSelected);
-			Call_PushString(sKey);
-			Call_PushCell(iClient);
-			Call_Finish();
+			Call_OnMenuSelected(TG_MenuItem, sKey, iClient);
 
 			CoreMenuItemsActions(iClient, sKey);
 		}

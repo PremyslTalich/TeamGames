@@ -202,21 +202,25 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	}
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type != TG_MenuItem) {
 		return;
 	}
 
 	if (StrEqual(id, MENU_ITEM_ID_CREATE)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "CreateFence", client);
+		Format(name, maxSize, "%T", "CreateFence", client);
 	} else if (StrEqual(id, MENU_ITEM_ID_DELETE)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "DeleteFence", client);
+		Format(name, maxSize, "%T", "DeleteFence", client);
 	}
 }
 
-public TG_OnMenuItemSelected(const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 {
+	if (type != TG_MenuItem) {
+		return;
+	}
+
 	if (StrEqual(id, MENU_ITEM_ID_CREATE, true) && g_bEnabled) {
 		new Float:fPos[3];
 		GetClientAbsOrigin(iClient, fPos);

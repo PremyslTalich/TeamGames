@@ -70,21 +70,25 @@ public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bo
 	}
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type != TG_Game) {
 		return;
 	}
 
 	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", client);
+		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", client);
+		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
 }
 
-public TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
+	if (type != TG_Game) {
+		return;
+	}
+
 	if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
 		TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, _, _, _, _, false);
 	} else if (StrEqual(sID, GAME_ID_REDONLY)) {

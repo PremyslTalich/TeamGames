@@ -53,18 +53,10 @@ public GamesMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		LogMessage("[TG DEBUG] Player %L selected game (id = '%s').", iClient, sKey);
 		#endif
 
-		new Action:result = Plugin_Continue;
-		Call_StartForward(Forward_OnGameSelect);
-		Call_PushString(sKey);
-		Call_PushCell(iClient);
-		Call_Finish(result);
-		if (result != Plugin_Continue)
+		if (Call_OnMenuSelect(TG_Game, sKey, iClient) != Plugin_Continue)
 			return;
 
-		Call_StartForward(Forward_OnGameSelected);
-		Call_PushString(sKey);
-		Call_PushCell(iClient);
-		Call_Finish();
+		Call_OnMenuSelected(TG_Game, sKey, iClient);
 	} else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack) {
 		MainMenu(iClient);
 	}

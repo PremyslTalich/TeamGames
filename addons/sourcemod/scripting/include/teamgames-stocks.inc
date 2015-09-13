@@ -5,10 +5,16 @@
 
 #include <cstrike>
 
+/**
+ * Is player in TG team (Red or Blue)?
+ *
+ * @param client	Client index.
+ * @return			True on success, false otherwise.
+ */
 stock bool:TG_IsPlayerRedOrBlue(client)
 {
-	if (client < 1 || client > MaxClients || !IsClientInGame(client) || !IsPlayerAlive(client) || GetClientTeam(client) != CS_TEAM_T)
-		return false;
+	// if (client < 1 || client > MaxClients || !IsClientInGame(client) || !IsPlayerAlive(client) || GetClientTeam(client) != CS_TEAM_T)
+		// return false;
 
 	return TG_IsTeamRedOrBlue(TG_GetPlayerTeam(client));
 }
@@ -34,39 +40,74 @@ stock bool:TG_InOppositeTeams(client1, client2)
 	return (team1 != team2);
 }
 
-
+/**
+ * Converts string to TG team.
+ *
+ * @param team		String to convert.
+ * @return			TG team.
+ */
 stock TG_Team:TG_GetTeamFromString(String:team[])
 {
-	if (StrEqual(team, "RedTeam", false) || StrEqual(team, "red", false) || team[0] == '1')
+	if (StrContains(team, "red", false) != -1 || team[0] == '1')
 		return TG_RedTeam;
-	else if (StrEqual(team, "BlueTeam", false) || StrEqual(team, "blue", false) || team[0] == '2')
+	else if (StrContains(team, "blue", false) != -1 || team[0] == '2')
 		return TG_BlueTeam;
-	else if (StrEqual(team, "NoneTeam", false) || StrEqual(team, "none", false) || team[0] == '0')
+	else if (StrContains(team, "none", false) != -1 || team[0] == '0')
 		return TG_NoneTeam;
 	else
 		return TG_ErrorTeam;
 }
 
+/**
+ * Returns oposite TG team.
+ *
+ * Red -> Blue
+ *
+ * Blue -> Red
+ *
+ * @param team 		TG team.
+ * @return 			Oposite TG team.
+ */
 stock TG_Team:TG_GetOppositeTeam(TG_Team:team)
 {
-	if (team == TG_RedTeam)
-		return TG_BlueTeam;
-	else if (team == TG_BlueTeam)
-		return TG_RedTeam;
-	else
-		return TG_ErrorTeam;
+	return (team == TG_RedTeam) ? TG_BlueTeam : (team == TG_BlueTeam) ? TG_RedTeam : TG_ErrorTeam;
+
+	// if (team == TG_RedTeam)
+		// return TG_BlueTeam;
+	// else if (team == TG_BlueTeam)
+		// return TG_RedTeam;
+	// else
+		// return TG_ErrorTeam;
 }
 
+/**
+ * Is TG team Red or Blue?
+ *
+ * @param team 		TG team.
+ * @return 			True on success, false otherwise.
+ */
 stock bool:TG_IsTeamRedOrBlue(TG_Team:team)
 {
 	return (team == TG_RedTeam || team == TG_BlueTeam);
 }
 
+/**
+ * Is TG team valid? (Red, Blue or None)
+ *
+ * @param team 		TG team.
+ * @return 			True on success, false otherwise.
+ */
 stock bool:TG_IsTeamValid(TG_Team:team)
 {
 	return (TG_IsTeamRedOrBlue(team) || team == TG_NoneTeam);
 }
 
+/**
+ * Get random client from TG team.
+ *
+ * @param team 		TG team.
+ * @return 			Client index on success, 0 otherwise.
+ */
 stock TG_GetRandomClient(TG_Team:team)
 {
 	decl clients[MAXPLAYERS + 1];
@@ -85,6 +126,19 @@ stock TG_GetRandomClient(TG_Team:team)
 	return clients[GetRandomInt(0, count - 1)];
 }
 
+
+/**
+ * Checks player's TG module access via SourceMod override system.
+ *
+ * 1. step: Check access for "TG_MenuItem-ModuleID" or "TG_Game-ModuleID" (depending on module type).
+ *
+ * 2. step: Check access for "ModuleID".
+ *
+ * @param client 		Client index.
+ * @param type 			Module type.
+ * @param moduleID 		Module ID.
+ * @return 				True on success, false otherwise.
+ */
 stock bool:TG_CheckModuleAccess(client, TG_ModuleType:type, const String:moduleID[])
 {
 	new String:typeID[128], iFlags;

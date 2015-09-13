@@ -42,26 +42,25 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
 {
 	if (type != TG_Game) {
 		return;
 	}
 
 	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-FiftyFifty", client);
+		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, TG_MODULE_NAME_LENGTH, "%T", "GameName-RedOnly", client);
+		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
 }
 
-public TG_OnGameSelected(const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
-		return;
-
-	strcopy(g_sWeapon, sizeof(g_sWeapon), "");
-	SetWeaponMenu(iClient, sID);
+	if ((StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game) {
+		strcopy(g_sWeapon, sizeof(g_sWeapon), "");
+		SetWeaponMenu(iClient, sID);
+	}
 }
 
 public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)

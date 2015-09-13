@@ -44,17 +44,7 @@ public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSet
 	return Plugin_Continue;
 }
 
-public Action:TG_OnGameSelect(const String:id[], client)
-{
-	if (!CheckWardenAccess(client)) {
-		CPrintToChat(client, "{error}%t", "AccessDenied");
-		return Plugin_Handled;
-	}
-
-	return Plugin_Continue;
-}
-
-public Action:TG_OnMenuItemSelect(const String:id[], client)
+public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client)
 {
 	if (!CheckWardenAccess(client)) {
 		CPrintToChat(client, "{error}%t", "AccessDenied");
