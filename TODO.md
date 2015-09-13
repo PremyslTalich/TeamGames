@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Check/Fix option "disabled" in modules config
 - [ ] Wrap forwards
 - [x] Add ConVar `tg_game_checkteams`
 - [ ] Finish API docs
