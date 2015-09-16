@@ -320,7 +320,7 @@ native TG_LogRoundMessage(const String:prefix[] = "", const String:format[] = ""
 native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", const String:format[] = "", any:...);
 
 
-native TG_ShowPlayerSelectMenu(client, TG_Team:team, TG_PlayerSelectMenuHandler:callBack, const String:format[] = "", any:...);
+native TG_ShowPlayerSelectMenu(client, TG_PlayerSelectMenuHandler:callBack, bool:bRedTeam = true, bool:bBlueTeam = true, bool:bRandom = true, const String:format[] = "", any:...);
 
 // functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
 

@@ -173,16 +173,26 @@ public Native_RemoveGame(Handle:hPlugin, iNumParams)
 public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 {
 	new iClient = GetNativeCell(1);
-	new TG_Team:iTeam = TG_Team:GetNativeCell(2);
-	new Function:fCallBack = Function:GetNativeCell(3);
+	new Function:fCallBack = Function:GetNativeCell(2);
+	new bool:bRedTeam = bool:GetNativeCell(3);
+	new bool:bBlueTeam = bool:GetNativeCell(4);
+	new bool:bRandom = bool:GetNativeCell(5);
 
 	decl String:CustomTitle[64];
-	FormatNativeString(0, 4, 5, sizeof(CustomTitle), _, CustomTitle);
+	FormatNativeString(0, 6, 7, sizeof(CustomTitle), _, CustomTitle);
 
-	if (!TG_IsTeamRedOrBlue(iTeam))
-		return false;
+	if (!bRedTeam && !bBlueTeam)
+		ThrowNativeError(0, "No team to choose player from!");
 
-	if (TG_GetTeamCount(iTeam) > 1) {
+	new iCount = 0;
+
+	if (bRedTeam)
+		iCount += TG_GetTeamCount(TG_RedTeam);
+
+	if (bBlueTeam)
+		iCount += TG_GetTeamCount(TG_BlueTeam);
+
+	if (iCount > 1) {
 		new Handle:hMenu = CreateMenu(PlayerSelectMenu_Handler);
 		decl String:sUserId[32];
 
@@ -191,38 +201,40 @@ public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 		else
 			SetMenuTitle(hMenu, CustomTitle);
 
-		AddMenuItemFormat(hMenu, "--RANDOM--", _, "%T", "MenuPlayerSelect-Random", iClient);
+		if (bRandom)
+			AddMenuItemFormat(hMenu, "--RANDOM--", _, "%T", "MenuPlayerSelect-Random", iClient);
 
 		for (new i = 1; i <= MaxClients; i++) {
-			if (!Client_IsIngame(i) || TG_GetPlayerTeam(i) != iTeam)
-				continue;
-
-			FormatEx(sUserId, sizeof(sUserId), "%d", GetClientUserId(i));
-			AddMenuItemFormat(hMenu, sUserId, _, "%N", i);
+			if ((bRedTeam && TG_GetPlayerTeam(i) == TG_RedTeam) || (bBlueTeam && TG_GetPlayerTeam(i) == TG_BlueTeam)) {
+				FormatEx(sUserId, sizeof(sUserId), "%d", GetClientUserId(i));
+				AddMenuItemFormat(hMenu, sUserId, _, "%N", i);
+			}
 		}
 
-		PushMenuCell(hMenu, "--TEAM--", _:iTeam);
+		PushMenuCell(hMenu, "--RED--", _:bRedTeam);
+		PushMenuCell(hMenu, "--BLUE--", _:bBlueTeam);
 		PushMenuCell(hMenu, "--PLUGIN--", _:hPlugin);
 		PushMenuCell(hMenu, "--FUNCTION--", _:fCallBack);
 
 		SetMenuExitBackButton(hMenu, true);
 		DisplayMenu(hMenu, iClient, 30);
-	} else {
+	} else if (iCount == 1) {
 		new iUser = 0;
 
-		if (TG_GetTeamCount(iTeam) == 1) {
-			for (new i = 1; i <= MaxClients; i++) {
-				if (Client_IsIngame(i) && TG_GetPlayerTeam(i) == iTeam) {
-					iUser = i;
-					break;
-				}
+		for (new i = 1; i <= MaxClients; i++) {
+			if ((bRedTeam && TG_GetPlayerTeam(i) == TG_RedTeam) || (bBlueTeam && TG_GetPlayerTeam(i) == TG_BlueTeam)) {
+				iUser = i;
+				break;
 			}
 		}
 
 		Call_StartFunction(hPlugin, fCallBack);
+		Call_PushCell(iClient);
 		Call_PushCell(iUser);
 		Call_PushCell(false);
 		Call_Finish();
+	} else {
+		return false;
 	}
 
 	return true;
@@ -233,14 +245,28 @@ public PlayerSelectMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	if (iAction == MenuAction_Select) {
 		new iUser;
 		new bool:bRandom = false;
-		new TG_Team:iTeam = TG_Team:GetMenuCell(hMenu, "--TEAM--");
+		new bool:bRedTeam = bool:GetMenuCell(hMenu, "--RED--");
+		new bool:bBlueTeam = bool:GetMenuCell(hMenu, "--BLUE--");
 		new Handle:hPlugin = Handle:GetMenuCell(hMenu, "--PLUGIN--");
 		new Function:fCallBack = Function:GetMenuCell(hMenu, "--FUNCTION--");
 		decl String:sUserId[32];
 		GetMenuItem(hMenu, iKey, sUserId, sizeof(sUserId));
 
 		if (StrEqual("--RANDOM--", sUserId)) {
-			iUser = TG_GetRandomClient(iTeam);
+			if (bRedTeam) {
+				iUser = TG_GetRandomClient(TG_RedTeam);
+			}
+
+			if (bBlueTeam) {
+				if (bRedTeam) {
+					if (GetRandomInt(0, 1) == 0) {
+						iUser = TG_GetRandomClient(TG_BlueTeam);
+					}
+				} else {
+					iUser = TG_GetRandomClient(TG_BlueTeam);
+				}
+			}
+
 			bRandom = true;
 		} else {
 			iUser = GetClientOfUserId(StringToInt(sUserId));
