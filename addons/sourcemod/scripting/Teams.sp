@@ -166,12 +166,7 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 	if (g_Game[GameProgress] != TG_NoGame && iTeam == TG_NoneTeam) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_StartForward(Forward_OnPlayerLeaveGame);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iClient);
-		Call_PushCell(iOldTeam);
-		Call_PushCell(TG_PlayerTrigger:TG_ChangeTGTeam);
-		Call_Finish();
+		Call_OnPlayerLeaveGame(g_Game[GameID], iClient, iOldTeam, TG_ChangeTGTeam);
 	}
 
 	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
@@ -360,12 +355,7 @@ bool:MakeRebel(iClient)
 	if (g_Game[GameProgress] != TG_NoGame) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_StartForward(Forward_OnPlayerLeaveGame);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iClient);
-		Call_PushCell(g_PlayerData[iClient][Team]);
-		Call_PushCell(TG_PlayerTrigger:TG_Rebel);
-		Call_Finish();
+		Call_OnPlayerLeaveGame(g_Game[GameID], iClient, g_PlayerData[iClient][Team], TG_Rebel);
 	}
 
 	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {

@@ -677,12 +677,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 	for (new i = 1; i <= MaxClients; i++) {
 		if (TG_IsPlayerRedOrBlue(i)) {
-			Call_StartForward(Forward_OnPlayerLeaveGame);
-			Call_PushString(g_Game[GameID]);
-			Call_PushCell(i);
-			Call_PushCell(g_PlayerData[i][Team]);
-			Call_PushCell(TG_PlayerTrigger:TG_GameEnd);
-			Call_Finish();
+			Call_OnPlayerLeaveGame(g_Game[GameID], i, g_PlayerData[i][Team], TG_GameEnd);
 		}
 	}
 
@@ -1363,4 +1358,14 @@ Action:Call_OnMenuSelect(TG_ModuleType:iType, const String:sID[], iClient)
 	Call_PushCell(iClient);
 	Call_Finish(iResult);
 	return iResult;
+}
+
+Call_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+{
+	Call_StartForward(Forward_OnPlayerLeaveGame);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_PushCell(iTeam);
+	Call_PushCell(iTrigger);
+	Call_Finish();
 }

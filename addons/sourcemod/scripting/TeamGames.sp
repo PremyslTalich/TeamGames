@@ -74,7 +74,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.1.1"
+#define _PLUGIN_VERSION "0.7.1.4"
 
 public Plugin:myinfo =
 {
@@ -168,7 +168,7 @@ public OnPluginStart()
 	// AutoExecConfigAppend(_, PLUGIN_CONFIG);
 	// AutoExecConfig(_, _, PLUGIN_CONFIG);
 
-	CAddVariable("&prefix", 	"TG", true);
+	CSavePrefix("TG");
 
 	CAddVariable("tg-noneteam", "{default}");
 	CAddVariable("tg-redteam", 	"{lightred}");
@@ -238,12 +238,7 @@ public OnClientDisconnect(iClient)
 	if (g_Game[GameProgress] != TG_NoGame && TG_IsPlayerRedOrBlue(iClient)) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_StartForward(Forward_OnPlayerLeaveGame);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iClient);
-		Call_PushCell(g_PlayerData[iClient][Team]);
-		Call_PushCell(TG_PlayerTrigger:TG_Disconnect);
-		Call_Finish();
+		Call_OnPlayerLeaveGame(g_Game[GameID], iClient, g_PlayerData[iClient][Team], TG_Disconnect);
 	}
 
 	if (TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]) && GetCountPlayersInTeam(g_PlayerData[iClient][Team]) == 0) {
@@ -499,12 +494,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	GetClientName(iVictim, sVictimName, sizeof(sVictimName));
 
 	if (g_Game[GameProgress] != TG_NoGame) {
-		Call_StartForward(Forward_OnPlayerLeaveGame);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iVictim);
-		Call_PushCell(g_PlayerData[iVictim][Team]);
-		Call_PushCell(TG_PlayerTrigger:TG_Death);
-		Call_Finish();
+		Call_OnPlayerLeaveGame(g_Game[GameID], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 
 		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	} else {
