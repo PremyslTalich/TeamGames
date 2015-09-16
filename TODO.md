@@ -1,9 +1,9 @@
 To do list
 ==========
 
-- [ ] Improve/Fix native TG_ShowPlayerSelectMenu
+- [x] Rewrite native TG_ShowPlayerSelectMenu
 - [ ] Check/Fix option "disabled" in modules config
-- [ ] Wrap forwards
+- [x] Wrap (some) forwards
 - [x] Add ConVar `tg_game_checkteams`
 - [ ] Finish API docs
 - [ ] Finish wiki
