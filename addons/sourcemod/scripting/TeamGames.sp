@@ -74,7 +74,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.1.4"
+#define _PLUGIN_VERSION "0.7.1.7"
 
 public Plugin:myinfo =
 {
@@ -248,12 +248,7 @@ public OnClientDisconnect(iClient)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_StartForward(Forward_OnTeamEmpty);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iClient);
-		Call_PushCell(g_PlayerData[iClient][Team]);
-		Call_PushCell(TG_PlayerTrigger:TG_Disconnect);
-		Call_Finish();
+		Call_OnTeamEmpty(g_Game[GameID], iClient, g_PlayerData[iClient][Team], TG_Death);
 	}
 
 	ClearPlayerData(iClient);
@@ -514,12 +509,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Death\")", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_StartForward(Forward_OnTeamEmpty);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iVictim);
-		Call_PushCell(g_PlayerData[iVictim][Team]);
-		Call_PushCell(TG_PlayerTrigger:TG_Death);
-		Call_Finish();
+		Call_OnTeamEmpty(g_Game[GameID], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 	}
 
 	g_PlayerData[iVictim][MenuLock] = true;

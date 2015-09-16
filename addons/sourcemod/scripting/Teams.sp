@@ -176,12 +176,7 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_StartForward(Forward_OnTeamEmpty);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iClient);
-		Call_PushCell(iOldTeam);
-		Call_PushCell(TG_PlayerTrigger:TG_ChangeTGTeam);
-		Call_Finish();
+		Call_OnTeamEmpty(g_Game[GameID], iClient, iOldTeam, TG_ChangeTGTeam);
 	}
 
 	#if defined DEBUG
@@ -365,12 +360,7 @@ bool:MakeRebel(iClient)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_StartForward(Forward_OnTeamEmpty);
-		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iClient);
-		Call_PushCell(iOldTeam);
-		Call_PushCell(TG_PlayerTrigger:TG_Rebel);
-		Call_Finish();
+		Call_OnTeamEmpty(g_Game[GameID], iClient, iOldTeam, TG_Rebel);
 	}
 
 	return true;

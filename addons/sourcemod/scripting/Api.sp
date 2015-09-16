@@ -1369,3 +1369,13 @@ Call_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrig
 	Call_PushCell(iTrigger);
 	Call_Finish();
 }
+
+Call_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+{
+	Call_StartForward(Forward_OnTeamEmpty);
+	Call_PushString(sID);
+	Call_PushCell(iClient);
+	Call_PushCell(iTeam);
+	Call_PushCell(iTrigger);
+	Call_Finish();
+}
