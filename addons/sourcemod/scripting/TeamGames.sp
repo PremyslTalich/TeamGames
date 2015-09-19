@@ -118,7 +118,7 @@ public OnPluginStart()
 	g_hMarkLimit = 					CreateConVar("tg_mark_limit",				"20",			"How many marks can be spawned at the moment");
 	g_hMarkLife = 					CreateConVar("tg_mark_life",				"20.0",			"How many seconds should be one mark spawned", _, true, 0.5, true, 600.0);
 	g_hMarkLaser = 					CreateConVar("tg_mark_laser",				"0.4",			"Mark spawn laser life (in seconds) (0.0 = no laser).", _, true, 0.0, true, 600.0);
-	g_hMarkBlockDMG = 				CreateConVar("tg_mark_nobullet",			"1",			"");
+	g_hMarkBlockDMG = 				CreateConVar("tg_mark_nobullet",			"1",			"Mark spawning will not consume ammo and deal damage. (1 = true, 0 = false)");
 
 	g_hImportantMsg = 				CreateConVar("tg_chat_doubleimportant",		"1",			"Print important messages twice (translations: GamePreparation, GameStart, TeamWins-RedTeam, TeamWins-BlueTeam and TeamWins-Tie)? (1 = true, 0 = false)"); //
 	g_hAllowTeamPrefix = 			CreateConVar("tg_chat_teamprefix",			"1",			"Use chat name prefix (for player in team red or team blue)? (1 = true, 0 = false) (requires plugin \"simple-chatprocessor.smx\")");
