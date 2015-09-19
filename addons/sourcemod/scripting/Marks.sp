@@ -42,12 +42,6 @@ public Action:Timer_MarkLimit(Handle:hTimer)
 	return Plugin_Continue;
 }
 
-public Action:Timer_AbleToMark(Handle:hTimer, any:iClient)
-{
-	g_PlayerData[iClient][AbleToMark] = true;
-	return Plugin_Continue;
-}
-
 bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime = 0.0, bool:bCount = true, bool:bFireEvent = true)
 {
 	new Float:fPos[3];
@@ -80,6 +74,17 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 	Call_PushFloat(fLife);
 	Call_Finish();
 
+	if (GetConVarBool(g_hMarkBlockDMG)) {
+		g_PlayerData[iClient][MarkBlockDMG] = true;
+
+		new iWeapon = Client_GetActiveWeapon(iClient);
+		if (iWeapon != INVALID_ENT_REFERENCE) {
+			SetEntProp(iWeapon, Prop_Send, "m_iClip1", GetEntProp(iWeapon, Prop_Send, "m_iClip1") + 1);
+		}
+
+		RequestFrame(Frame_MarkBlockDMG, iClient);
+	}
+
 	fPos[2] += g_Mark[iTeam][e_High];
 
 	TE_SetupGlowSprite(fPos, g_Mark[iTeam][e_Sprite], fLife, g_Mark[iTeam][e_Scale], 255);
@@ -87,7 +92,7 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 
 	if (bCount) {
 		g_PlayerData[iClient][AbleToMark] = false;
-		CreateTimer(0.01, Timer_AbleToMark, iClient);
+		RequestFrame(Frame_AbleToMark, iClient);
 
 		g_iMarkLimitCounter++;
 		CreateTimer(GetConVarFloat(g_hMarkLife), Timer_MarkLimit);
@@ -110,4 +115,13 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 	}
 
 	return true;
+}
+
+public Frame_AbleToMark(any:iClient)
+{
+	g_PlayerData[iClient][AbleToMark] = true;
+}
+public Frame_MarkBlockDMG(any:iClient)
+{
+	g_PlayerData[iClient][MarkBlockDMG] = false;
 }

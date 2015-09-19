@@ -74,7 +74,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.1.7"
+#define _PLUGIN_VERSION "0.7.1.20"
 
 public Plugin:myinfo =
 {
@@ -118,6 +118,7 @@ public OnPluginStart()
 	g_hMarkLimit = 					CreateConVar("tg_mark_limit",				"20",			"How many marks can be spawned at the moment");
 	g_hMarkLife = 					CreateConVar("tg_mark_life",				"20.0",			"How many seconds should be one mark spawned", _, true, 0.5, true, 600.0);
 	g_hMarkLaser = 					CreateConVar("tg_mark_laser",				"0.4",			"Mark spawn laser life (in seconds) (0.0 = no laser).", _, true, 0.0, true, 600.0);
+	g_hMarkBlockDMG = 				CreateConVar("tg_mark_nobullet",			"1",			"");
 
 	g_hImportantMsg = 				CreateConVar("tg_chat_doubleimportant",		"1",			"Print important messages twice (translations: GamePreparation, GameStart, TeamWins-RedTeam, TeamWins-BlueTeam and TeamWins-Tie)? (1 = true, 0 = false)"); //
 	g_hAllowTeamPrefix = 			CreateConVar("tg_chat_teamprefix",			"1",			"Use chat name prefix (for player in team red or team blue)? (1 = true, 0 = false) (requires plugin \"simple-chatprocessor.smx\")");
@@ -285,7 +286,7 @@ public Action:Event_RoundEnd(Handle:hEvent, const String:sName[], bool:bDontBroa
 
 public Action:Hook_TraceAttack(iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType, &iAmmoType, iHitBox, iHitGroup)
 {
-	new Action:iReturnValue = Hook_PlayerAttack(true, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
+	new Action:iReturnValue = (g_PlayerData[iAttacker][MarkBlockDMG]) ? Plugin_Handled : Hook_PlayerAttack(true, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
 
 	// if ((Client_IsIngame(iAttacker) || iAttacker == 0) && Client_IsIngame(iVictim))
 		// PrintToChatAll("Attack: %N -> %N = %d", iAttacker, iVictim, iReturnValue);
@@ -295,7 +296,7 @@ public Action:Hook_TraceAttack(iVictim, &iAttacker, &iInflictor, &Float:fDamage,
 
 public Action:Hook_OnTakeDamage(iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType)
 {
-	new Action:iReturnValue = Hook_PlayerAttack(false, iVictim, iAttacker, iInflictor, fDamage, iDamageType);
+	new Action:iReturnValue = (g_PlayerData[iAttacker][MarkBlockDMG]) ? Plugin_Handled : Hook_PlayerAttack(false, iVictim, iAttacker, iInflictor, fDamage, iDamageType);
 
 	// if ((Client_IsIngame(iAttacker) || iAttacker == 0) && Client_IsIngame(iVictim))
 		// PrintToChatAll("Damage: %N -> %N = %d", iAttacker, iVictim, iReturnValue);

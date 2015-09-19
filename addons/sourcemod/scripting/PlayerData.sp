@@ -5,6 +5,7 @@ enum PlayerDataStruct
 	bool:AbleToSwitch, // is able to switch to another iTeam
 	String:DefaultModel[PLATFORM_MAX_PATH], // players default model (skin)
 	bool:AbleToMark, // is able to make mark
+	bool:MarkBlockDMG, // is mark blocking dmg?
 	bool:AbleToFencePunishColor
 }
 new g_PlayerData[MAXPLAYERS + 1][PlayerDataStruct];
@@ -39,6 +40,7 @@ ClearPlayerData(iClient)
 	g_PlayerData[iClient][MenuLock] = true;
 	g_PlayerData[iClient][AbleToSwitch] = true;
 	g_PlayerData[iClient][AbleToMark] = true;
+	g_PlayerData[iClient][MarkBlockDMG] = false;
 	g_PlayerData[iClient][AbleToFencePunishColor] = true;
 }
 
