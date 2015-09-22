@@ -199,17 +199,23 @@ LoadMenuItemsConfig()
 	KvJumpToKey(hKV, MODCONF_MENUITEMS);
 
 	if (KvGotoFirstSubKey(hKV)) {
+		new String:sID[TG_MODULE_ID_LENGTH];
+
 		do {
 			if (g_iMenuItemListEnd >= MAX_MENU_ITEMS)
 				break;
 
-			if (KvGetNum(hKV, "disabled", 0) == 1)
-				continue;
+			KvGetSectionName(hKV, sID, sizeof(sID));
 
+			if (KvGetNum(hKV, "disabled", 0) == 1) {
+				AddModuleToDisabledList(TG_MenuItem, sID);
+				continue;
+			}
+
+			strcopy(g_MenuItemList[g_iMenuItemListEnd][Id], TG_MODULE_ID_LENGTH, sID);
 			KvGetString(hKV, "separator", sKey, sizeof(sKey), "none");
 			g_MenuItemList[g_iMenuItemListEnd][Separator] = GetSeparatorType(sKey);
 
-			KvGetSectionName(hKV, g_MenuItemList[g_iMenuItemListEnd][Id], TG_MODULE_ID_LENGTH);
 			g_MenuItemList[g_iMenuItemListEnd][Visible] = bool:KvGetNum(hKV, "visibility", 1);
 
 			if (StrContains(g_MenuItemList[g_iMenuItemListEnd][Id], "Core_", false) == 0)

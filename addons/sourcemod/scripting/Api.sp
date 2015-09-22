@@ -114,7 +114,7 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(1, "Game registration Failed! Couldn't get Arg1 (Game ID)! (Error - \"TG_RegGame #1\")");
 	}
 
-	if (IsGameDisabled(sID))
+	if (IsModuleDisabled(TG_Game, sID))
 		return 5;
 
 	if (StrContains(sID, "Core_", false) == 0) {
@@ -322,7 +322,7 @@ public Native_RegMenuItem(Handle:hPlugin, iNumParams)
 		return ThrowNativeError(2, "Main menu item registration Failed! Couldn't get Arg1 (Item ID)! (Error - \"TG_RegMenuItem #2\")");
 	}
 
-	if (IsMenuItemDisabled(sItemID))
+	if (IsModuleDisabled(TG_MenuItem, sItemID))
 		return 7;
 
 	if (StrContains(sItemID, "Core_", false) == 0) {

@@ -20,6 +20,38 @@ enum gamestatusinfo
 }
 new g_Game[gamestatusinfo];
 
+new String:g_sDisabledModulesList[MAX_MENU_ITEMS + MAX_GAMES][TG_MODULE_ID_LENGTH + 12];
+new g_iDisabledModulesListEnd = 0;
+
+AddModuleToDisabledList(TG_ModuleType:iType, const String:sID[])
+{
+	if (g_iDisabledModulesListEnd + 1 < MAX_MENU_ITEMS + MAX_GAMES) {
+		new String:m_sID[TG_MODULE_ID_LENGTH + 12];
+		Format(m_sID, sizeof(m_sID), "%s-%s", (iType == TG_MenuItem) ? "TG_MenuItem" : "TG_Game", sID);
+		strcopy(g_sDisabledModulesList[g_iDisabledModulesListEnd], TG_MODULE_ID_LENGTH + 12, m_sID);
+
+		g_iDisabledModulesListEnd++;
+	}
+}
+
+bool:IsModuleDisabled(TG_ModuleType:iType, const String:sID[])
+{
+	if (g_iDisabledModulesListEnd == 0) {
+		return false;
+	}
+
+	new String:m_sID[TG_MODULE_ID_LENGTH + 12];
+	Format(m_sID, sizeof(m_sID), "%s-%s", (iType == TG_MenuItem) ? "TG_MenuItem" : "TG_Game", sID);
+
+	for (new i = 0; i < g_iDisabledModulesListEnd; i++) {
+		if (StrEqual(g_sDisabledModulesList[i], m_sID)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 ClearGameStatusInfo()
 {
 	g_Game[GameProgress] = TG_NoGame;
@@ -134,44 +166,6 @@ RemoveAllGames()
 {
 	for (new i = 0; i < MAX_GAMES; i++)
 		g_GameList[i][Used] = false;
-}
-
-bool:IsGameDisabled(const String:sID[TG_MODULE_ID_LENGTH])
-{
-	decl String:sPath[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, sPath, sizeof(sPath), MODULES_CONFIG);
-
-	new Handle:hKV = CreateKeyValues(MODCONF_MENUITEMS);
-	FileToKeyValues(hKV, sPath);
-
-	if (!KvJumpToKey(hKV, sID)) {
-		CloseHandle(hKV);
-		return false;
-	}
-
-	new bool:bDisabled = bool:KvGetNum(hKV, "disabled", 0);
-	CloseHandle(hKV);
-
-	return bDisabled;
-}
-
-bool:IsMenuItemDisabled(const String:sID[TG_MODULE_ID_LENGTH])
-{
-	decl String:sPath[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, sPath, sizeof(sPath), MODULES_CONFIG);
-
-	new Handle:hKV = CreateKeyValues(MODCONF_MENUITEMS);
-	FileToKeyValues(hKV, sPath);
-
-	if (!KvJumpToKey(hKV, sID)) {
-		CloseHandle(hKV);
-		return false;
-	}
-
-	new bool:bDisabled = bool:KvGetNum(hKV, "disabled", 0);
-	CloseHandle(hKV);
-
-	return bDisabled;
 }
 
 bool:IsGameTypeAvailable(TG_GameType:iType)
