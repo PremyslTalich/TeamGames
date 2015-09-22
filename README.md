@@ -1,6 +1,6 @@
 #TeamGames
 
-Modular SourceMod plugin system for JailBreak servers with many features:
+Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many features:
 - Two [teams](https://raw.githubusercontent.com/KissLick/TeamGames/master/extras/screenshots/teams.jpg), red and blue
 - Team based games
 - Two different [marks](https://github.com/KissLick/TeamGames/wiki/Marks) (each for one team)
