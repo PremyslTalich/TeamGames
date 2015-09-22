@@ -3,7 +3,7 @@ To do list
 
 - [x] Add non-ammo spending & damage dealign marks
 - [x] Rewrite native TG_ShowPlayerSelectMenu
-- [ ] Check/Fix option "disabled" in modules config
+- [x] Check/Fix option "disabled" in modules config
 - [x] Wrap (some) forwards
 - [x] Add ConVar `tg_game_checkteams`
 - [ ] Finish API docs
