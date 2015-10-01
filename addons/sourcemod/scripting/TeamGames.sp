@@ -99,9 +99,9 @@ public OnPluginStart()
 
 	g_hMenuPercent = 				CreateConVar("tg_menu_percent", 			"0.0", 			"How many percent of alive CTs must use !tg to unlock !tg menu (0.0 = no limit)", _, true, 0.0, true, 1.0);
 
-	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow sefl damage, even in game");
+	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow self damage, even in game");
 
-	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 			"How many games can be played in one round. (-1 = no limit)");
+	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 			"How many games can be played in one round? (-1 = no limit)");
 	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"1", 			"Check teams before starting FiftyFifty game.");
 	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
 	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",			"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
@@ -111,8 +111,8 @@ public OnPluginStart()
 
 	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
 	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",			"How should be teams differentiated? (0 = color, 1 = skin)");
-	g_hTeamAttack = 				CreateConVar("tg_team_attack",				"0",			"Can Ts in different teams (excluding none team) attack themselves even if there is no game? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
-	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",			"Location for notification about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud\n\t4 = screen overlay (this might break other overlays!)");
+	g_hTeamAttack = 				CreateConVar("tg_team_attack",				"0",			"Can Ts in different teams (excluding none team) attack each other even if there is no game? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
+	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",			"Location for notifications about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud\n\t4 = screen overlay (this might break other overlays!)");
 
 	g_hAllowMark = 					CreateConVar("tg_mark_allow",				"1",			"Should be marks enabled? (1 = true, 0 = false)");
 	g_hMarkLimit = 					CreateConVar("tg_mark_limit",				"20",			"How many marks can be spawned at the moment");
