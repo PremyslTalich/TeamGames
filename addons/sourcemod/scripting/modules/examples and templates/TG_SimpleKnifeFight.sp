@@ -1,5 +1,4 @@
 #include <sourcemod>
-#include <smlib>
 
 // TeamGames include
 #include <teamgames>
@@ -79,7 +78,7 @@ public TG_OnGamePrepare(const String:sID[], client, const String:gameSettings[],
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
-		Client_GiveWeapon(i, "weapon_knife", true);
+		GivePlayerItem(i, "weapon_knife");
 		SetEntityHealth(i, 35);
 	}
 }
