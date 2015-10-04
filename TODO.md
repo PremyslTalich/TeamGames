@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Rewrite TG_GetRegedModules (?)
+- [x] Rewrite TG_GetRegedModules (?) - nope
 - [x] Add non-ammo spending & damage dealign marks
 - [x] Rewrite native TG_ShowPlayerSelectMenu
 - [x] Check/Fix option "disabled" in modules config
