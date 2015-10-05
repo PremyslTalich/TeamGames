@@ -14,7 +14,7 @@ public Plugin:myinfo =
 
 public OnPluginStart()
 {
-	LoadTranslations("TG.GAME_ID.phrases");
+	LoadTranslations("TG.GAME.phrases");
 }
 
 public OnLibraryAdded(const String:sName[])
