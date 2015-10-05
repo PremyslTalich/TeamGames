@@ -4,6 +4,7 @@
 #define _teamgames_stocks_included_
 
 #include <cstrike>
+#include <sdktools>
 
 /**
  * Is player in TG team (Red or Blue)?
@@ -13,9 +14,6 @@
  */
 stock bool:TG_IsPlayerRedOrBlue(client)
 {
-	// if (client < 1 || client > MaxClients || !IsClientInGame(client) || !IsPlayerAlive(client) || GetClientTeam(client) != CS_TEAM_T)
-		// return false;
-
 	return TG_IsTeamRedOrBlue(TG_GetPlayerTeam(client));
 }
 
@@ -71,13 +69,6 @@ stock TG_Team:TG_GetTeamFromString(String:team[])
 stock TG_Team:TG_GetOppositeTeam(TG_Team:team)
 {
 	return (team == TG_RedTeam) ? TG_BlueTeam : (team == TG_BlueTeam) ? TG_RedTeam : TG_ErrorTeam;
-
-	// if (team == TG_RedTeam)
-		// return TG_BlueTeam;
-	// else if (team == TG_BlueTeam)
-		// return TG_RedTeam;
-	// else
-		// return TG_ErrorTeam;
 }
 
 /**
@@ -191,7 +182,7 @@ stock GivePlayerWeaponAndAmmo(client, String:weapon[], clip = -1, ammo = -1)
 			SetEntProp(weaponEnt, Prop_Send, "m_iClip1", clip);
 
 		if (ammo != -1) {
-			new iOffset = FindDataMapOffs(client, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(weaponEnt) * 4);
+			new iOffset = FindDataMapOffs(client, "m_iAmmo") + (GetEntProp(weaponEnt, Prop_Data, "m_iPrimaryAmmoType") * 4);
 			SetEntData(client, iOffset, ammo, 4, true);
 
 			if (GetEngineVersion() == Engine_CSGO) {
@@ -212,7 +203,7 @@ stock SetPlayerWeaponAmmo(client, weaponEnt, clip = -1, ammo = -1)
 		SetEntProp(weaponEnt, Prop_Send, "m_iClip1", clip);
 
 	if (ammo != -1) {
-		new iOffset = FindDataMapOffs(client, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(weaponEnt) * 4);
+		new iOffset = FindDataMapOffs(client, "m_iAmmo") + (GetEntProp(weaponEnt, Prop_Data, "m_iPrimaryAmmoType") * 4);
 		SetEntData(client, iOffset, ammo, 4, true);
 
 		if (GetEngineVersion() == Engine_CSGO) {

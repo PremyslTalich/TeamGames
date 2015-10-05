@@ -4,7 +4,6 @@
 #define _teamgames_included_
 
 #include <menus>
-#include <smlib>
 
 public SharedPlugin:__pl_teamgames =
 {

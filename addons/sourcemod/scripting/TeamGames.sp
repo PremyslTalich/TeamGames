@@ -3,6 +3,7 @@
 #include <sourcemod>
 #include <sdkhooks>
 #include <cstrike>
+#include <smlib>
 #include <teamgames>
 // #include <convar_append>
 #include <menu-stocks>
