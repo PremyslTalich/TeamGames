@@ -1,7 +1,7 @@
 #include <sourcemod>
 #include <teamgames>
 
-#define GAME_ID	"SimpleKnifeFight"
+#define GAME_ID	"SimpleKnifeFight-Raska"
 
 public Plugin:myinfo =
 {
@@ -39,16 +39,16 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	}
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], client)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client)
 {
-	if (type == TG_Game && StrEqual(sID, GAME_ID)) {
+	if (type == TG_Game && StrEqual(id, GAME_ID)) {
 		TG_StartGame(client, GAME_ID);
 	}
 }
 
-public TG_OnGamePrepare(const String:sID[], client, const String:gameSettings[], Handle:dataPack)
+public TG_OnGamePrepare(const String:id[], client, const String:gameSettings[], Handle:dataPack)
 {
-	if (!StrEqual(sID, GAME_ID))
+	if (!StrEqual(id, GAME_ID))
 		return;
 
 	for (new i = 1; i <= MaxClients; i++)
