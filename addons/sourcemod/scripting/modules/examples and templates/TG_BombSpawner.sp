@@ -21,7 +21,7 @@ public OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "TeamGames")) {
 		if (!TG_IsModuleReged(TG_MenuItem, ITEM_ID)) {
-			TG_RemoveMenuItem(ITEM_ID);
+			TG_RegMenuItem(ITEM_ID);
 		}
 	}
 }
