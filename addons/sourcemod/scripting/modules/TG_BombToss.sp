@@ -47,7 +47,7 @@ public OnPluginStart()
 
 public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(name, "TeamGames") && !TG_IsModuleReged(TG_MenuItem, MENU_ITEM_ID_SPAWNBOMB)) {
+	if (StrEqual(name, "TeamGames")) {
 		TG_RegMenuItem(MENU_ITEM_ID_SPAWNBOMB);
 		TG_RegMenuItem(MENU_ITEM_ID_TARGET);
 	}

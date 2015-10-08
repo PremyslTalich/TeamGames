@@ -21,11 +21,8 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames") {
-		if (!TG_IsModuleReged(TG_Game, GAME_FF))
-			TG_RegGame(GAME_FF);
-			
-		if (!TG_IsModuleReged(TG_Game, GAME_RO))
-			TG_RegGame(GAME_RO, TG_RedOnly);
+		TG_RegGame(GAME_FF);
+		TG_RegGame(GAME_RO, TG_RedOnly);
 	}
 }
 
@@ -40,7 +37,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	if (type == TG_Game) {
 		if (StrEqual(id, GAME_FF))
 			Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
-		
+
 		if (StrEqual(id, GAME_RO))
 			Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
@@ -57,7 +54,7 @@ public TG_OnGamePrepare(const String:id[], client, const String:gameSettings[], 
 	if (StrEqual(id, GAME_FF) || StrEqual(id, GAME_RO)) {
 		// code here
 	}
-	
+
 }
 
 public TG_OnGameStart(const String:id[], client, const String:gameSettings[], Handle:dataPack)
@@ -65,7 +62,7 @@ public TG_OnGameStart(const String:id[], client, const String:gameSettings[], Ha
 	if (StrEqual(id, GAME_FF)) {
 		// code here
 	}
-	
+
 	if (StrEqual(id, GAME_RO)) {
 		// code here
 	}
@@ -76,7 +73,7 @@ public TG_OnGameEnd(const String:id[], TG_Team:team, winners[], winnersCount, Ha
 	if (StrEqual(id, GAME_FF)) {
 		// code here
 	}
-	
+
 	if (StrEqual(id, GAME_RO)) {
 		// code here
 	}

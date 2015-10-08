@@ -19,7 +19,7 @@ public OnPluginStart()
 
 public OnLibraryAdded(const String:sName[])
 {
-	if (StrEqual(sName, "TeamGames") && !TG_IsModuleReged(TG_Game, GAME_ID))
+	if (StrEqual(sName, "TeamGames"))
 		TG_RegGame(GAME_ID);
 }
 
@@ -32,7 +32,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 {
 	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
-	
+
 	Format(name, maxSize, "%T", "GameName", client);
 }
 
@@ -40,7 +40,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client)
 {
 	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
-	
+
 	TG_StartGame(client, GAME_ID);
 }
 
