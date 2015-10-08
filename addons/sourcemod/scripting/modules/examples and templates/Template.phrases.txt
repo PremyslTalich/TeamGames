@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"en"		"GAME_NAME"
+	}
+}
