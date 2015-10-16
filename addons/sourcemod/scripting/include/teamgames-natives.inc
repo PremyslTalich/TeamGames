@@ -319,12 +319,6 @@ native TG_LogRoundMessage(const String:prefix[] = "", const String:format[] = ""
  */
 native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", const String:format[] = "", any:...);
 
-
-native TG_ShowPlayerSelectMenu(client, TG_PlayerSelectMenuHandler:callBack, bool:bRedTeam = true, bool:bBlueTeam = true, bool:bRandom = true, const String:format[] = "", any:...);
-
-// functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
-
-
 /**
  * Prototype for TG_ShowPlayerSelectMenu callback.
  *
@@ -333,4 +327,21 @@ native TG_ShowPlayerSelectMenu(client, TG_PlayerSelectMenuHandler:callBack, bool
  * @param IsRandom 		True if activator chosed random player, false otherwise.
  * @noreturn
  */
-typedef TG_PlayerSelectMenuHandler = function void (activator, client, bool:IsRandom);
+// typedef TG_PlayerSelectMenuHandler = function void (activator, client, bool:IsRandom);
+functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
+
+/**
+ * Opens menu for choosing player from TG team.
+ * 
+ * If there is only one player in selected TG teams, the menu is skiped and callback is called imediately.
+ * 
+ * @param client      	Client index to open menu for.
+ * @param callBack      Callback function to call after player selection.
+ * @param redTeam      	Allow Red team in menu.
+ * @param blueTeam      Allow Blue team in menu.
+ * @param random      	Allow random player option in menu.
+ * @param format      	Format string for menu heading.
+ * @param ...      		Format string arguments.
+ * @return 				False if there are no players to be in the menu, True otherwise.
+ */
+native TG_ShowPlayerSelectMenu(client, TG_PlayerSelectMenuHandler:callBack, bool:redTeam = true, bool:blueTeam = true, bool:random = true, const String:format[] = "", any:...);

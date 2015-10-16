@@ -117,7 +117,6 @@ stock TG_GetRandomClient(TG_Team:team)
 	return clients[GetRandomInt(0, count - 1)];
 }
 
-
 /**
  * Checks player's TG module access via SourceMod override system.
  *
