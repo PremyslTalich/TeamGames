@@ -7,8 +7,8 @@ To do list
 - [x] Check/Fix option "disabled" in modules config
 - [x] Wrap (some) forwards
 - [x] Add ConVar `tg_game_checkteams`
-- [ ] Finish API docs
-- [ ] Finish wiki
+- [x] Finish API docs
+- [x] Finish wiki
 - [x] Add missing download lists to extras
 - [ ] Fix updater link & file - not yet
 - [x] Fix bug about console winning redonly game
