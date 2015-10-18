@@ -119,7 +119,7 @@ native bool:TG_GetTeamsLock();
  * @param id			Game ID (!!! MUST BE UNIQUE !!!).
  * @return				0 on success, otherwise on failure.
  */
-native TG_RegGame(const String:id[64], TG_GameType:type = TG_FiftyFifty);
+native TG_RegGame(const String:id[], TG_GameType:type = TG_FiftyFifty);
 
 /**
  * Check if the given module is registred.
@@ -163,7 +163,7 @@ native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
  * @param id			Item ID (!!! MUST BE UNIQUE !!!).
  * @return				0 on success, otherwise on failure.
  */
-native TG_RegMenuItem(const String:id[64]);
+native TG_RegMenuItem(const String:id[]);
 
 /**
  * Unregister (remove) item from TeamGames main menu.
