@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.2.43"
+#define _PLUGIN_VERSION "0.7.2.45"
 
 public Plugin:myinfo =
 {

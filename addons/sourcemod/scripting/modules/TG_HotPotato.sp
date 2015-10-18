@@ -230,7 +230,7 @@ public ModuleSetTypeGameMenu_Handler(Handle:menu, MenuAction:iAction, iClient, i
 			g_game[ToLastMan] = true;
 		}
 
-		TG_ShowPlayerSelectMenu(iClient, TG_RedTeam, SelectPlayerHandeler, "%T", "Menu-ChooseFirstPotato", iClient);
+		TG_ShowPlayerSelectMenu(iClient, SelectPlayerHandeler, true, false, true, "%T", "Menu-ChooseFirstPotato", iClient);
 	}
 }
 

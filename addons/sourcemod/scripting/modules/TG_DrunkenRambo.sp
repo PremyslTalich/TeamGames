@@ -85,7 +85,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
 	if (type == TG_Game && StrEqual(sID, GAME_ID))
-		TG_ShowPlayerSelectMenu(iClient, TG_RedTeam, SelectPlayerHandeler, "%T", "ChooseRambo", iClient);
+		TG_ShowPlayerSelectMenu(iClient, SelectPlayerHandeler, true, false, true, "%T", "ChooseRambo", iClient);
 }
 
 public SelectPlayerHandeler(iActivator, iClient, bool:bIsRandom)
