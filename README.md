@@ -11,7 +11,7 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 - Using [[DTC] DownloadTableConfig](https://github.com/KissLick/DownloadTableConfig) to easily handle files and downloads
 - Keep [logs](https://github.com/KissLick/TeamGames/wiki/Logs) of TeamGames activities
 - [Warden plugin](https://github.com/KissLick/TeamGames/wiki/Warden-plugin) support
-- Wide API for plugin developers
+- Wide [API](http://www.teamgames.ga/teamgames) for plugin developers
 
 ##Games
 
