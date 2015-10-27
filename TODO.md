@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] TG_Warden: Move color code from src to translations
+- [ ] TG_Warden - Move color code from src to translations
 - [x] Rewrite TG_GetRegedModules (?) - nope
 - [x] Add non-ammo spending & damage dealign marks
 - [x] Rewrite native TG_ShowPlayerSelectMenu
