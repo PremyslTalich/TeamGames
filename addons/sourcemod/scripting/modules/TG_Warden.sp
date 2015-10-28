@@ -27,7 +27,7 @@ public OnPluginStart()
 public Action:TG_OnMenuDisplay(client)
 {
 	if (!CheckWardenAccess(client)) {
-		CPrintToChat(client, "{error}%t", "AccessDenied");
+		CPrintToChat(client, "%t", "AccessDenied");
 		return Plugin_Handled;
 	}
 
@@ -37,7 +37,7 @@ public Action:TG_OnMenuDisplay(client)
 public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!CheckWardenAccess(client)) {
-		CPrintToChat(client, "{error}%t", "AccessDenied");
+		CPrintToChat(client, "%t", "AccessDenied");
 		return Plugin_Handled;
 	}
 
@@ -47,7 +47,7 @@ public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSet
 public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client)
 {
 	if (!CheckWardenAccess(client)) {
-		CPrintToChat(client, "{error}%t", "AccessDenied");
+		CPrintToChat(client, "%t", "AccessDenied");
 		return Plugin_Handled;
 	}
 
@@ -66,7 +66,7 @@ public Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:life
 public Action:TG_OnLaserFenceCreate(client, Float:a[3], Float:c[3])
 {
 	if (GetConVarBool(g_hFence) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "{error}%t", "AccessDenied");
+		CPrintToChat(client, "%t", "AccessDenied");
 		return Plugin_Handled;
 	}
 
