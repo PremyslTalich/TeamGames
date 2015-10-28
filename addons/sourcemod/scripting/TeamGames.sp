@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.2.45"
+#define _PLUGIN_VERSION "0.7.2.46"
 
 public Plugin:myinfo =
 {
@@ -287,7 +287,7 @@ public Action:Event_RoundEnd(Handle:hEvent, const String:sName[], bool:bDontBroa
 
 public Action:Hook_TraceAttack(iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType, &iAmmoType, iHitBox, iHitGroup)
 {
-	new Action:iReturnValue = (g_PlayerData[iAttacker][MarkBlockDMG]) ? Plugin_Handled : Hook_PlayerAttack(true, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
+	new Action:iReturnValue = (Client_IsIngame(iAttacker) && g_PlayerData[iAttacker][MarkBlockDMG]) ? Plugin_Handled : Hook_PlayerAttack(true, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
 
 	// if ((Client_IsIngame(iAttacker) || iAttacker == 0) && Client_IsIngame(iVictim))
 		// PrintToChatAll("Attack: %N -> %N = %d", iAttacker, iVictim, iReturnValue);
@@ -297,7 +297,7 @@ public Action:Hook_TraceAttack(iVictim, &iAttacker, &iInflictor, &Float:fDamage,
 
 public Action:Hook_OnTakeDamage(iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType)
 {
-	new Action:iReturnValue = (g_PlayerData[iAttacker][MarkBlockDMG]) ? Plugin_Handled : Hook_PlayerAttack(false, iVictim, iAttacker, iInflictor, fDamage, iDamageType);
+	new Action:iReturnValue = (Client_IsIngame(iAttacker) && g_PlayerData[iAttacker][MarkBlockDMG]) ? Plugin_Handled : Hook_PlayerAttack(false, iVictim, iAttacker, iInflictor, fDamage, iDamageType);
 
 	// if ((Client_IsIngame(iAttacker) || iAttacker == 0) && Client_IsIngame(iVictim))
 		// PrintToChatAll("Damage: %N -> %N = %d", iAttacker, iVictim, iReturnValue);
