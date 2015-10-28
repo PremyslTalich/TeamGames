@@ -695,7 +695,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 			}
 
 			for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
-				CPrintToChat(iUser, "%T", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie");
+				CPrintToChat(iUser, "%T", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie", iUser);
 			}
 		}
 	} else if (g_Game[GameType] == TG_RedOnly) {
@@ -724,7 +724,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				Call_AskModuleName(g_Game[GameID], TG_Game, iUser, sGameName, sizeof(sGameName));
 
 				for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
-					CPrintToChat(iUser, "%T", "GameEnd", sGameName);
+					CPrintToChat(iUser, "%T", "GameEnd", iUser, sGameName);
 				}
 			}
 		}
