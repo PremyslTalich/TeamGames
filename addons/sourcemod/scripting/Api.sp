@@ -689,8 +689,18 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 	}
 
 	if (g_Game[GameType] == TG_FiftyFifty) {
-		PrintImportantMessage("%t", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie");
+		for (new iUser = 1; iUser <= MaxClients; iUser++) {
+			if (!IsClientInGame(iUser)) {
+				continue;
+			}
+
+			for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
+				CPrintToChat(iUser, "%T", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie");
+			}
+		}
 	} else if (g_Game[GameType] == TG_RedOnly) {
+		new String:sGameName[TG_MODULE_NAME_LENGTH];
+
 		if (iWinnersCount > 0) {
 			new bool:bOnlyOneWinner = (iWinnersCount == 1);
 
@@ -699,7 +709,6 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 					continue;
 				}
 
-				new String:sGameName[TG_MODULE_NAME_LENGTH];
 				Call_AskModuleName(g_Game[GameID], TG_Game, iUser, sGameName, sizeof(sGameName));
 
 				for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
@@ -707,7 +716,17 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				}
 			}
 		} else {
-			PrintImportantMessage("%t", "GameEnd");
+			for (new iUser = 1; iUser <= MaxClients; iUser++) {
+				if (!IsClientInGame(iUser)) {
+					continue;
+				}
+
+				Call_AskModuleName(g_Game[GameID], TG_Game, iUser, sGameName, sizeof(sGameName));
+
+				for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
+					CPrintToChat(iUser, "%T", "GameEnd", sGameName);
+				}
+			}
 		}
 	}
 
@@ -718,24 +737,6 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 		EmitSoundToAllAny(g_sGameEnd[iTeam]);
 
 	return 0;
-}
-
-static PrintImportantMessage(String:sFormat[], any:...)
-{
-	decl String:sMessage[1024];
-
-	for (new iClient = 1; iClient <= MaxClients; iClient++) {
-		if (!IsClientInGame(iClient)) {
-			continue;
-		}
-
-		SetGlobalTransTarget(iClient);
-		VFormat(sMessage, sizeof(sMessage), sFormat, 2);
-
-		CPrintToChat(iClient, sMessage);
-		if (GetConVarBool(g_hImportantMsg))
-			CPrintToChat(iClient, sMessage);
-	}
 }
 
 public Native_SetModuleVisibility(Handle:hPlugin, iNumParams)
