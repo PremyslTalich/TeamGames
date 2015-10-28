@@ -13,7 +13,7 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 - [Warden plugin](https://github.com/KissLick/TeamGames/wiki/Warden-plugin) support
 - Wide [API](http://www.teamgames.ga/teamgames) for plugin developers
 
-***Found a bug?** *Make an [issue](https://github.com/KissLick/TeamGames/issues/new?title=Not%20something%20like%20%22bug%22%20or%20%22problem%22%20pls...&labels=bug) ;-)*
+***Found a bug?*** *Make an [issue](https://github.com/KissLick/TeamGames/issues/new?title=Not%20something%20like%20%22bug%22%20or%20%22problem%22%20pls...&labels=bug) ;-)*
 
 ##Games
 
