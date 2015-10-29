@@ -14,7 +14,7 @@ public Plugin:myinfo =
 	name = "[TG] ChickenHunt",
 	author = "Raska",
 	description = "",
-	version = "0.1",
+	version = "0.2",
 	url = ""
 }
 
@@ -209,7 +209,8 @@ bool:SpawnChickenWave()
 		GetClientAbsOrigin(i, fClientPos);
 		fClientPos[2] += 8.0;
 
-		for (new n = 0; n < 2; n++) {
+		// for (new n = 0; n < 2; n++) {
+		for (new n = 0; n < GetRandomInt(1, 2); n++) {
 			SpawnChicken(fClientPos);
 		}
 
