@@ -1,8 +1,9 @@
 To do list
 ==========
 
-- [ ] Rename members in MarkStruct
-- [ ] Allow "spawning" marks without sprite (to allow modules use custom marks as official tg marks)
+- [ ] Tests and find+fix some bugs
+- [x] Rename members in MarkStruct
+- [x] Allow "spawning" marks without sprite (to allow modules use custom marks as official tg marks)
 - [x] Warden - Move color code from src to translations
 - [x] Rewrite TG_GetRegedModules (?) - nope
 - [x] Add non-ammo spending & damage dealign marks
