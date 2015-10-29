@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Create module for custom laser/steam marks
 - [ ] Tests and find+fix some bugs
 - [x] Rename members in MarkStruct
 - [x] Allow "spawning" marks without sprite (to allow modules use custom marks as official tg marks)
