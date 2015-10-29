@@ -331,9 +331,9 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 			return;
 		}
 
-		g_Mark[iTeam][e_Sprite] = PrecacheModel(m_sFile);
-		g_Mark[iTeam][e_High] = DTC_GetArgFloat(hArgs, 2, 12.0);
-		g_Mark[iTeam][e_Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
+		g_Mark[iTeam][Sprite] = PrecacheModel(m_sFile);
+		g_Mark[iTeam][High] = DTC_GetArgFloat(hArgs, 2, 12.0);
+		g_Mark[iTeam][Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
 	} else if (StrEqual(sPrefixName, "MarkLaser")) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
@@ -342,12 +342,12 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 			return;
 		}
 
-		g_Mark[iTeam][e_LaserSprite] = PrecacheModel(m_sFile);
-		g_Mark[iTeam][e_LaserColor][0] = DTC_GetArgNum(hArgs, 2, 255);
-		g_Mark[iTeam][e_LaserColor][1] = DTC_GetArgNum(hArgs, 3, 255);
-		g_Mark[iTeam][e_LaserColor][2] = DTC_GetArgNum(hArgs, 4, 255);
-		g_Mark[iTeam][e_LaserColor][3] = DTC_GetArgNum(hArgs, 5, 255);
-		g_Mark[iTeam][e_LaserWidth] = DTC_GetArgFloat(hArgs, 6, 1.0);
+		g_Mark[iTeam][LaserSprite] = PrecacheModel(m_sFile);
+		g_Mark[iTeam][LaserColor][0] = DTC_GetArgNum(hArgs, 2, 255);
+		g_Mark[iTeam][LaserColor][1] = DTC_GetArgNum(hArgs, 3, 255);
+		g_Mark[iTeam][LaserColor][2] = DTC_GetArgNum(hArgs, 4, 255);
+		g_Mark[iTeam][LaserColor][3] = DTC_GetArgNum(hArgs, 5, 255);
+		g_Mark[iTeam][LaserWidth] = DTC_GetArgFloat(hArgs, 6, 1.0);
 	} else if (StrEqual(sPrefixName, "TeamOverlay")) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 

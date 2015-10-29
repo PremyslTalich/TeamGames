@@ -1,20 +1,17 @@
 enum MarkStruct
 {
-	e_Sprite,
-	Float:e_High,
-    Float:e_Scale,
-	String:e_LaserSprite,
-	Float:e_LaserWidth,
-	e_LaserColor[4]
+	Sprite,
+	Float:High,
+    Float:Scale,
+	String:LaserSprite,
+	Float:LaserWidth,
+	LaserColor[4]
 }
 new g_Mark[3][MarkStruct];
 
 public Action:Event_BulletImpact(Handle:hEvent,const String:sName[],bool:bDontBroadcast)
 {
 	if (!GetConVarBool(g_hAllowMark) || g_iMarkLimitCounter >= GetConVarInt(g_hMarkLimit))
-		return Plugin_Continue;
-
-	if (g_Mark[TG_RedTeam][e_Sprite] == 0 && g_Mark[TG_BlueTeam][e_Sprite] == 0)
 		return Plugin_Continue;
 
 	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
@@ -24,9 +21,9 @@ public Action:Event_BulletImpact(Handle:hEvent,const String:sName[],bool:bDontBr
 		new Float:fY = GetEventFloat(hEvent, "y");
 		new Float:fZ = GetEventFloat(hEvent, "z");
 
-		if ((GetClientButtons(iClient) & IN_USE) && g_Mark[TG_RedTeam][e_Sprite] != 0) {
+		if (GetClientButtons(iClient) & IN_USE) {
 			SpawnMark(iClient, TG_RedTeam, fX, fY, fZ);
-		} else if ((GetClientButtons(iClient) & IN_SPEED) && g_Mark[TG_BlueTeam][e_Sprite] != 0) {
+		} else if (GetClientButtons(iClient) & IN_SPEED) {
 			SpawnMark(iClient, TG_BlueTeam, fX, fY, fZ);
 		}
 	}
@@ -85,10 +82,13 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 		RequestFrame(Frame_MarkBlockDMG, iClient);
 	}
 
-	fPos[2] += g_Mark[iTeam][e_High];
 
-	TE_SetupGlowSprite(fPos, g_Mark[iTeam][e_Sprite], fLife, g_Mark[iTeam][e_Scale], 255);
-	TE_SendToAll();
+	if (g_Mark[iTeam][Sprite] != 0) {
+		fPos[2] += g_Mark[iTeam][High];
+
+		TE_SetupGlowSprite(fPos, g_Mark[iTeam][Sprite], fLife, g_Mark[iTeam][Scale], 255);
+		TE_SendToAll();
+	}
 
 	if (bCount) {
 		g_PlayerData[iClient][AbleToMark] = false;
@@ -98,19 +98,19 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 		CreateTimer(GetConVarFloat(g_hMarkLife), Timer_MarkLimit);
 	}
 
-	if (GetConVarFloat(g_hMarkLaser) > 0.0 && Client_IsIngame(iClient) && g_Mark[iTeam][e_LaserSprite] != 0) {
+	if (GetConVarFloat(g_hMarkLaser) > 0.0 && Client_IsIngame(iClient) && g_Mark[iTeam][LaserSprite] != 0) {
 		new Float:fClientPos[3];
 
 		GetClientEyePosition(iClient, fClientPos);
 		fClientPos[2] -= 16;
 
 		new iLaserColor[4];
-		iLaserColor[0] = g_Mark[iTeam][e_LaserColor][0];
-		iLaserColor[1] = g_Mark[iTeam][e_LaserColor][1];
-		iLaserColor[2] = g_Mark[iTeam][e_LaserColor][2];
-		iLaserColor[3] = g_Mark[iTeam][e_LaserColor][3];
+		iLaserColor[0] = g_Mark[iTeam][LaserColor][0];
+		iLaserColor[1] = g_Mark[iTeam][LaserColor][1];
+		iLaserColor[2] = g_Mark[iTeam][LaserColor][2];
+		iLaserColor[3] = g_Mark[iTeam][LaserColor][3];
 
-		TE_SetupBeamPoints(fClientPos, fPos, g_Mark[iTeam][e_LaserSprite], g_Mark[iTeam][e_LaserSprite], 0, 0, GetConVarFloat(g_hMarkLaser), g_Mark[iTeam][e_LaserWidth], g_Mark[iTeam][e_LaserWidth], 1024, 0.0, iLaserColor, 0);
+		TE_SetupBeamPoints(fClientPos, fPos, g_Mark[iTeam][LaserSprite], g_Mark[iTeam][LaserSprite], 0, 0, GetConVarFloat(g_hMarkLaser), g_Mark[iTeam][LaserWidth], g_Mark[iTeam][LaserWidth], 1024, 0.0, iLaserColor, 0);
 		TE_SendToAll();
 	}
 
