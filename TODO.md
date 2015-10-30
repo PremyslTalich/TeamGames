@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Fix tg_game_checkteams in tg menu
 - [ ] Add some settings to Warden module
 - [ ] Create module for custom laser/steam marks
 - [ ] Tests and find+fix some bugs
