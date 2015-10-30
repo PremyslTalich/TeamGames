@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Add some settings to Warden module
 - [ ] Create module for custom laser/steam marks
 - [ ] Tests and find+fix some bugs
 - [x] Rename members in MarkStruct
