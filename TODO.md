@@ -1,7 +1,6 @@
 To do list
 ==========
 
-- [ ] Update warden module wiki
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
 - [ ] Create module for custom laser/steam/model/particles marks
@@ -10,6 +9,7 @@ To do list
 
 ---
 
+- [x] Update warden module wiki
 - [x] Fix `tg_game_checkteams` in tg menu
 - [x] Add some settings to Warden module
 - [x] Rename members in MarkStruct
