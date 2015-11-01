@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Update warden module wiki
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
 - [x] Fix `tg_game_checkteams` in tg menu
