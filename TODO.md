@@ -1,8 +1,8 @@
 To do list
 ==========
 
-- [ ] Fix tg_game_checkteams in tg menu
-- [ ] Add some settings to Warden module
+- [x] Fix `tg_game_checkteams` in tg menu
+- [x] Add some settings to Warden module
 - [ ] Create module for custom laser/steam/model/particles marks
 - [ ] Tests and find+fix some bugs
 - [x] Rename members in MarkStruct
