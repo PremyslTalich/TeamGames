@@ -4,10 +4,14 @@ To do list
 - [ ] Update warden module wiki
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
+- [ ] Create module for custom laser/steam/model/particles marks
+- [ ] Tests and find+fix some bugs 
+- [ ] Fix updater link & file - not yet
+
+---
+
 - [x] Fix `tg_game_checkteams` in tg menu
 - [x] Add some settings to Warden module
-- [ ] Create module for custom laser/steam/model/particles marks
-- [ ] Tests and find+fix some bugs
 - [x] Rename members in MarkStruct
 - [x] Allow "spawning" marks without sprite (to allow modules use custom marks as official tg marks)
 - [x] Warden - Move color code from src to translations
@@ -20,7 +24,6 @@ To do list
 - [x] Finish API docs
 - [x] Finish wiki
 - [x] Add missing download lists to extras
-- [ ] Fix updater link & file - not yet
 - [x] Fix bug about console winning redonly game
 - [x] Fix some log messages
 - [x] Fix bug in ChickenHunt about spawning chickens
