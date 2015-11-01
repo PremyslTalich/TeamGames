@@ -171,11 +171,16 @@ RemoveAllGames()
 bool:IsGameTypeAvailable(TG_GameType:iType)
 {
 	if (iType == TG_FiftyFifty) {
-		if (GetCountPlayersInTeam(TG_RedTeam) == GetCountPlayersInTeam(TG_BlueTeam) && GetCountPlayersInTeam(TG_RedTeam) > 0)
-			return true;
+		new iRed = GetCountPlayersInTeam(TG_RedTeam);
+		new iBlue = GetCountPlayersInTeam(TG_BlueTeam);
+
+		if (GetConVarBool(g_hCheckTeams)) {
+			return (iRed == iBlue && iRed > 0);
+		} else {
+			return (iRed > 0 && iBlue > 0);
+		}
 	} else if (iType == TG_RedOnly) {
-		if (GetCountPlayersInTeam(TG_RedTeam) >= 2 && GetCountPlayersInTeam(TG_BlueTeam) == 0)
-			return true;
+		return (GetCountPlayersInTeam(TG_RedTeam) >= 2 && GetCountPlayersInTeam(TG_BlueTeam) == 0);
 	}
 
 	return false;
