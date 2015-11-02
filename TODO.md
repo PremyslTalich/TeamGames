@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Rewrite bombtoss translation
 - [ ] Plugins configs...
 - [ ] Add fixed player skin to extras
 - [ ] Check reported buggy HE battle
