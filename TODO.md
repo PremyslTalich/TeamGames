@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Add fixed player skin to extras
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
 - [ ] Create module for custom laser/steam/model/particles marks
