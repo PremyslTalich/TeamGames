@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Make wiki for some modules
 - [ ] Move `extras/screenshots/` to `extras/wiki/`
 - [ ] Rewrite bombtoss translation
 - [ ] Plugins configs...
