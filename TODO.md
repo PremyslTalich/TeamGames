@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Move extras/screenshots to extras/wiki
+- [ ] Move `extras/screenshots/` to `extras/wiki/`
 - [ ] Rewrite bombtoss translation
 - [ ] Plugins configs...
 - [ ] Add fixed player skin to extras
