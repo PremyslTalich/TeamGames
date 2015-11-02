@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Plugin configs...
+- [ ] Plugins configs...
 - [ ] Add fixed player skin to extras
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
