@@ -2,7 +2,6 @@ To do list
 ==========
 
 - [ ] Make wiki for some modules
-- [ ] Rewrite bombtoss translation
 - [ ] Plugins configs...
 - [ ] Add fixed player skin to extras
 - [ ] Check reported buggy HE battle
@@ -12,6 +11,7 @@ To do list
 
 ---
 
+- [x] Rewrite bombtoss translation
 - [x] Move `extras/screenshots/` to `extras/wiki/`
 - [x] Update warden module wiki
 - [x] Fix `tg_game_checkteams` in tg menu
