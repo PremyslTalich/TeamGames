@@ -7,7 +7,7 @@
 	}
 	"SpawnTarget"
 	{
-		"en"		"Spawn target"
+		"en"		"BombToss target"
 	}
 	"BombInfo"
 	{
