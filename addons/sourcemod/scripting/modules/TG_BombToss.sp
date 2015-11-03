@@ -39,7 +39,7 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.BombToss.phrases");
 
-	g_hOneBomb = CreateConVar("tg_bt_onebomb", "1", "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
+	g_hOneBomb = CreateConVar("sm_tg_bombtoss_onebomb", "1", "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
 
 	HookEvent("round_start", 	Event_RoundStart, 	EventHookMode_Post);
 	HookEvent("bullet_impact", Event_BulletImpact, EventHookMode_Post);
