@@ -51,7 +51,7 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.PermanentFeces.phrases");
 
-	g_hFenceType = CreateConVar("tg_pf_fence_type", "0", "0 = beam fence, 1 = rope fence");
+	g_hFenceType = CreateConVar("sm_tg_pfence_type", "0", "0 = beam fence, 1 = rope fence");
 
 	HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
 }
