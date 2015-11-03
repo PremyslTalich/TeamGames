@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Add some ConVars to bombtoss module
 - [ ] Make wiki for some modules
 - [ ] Plugins configs...
 - [ ] Add fixed player skin to extras
