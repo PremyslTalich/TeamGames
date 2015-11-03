@@ -9,8 +9,8 @@
 #include <colorvariables>
 #include <menu-stocks>
 
-#define MENU_ITEM_ID_CREATE 				"PermanentFeces-Raska-Create"
-#define MENU_ITEM_ID_DELETE 				"PermanentFeces-Raska-Delete"
+#define MENU_ITEM_ID_CREATE 				"PermanentFeces-Create"
+#define MENU_ITEM_ID_DELETE 				"PermanentFeces-Delete"
 
 #define TARGET_DOWNLOAD_PREFIX_CORNER 		"PermanentFeces-Corner"
 #define TARGET_DOWNLOAD_PREFIX_MATERIAL 	"PermanentFeces-Material"
