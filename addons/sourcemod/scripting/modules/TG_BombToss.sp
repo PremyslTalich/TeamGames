@@ -13,7 +13,7 @@
 #define BOMB_TARGETNAME 		"BombToss"
 #define BOMB_TARGETNAME_USED 	"BombToss-"
 
-new Handle:g_hOneBomb, g_bOneBomb;
+new Handle:g_hOneBomb, Handle:g_hMaxBombs;
 
 new String:g_sTargetModel[PLATFORM_MAX_PATH];
 new Float:g_fTargetPosition[3];
@@ -23,7 +23,6 @@ new Handle:g_hTimer = INVALID_HANDLE;
 new Handle:g_hBombList = INVALID_HANDLE;
 new Handle:g_hTossedBombList = INVALID_HANDLE;
 
-new g_iMaxBombs = 32;
 new g_iBombCounter = 0;
 
 public Plugin:myinfo =
@@ -40,6 +39,7 @@ public OnPluginStart()
 	LoadTranslations("TG.BombToss.phrases");
 
 	g_hOneBomb = CreateConVar("sm_tg_bombtoss_onebomb", "1", "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
+	g_hMaxBombs = CreateConVar("sm_tg_bombtoss_maxbombs", "32", "Maximum number of bombs spawned at once.");
 
 	HookEvent("round_start", 	Event_RoundStart, 	EventHookMode_Post);
 	HookEvent("bullet_impact", Event_BulletImpact, EventHookMode_Post);
@@ -51,11 +51,6 @@ public OnLibraryAdded(const String:name[])
 		TG_RegMenuItem(MENU_ITEM_ID_SPAWNBOMB);
 		TG_RegMenuItem(MENU_ITEM_ID_TARGET);
 	}
-}
-
-public OnConfigsExecuted()
-{
-	g_bOneBomb = GetConVarBool(g_hOneBomb);
 }
 
 public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bool:bKnown)
@@ -108,13 +103,13 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	}
 
 	if (StrEqual(id, MENU_ITEM_ID_SPAWNBOMB)) {
-		if (g_iBombCounter < g_iMaxBombs) {
+		if (g_iBombCounter < GetConVarInt(g_hMaxBombs)) {
 			status = TG_Active;
 		} else {
 			status = TG_Inactive;
 		}
 
-		Format(name, maxSize, "%T", "SpawnBomb", client, g_iMaxBombs - g_iBombCounter);
+		Format(name, maxSize, "%T", "SpawnBomb", client, GetConVarInt(g_hMaxBombs) - g_iBombCounter);
 	} else if (StrEqual(id, MENU_ITEM_ID_TARGET)) {
 		Format(name, maxSize, "%T", "SpawnTarget", client);
 	}
@@ -127,7 +122,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient) // some
 	}
 
 	if (StrEqual(id, MENU_ITEM_ID_SPAWNBOMB, true)) {
-		if (g_iBombCounter >= g_iMaxBombs){
+		if (g_iBombCounter >= GetConVarInt(g_hMaxBombs)){
 			return;
 		}
 
@@ -142,7 +137,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient) // some
 		SetEntData(iWeapon, FindSendPropInfo("CBaseEntity", "m_CollisionGroup"), 2, 4, true);
 		g_iBombCounter++;
 
-		TG_LogRoundMessage("BombToss", "Player %L spawned bomb. (%d bombs remaining)", iClient, g_iMaxBombs - g_iBombCounter);
+		TG_LogRoundMessage("BombToss", "Player %L spawned bomb. (%d bombs remaining)", iClient, GetConVarInt(g_hMaxBombs) - g_iBombCounter);
 
 		TurnTimerOn();
 		TG_FakeSelect(iClient, TG_MenuItem, "Core_MainMenu");
@@ -183,7 +178,7 @@ public Action:Hook_OnWeaponCanUse(iClient, weapon) // hook pickup bomb
 	GetEdictClassname(weapon, sWeaponClassName, sizeof(sWeaponClassName));
 
 	if (StrEqual(sWeaponClassName, "weapon_c4")) {
-		if (g_bOneBomb && Client_GetWeapon(iClient, "weapon_c4") != INVALID_ENT_REFERENCE)
+		if (GetConVarBool(g_hOneBomb) && Client_GetWeapon(iClient, "weapon_c4") != INVALID_ENT_REFERENCE)
 			return Plugin_Handled;
 
 		decl String:sWeaponTargetName[64];
