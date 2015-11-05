@@ -12,12 +12,12 @@
 	"BombInfo"
 	{
 		"#format"	"{1:s}"
-		"en"		"Droped: {1}"
+		"en"		"Dropped: {1}"
 	}
 	"BombInfoWithTarget"
 	{
 		"#format"	"{1:s},{2:f}"
-		"en"		"Droped: {1} ({2})"
+		"en"		"Dropped: {1} ({2})"
 	}
 	"TargetInfo"
 	{
