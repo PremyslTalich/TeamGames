@@ -1,9 +1,8 @@
 To do list
 ==========
 
-- [ ] Make wiki for some modules
 - [ ] Plugins configs...
-- [ ] Add fixed player skin to extras
+- [ ] Add fixed player skins to extras
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
 - [ ] Create module for custom laser/steam/model/particles marks
@@ -11,6 +10,7 @@ To do list
 
 ---
 
+- [x] Make wiki for some modules
 - [x] Add some ConVars to bombtoss module
 - [x] Rewrite bombtoss translation
 - [x] Move `extras/screenshots/` to `extras/wiki/`
