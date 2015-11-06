@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Rewrite `CreateConfigDirectoryIfNotExist`
 - [ ] Plugins configs...
 - [ ] Add fixed player skins to extras
 - [ ] Check reported buggy HE battle
