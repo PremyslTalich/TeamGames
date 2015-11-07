@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.3.19"
+#define _PLUGIN_VERSION "0.7.4.1"
 
 public Plugin:myinfo =
 {
@@ -477,7 +477,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	new String:sWeapon[64];
 	GetEventString(hEvent, "weapon", sWeapon, sizeof(sWeapon));
 
-	if (Client_IsIngame(iAttacker) && GetClientTeam(iVictim) == CS_TEAM_T && GetClientTeam(iAttacker) == CS_TEAM_T && iAttacker != iVictim) {
+	if (Client_IsIngame(iAttacker) && GetClientTeam2(iVictim) == CS_TEAM_T && GetClientTeam2(iAttacker) == CS_TEAM_T && iAttacker != iVictim) {
 		RequestFrame(Frame_AddFragsAndScore, iAttacker);
 	}
 
@@ -498,9 +498,9 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	if (g_Game[GameProgress] != TG_NoGame) {
 		Call_OnPlayerLeaveGame(g_Game[GameID], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 
-		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam2(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	} else {
-		TG_LogRoundMessage("PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (Client_IsIngame(iAttacker) && GetClientTeam(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
+		TG_LogRoundMessage("PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (Client_IsIngame(iAttacker) && GetClientTeam2(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	}
 
 	if (g_PlayerData[iVictim][Team] == TG_RedTeam) {
@@ -527,6 +527,11 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 		ClientCommand(iVictim, "r_screenoverlay \"\"");
 
 	return Plugin_Continue;
+}
+
+GetClientTeam2(iClient)
+{
+	return (iClient != 0) ? GetClientTeam(iClient) : CS_TEAM_NONE;
 }
 
 public Frame_AddFragsAndScore(any:iClient)
