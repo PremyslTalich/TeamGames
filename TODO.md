@@ -1,8 +1,6 @@
 To do list
 ==========
 
-- [ ] Rewrite `CreateConfigDirectoryIfNotExist`
-- [ ] Plugins configs...
 - [ ] Add fixed player skins to extras
 - [ ] Check reported buggy HE battle
 - [ ] Add cookie settings for nobullet marks?
@@ -11,6 +9,8 @@ To do list
 
 ---
 
+- [x] Rewrite `CreateConfigDirectoryIfNotExist`
+- [x] Plugins configs...
 - [x] Make wiki for some modules
 - [x] Add some ConVars to bombtoss module
 - [x] Rewrite bombtoss translation
