@@ -11,7 +11,7 @@ CreateModulesConfigFileIfNotExist()
 	decl String:sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), MODULES_CONFIG);
 
-	CreateConfigDirectoryIfNotExist();
+	CreateDirectoryPath(sPath, 511, true);
 
 	if (!FileExists(sPath, false)) {
 		new Handle:hFile = OpenFile(sPath, "w");
@@ -29,39 +29,6 @@ CreateModulesConfigFileIfNotExist()
 		WriteFileLine(hFile, "	\"%s\"{}", MODCONF_GAMES);
 		WriteFileLine(hFile, "}");
 		CloseHandle(hFile);
-	}
-}
-
-CreateConfigDirectoryIfNotExist()
-{
-	decl String:sPath[PLATFORM_MAX_PATH];
-
-	BuildPath(Path_SM, sPath, sizeof(sPath), DOWNLOADS_CONFIG);
-	if (FindCharInString(sPath, '/') != -1) {
-		strcopy(sPath, FindCharInString(sPath, '/', true) + 1, sPath);
-	} else {
-		strcopy(sPath, FindCharInString(sPath, '\\', true) + 1, sPath);
-	}
-
-	if (!DirExists(sPath)) {
-		CreateDirectory(sPath, 511);
-	}
-
-	BuildPath(Path_SM, sPath, sizeof(sPath), MODULES_CONFIG);
-	if (FindCharInString(sPath, '/') != -1) {
-		strcopy(sPath, FindCharInString(sPath, '/', true) + 1, sPath);
-	} else {
-		strcopy(sPath, FindCharInString(sPath, '\\', true) + 1, sPath);
-	}
-
-	if (!DirExists(sPath)) {
-		CreateDirectory(sPath, 511);
-	}
-
-	BuildPath(Path_SM, sPath, sizeof(sPath), FENCES_CONFIGS);
-
-	if (!DirExists(sPath)) {
-		CreateDirectory(sPath, 511);
 	}
 }
 

@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.3.10"
+#define _PLUGIN_VERSION "0.7.3.19"
 
 public Plugin:myinfo =
 {
@@ -168,6 +168,10 @@ public OnPluginStart()
 	g_iMarkLimitCounter = 0;
 
 	// AutoExecConfigAppend(_, PLUGIN_CONFIG);
+
+	new String:sPluginConfig[PLATFORM_MAX_PATH];
+	FormatEx(sPluginConfig, sizeof(sPluginConfig), "cfg/%s", PLUGIN_CONFIG);
+	CreateDirectoryPath(sPluginConfig, 511);
 	AutoExecConfig(_, _, PLUGIN_CONFIG);
 
 	CSavePrefix("TG");
@@ -196,6 +200,7 @@ public OnMapStart()
 	new String:sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof (sPath), DOWNLOADS_CONFIG);
 
+	CreateDirectoryPath(sPath, 511, true);
 	DTC_CreateConfig(sPath, DTC_OnCreateConfig);
 	DTC_LoadConfig(sPath, DTC_OnFile);
 
@@ -545,7 +550,7 @@ LoadLogging()
 		BuildPath(Path_SM, sDirPath, sizeof(sDirPath), LOGS_DIRECTORY);
 
 		if (!DirExists(sDirPath))
-			CreateDirectory(sDirPath, 511);
+			CreateDirectoryPath(sDirPath, 511);
 
 		if (fLogTime > 0.0) {
 			new Handle:hDirectory = OpenDirectory(sDirPath);

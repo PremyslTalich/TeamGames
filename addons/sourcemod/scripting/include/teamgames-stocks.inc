@@ -169,6 +169,43 @@ stock GetCmdArgFloat(argnum)
 	return StringToFloat(value);
 }
 
+stock CreateDirectoryPath(const String:dirPath[], mode, bool:containsFile = false)
+{
+	new String:path[PLATFORM_MAX_PATH];
+
+	strcopy(path, sizeof(path), dirPath);
+	ReplaceString(path, sizeof(path), "\\", "/");
+	ReplaceString(path, sizeof(path), "//", "/");
+
+	if (path[0] ==  '/') {
+		strcopy(path, sizeof(path), path);
+	}
+
+	if (path[strlen(path) - 1] ==  '/') {
+		strcopy(path, sizeof(path) - 1, path);
+	}
+
+	new String:dir[PLATFORM_MAX_PATH];
+	new slash, pos, i;
+
+	while (strlen(path) > pos) {
+		if ((slash = FindCharInString(path[pos], '/')) != -1) {
+			i = slash + pos + 1;
+		} else {
+			if (containsFile) {
+				return;
+			} else {
+				i = sizeof(dir);
+			}
+		}
+
+		strcopy(dir, i, path);
+		pos += i - pos;
+
+		CreateDirectory(dir, mode);
+	}
+}
+
 //------------------------------------------------------------------------------------------------
 // Weapons (safe to use in both CS:S and CS:GO)
 
