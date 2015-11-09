@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Update fences wiki (+ extras?) - https://github.com/KissLick/TeamGames/issues/2
+- [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add fixed player skins to extras
 - [ ] Check reported buggy HE battle - fixed?
 - [ ] Add cookie settings for nobullet marks?
