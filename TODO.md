@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] HTML HintText phrase for CS:GO - [PullRequest #5](https://github.com/KissLick/TeamGames/pull/5)
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add multicoloring functions to TG teams menu - [Issue #3](https://github.com/KissLick/TeamGames/issues/3)
 - [ ] Add fixed player skins to extras
