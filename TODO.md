@@ -8,7 +8,6 @@ To do list
 - [ ] Add fixed player skins to extras
 - [ ] Check reported buggy HE battle - fixed?
 - [ ] Add cookie settings for nobullet marks?
-- [ ] Create module for custom laser/steam/model/particles marks
 - [ ] Fix updater link & file - *not yet*
 
 ---
