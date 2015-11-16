@@ -155,6 +155,11 @@ stock bool:DispatchKeyValueFormat(entity, const String:keyName[], const String:f
 	return DispatchKeyValue(entity, keyName, value);
 }
 
+stock bool:DispatchKeyValueNum(entity, const String:keyName[], value)
+{
+	return DispatchKeyValueFormat(entity, keyName, "%d", value);
+}
+
 stock GetCmdArgInt(argnum)
 {
 	decl String:value[256];
