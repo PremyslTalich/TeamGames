@@ -2,7 +2,6 @@ To do list
 ==========
 
 - [ ] Test & publish MoreMarks module
-- [ ] HTML HintText phrase for CS:GO - [PullRequest #5](https://github.com/KissLick/TeamGames/pull/5)
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add multiple-players-team-switch functions to TG teams menu - [Issue #3](https://github.com/KissLick/TeamGames/issues/3)
 - [ ] Add fixed player skins to extras
@@ -12,6 +11,7 @@ To do list
 
 ---
 
+- [x] HTML HintText phrase for CS:GO - [PullRequest #5](https://github.com/KissLick/TeamGames/pull/5)
 - [x] Rewrite `CreateConfigDirectoryIfNotExist`
 - [x] Plugins configs...
 - [x] Make wiki for some modules
