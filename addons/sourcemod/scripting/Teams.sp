@@ -260,12 +260,11 @@ NotifyPlayerTeam(iClient, TG_Team:iTeam, bool:bIgnoreNoneTeam = true)
 
 	decl String:sMsg[256];
 
-	if (iTeam == TG_NoneTeam)
-		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-NoneTeam", iClient);
-	else if (iTeam == TG_RedTeam)
-		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-RedTeam", iClient);
-	else if (iTeam == TG_BlueTeam)
-		Format(sMsg, sizeof(sMsg), "%T", "TeamHud-BlueTeam", iClient);
+	if (g_iEngineVersion == Engine_CSGO) {
+		Format(sMsg, sizeof(sMsg), "%T", (iTeam == TG_RedTeam) ? "TeamHud-CSGO-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamHud-CSGO-BlueTeam" : "TeamHud-CSGO-NoneTeam", iClient);
+	} else {
+		Format(sMsg, sizeof(sMsg), "%T", (iTeam == TG_RedTeam) ? "TeamHud-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamHud-BlueTeam" : "TeamHud-NoneTeam", iClient);
+	}
 
 	if (GetConVarInt(g_hNotifyPlayerTeam) == 1) {
 		PrintKeyHintText(iClient, sMsg);

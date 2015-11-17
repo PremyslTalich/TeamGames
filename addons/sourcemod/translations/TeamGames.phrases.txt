@@ -41,6 +41,18 @@
 	{
 		"en"		"You are not in a team !"
 	}
+	"TeamHud-CSGO-RedTeam" // CSGO hint msg for player in team red
+	{
+		"en"		"You are in <font color='#ff0000'>red team</font>!"
+	}
+	"TeamHud-CSGO-BlueTeam" // CSGO hint msg for player in team blue
+	{
+		"en"		"You are in <font color='#0000ff'>blue team</font>!"
+	}
+	"TeamHud-CSGO-NoneTeam" // CSGO hint msg for player moved out of team
+	{
+		"en"		"You are not in a team !"
+	}
 //------------------------------------------------------------------------------------------------
 // Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
 	"TeamPrefix-RedTeam" // player prefix in chat (team red)
