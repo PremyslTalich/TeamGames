@@ -36,6 +36,18 @@
 	{
 		"cze"		"Nejsi v žádném teamu !"
 	}
+	"TeamHud-CSGO-RedTeam" // CSGO hint msg for player in team red
+	{
+		"cze"		"Jsi v teamu <font color='#ff0000'>červených</font> !"
+	}
+	"TeamHud-CSGO-BlueTeam" // CSGO hint msg for player in team blue
+	{
+		"cze"		"Jsi v teamu <font color='#0000ff'>modrých</font> !"
+	}
+	"TeamHud-CSGO-NoneTeam" // CSGO hint msg for player moved out of team
+	{
+		"cze"		"Nejsi v žádném teamu !"
+	}
 //------------------------------------------------------------------------------------------------
 // Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
 	"TeamPrefix-RedTeam" // player prefix in chat (team red)
