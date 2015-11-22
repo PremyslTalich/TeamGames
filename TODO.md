@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Reported some weird bugs, gonna fix them soon
+- [ ] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?)
 - [ ] Test & publish MoreMarks module
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add multiple-players-team-switch functions to TG teams menu - [Issue #3](https://github.com/KissLick/TeamGames/issues/3)
