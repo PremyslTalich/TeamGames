@@ -47,6 +47,11 @@ TeamsMenu(iClient)
 	AddMenuItem(hMenu, "spacer", "spacer", ITEMDRAW_SPACER);
 	AddMenuItemFormat(hMenu, "AllNone", _, "%T", "MenuTeams-NoneTeamAll", iClient);
 
+	if (GetConVarBool(g_hAllowMultiSwitch)) {
+		AddMenuItemFormat(hMenu, "FiftyFifty", _, "%T", "MenuTeams-FiftyFiftyAll", iClient);
+		AddMenuItemFormat(hMenu, "AllRed", _, "%T", "MenuTeams-RedTeamAll", iClient);
+	}
+
 	SetMenuExitBackButton(hMenu, true);
 	DisplayMenu(hMenu, iClient, 30);
 }
@@ -59,17 +64,47 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 		if (StrEqual(sKey, "AllNone")) {
 			ClearTeams();
-			TeamsMenu(iClient);
-		}
+		} else if (StrEqual(sKey, "AllRed")) {
+			new TG_Team:iTeam;
 
-		new target = GetClientAimTarget(iClient);
-		if (target > 0) {
-			#if defined DEBUG
-			LogMessage("[TG DEBUG] Switch player %N to iTeam %d (%s).", target, _:TG_GetTeamFromString(sKey), sKey);
-			#endif
+			for (new iUser = 1; iUser <= MaxClients; iUser++) {
+				iTeam = TG_GetPlayerTeam(iUser);
+				if (iTeam == TG_NoneTeam || iTeam == TG_BlueTeam) {
+					SwitchToTeam(iClient, iUser, TG_RedTeam);
+				}
+			}
+		} else if (StrEqual(sKey, "FiftyFifty")) {
+			new iUsers[MAXPLAYERS + 1];
+			new TG_Team:iTeam = TG_RedTeam;
+			new iUsersCount;
 
-			new TG_Team:iTeam = TG_GetTeamFromString(sKey);
-			SwitchToTeam(iClient, target, iTeam);
+			for (new iUser = 1; iUser <= MaxClients; iUser++) {
+				if (TG_GetPlayerTeam(iUser) != TG_ErrorTeam) {
+					iUsers[iUsersCount] = iUser;
+					iUsersCount++;
+				}
+			}
+
+			if ((iUsersCount & 1) == 1) {
+				iUsersCount--;
+				SwitchToTeam(iClient, iUsers[iUsersCount], TG_NoneTeam);
+			}
+
+			for (new i = 0; i < iUsersCount; i++) {
+				SwitchToTeam(iClient, iUsers[i], iTeam);
+				iTeam = TG_GetOppositeTeam(iTeam);
+			}
+		} else {
+			new target = GetClientAimTarget(iClient);
+			if (target > 0) {
+				#if defined DEBUG
+				LogMessage("[TG DEBUG] Switch player %N to iTeam %d (%s).", target, _:TG_GetTeamFromString(sKey), sKey);
+				#endif
+
+				new TG_Team:iTeam = TG_GetTeamFromString(sKey);
+				SwitchToTeam(iClient, target, iTeam);
+			}
+
 		}
 
 		TeamsMenu(iClient);

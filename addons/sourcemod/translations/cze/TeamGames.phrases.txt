@@ -190,6 +190,14 @@
 	{
 		"cze"		"Všechny hráče odebrat z teamů"
 	}
+	"MenuTeams-FiftyFiftyAll"
+	{
+		"cze"		"Rozdělit hráče do červeného a modrého teamu"
+	}
+	"MenuTeams-RedTeamAll"
+	{
+		"cze"		"Všechny hráče do teamu červených"
+	}
 //------------------------------------------------------------------------------------------------
 // Games menu
 	"MenuGames-Title"

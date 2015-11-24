@@ -4,6 +4,7 @@ new Handle:g_hAutoUpdate;
 new Handle:g_hModuleDefVisibility;
 
 new Handle:g_hMenuPercent;
+new Handle:g_hAllowMultiSwitch;
 
 new Handle:g_hSelfDamage;
 

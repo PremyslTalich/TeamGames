@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.7.5.1"
+#define _PLUGIN_VERSION "0.8.0.1"
 
 public Plugin:myinfo =
 {
@@ -99,6 +99,7 @@ public OnPluginStart()
 	g_hModuleDefVisibility = 		CreateConVar("tg_module_defvisibility",		"1", 			"Default visibility of new modules (might not work properly). (1 = visible, 0 = invisible)");
 
 	g_hMenuPercent = 				CreateConVar("tg_menu_percent", 			"0.0", 			"How many percent of alive CTs must use !tg to unlock !tg menu (0.0 = no limit)", _, true, 0.0, true, 1.0);
+	g_hAllowMultiSwitch = 			CreateConVar("tg_menu_team_multiswitch",	"0",			"Allow multi switch functions in teams menu? (1 = yes, 0 = no)");
 
 	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow self damage, even in game");
 

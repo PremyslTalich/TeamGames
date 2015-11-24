@@ -207,6 +207,14 @@
 	{
 		"en"		"Everyone out of team"
 	}
+	"MenuTeams-FiftyFiftyAll"
+	{
+		"en"		"Divide players into Red & Blue team"
+	}
+	"MenuTeams-RedTeamAll"
+	{
+		"en"		"Everyone into Red team"
+	}
 //------------------------------------------------------------------------------------------------
 // Games menu
 	"MenuGames-Title"
