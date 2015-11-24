@@ -4,7 +4,6 @@ To do list
 - [ ] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?)
 - [ ] Test & publish MoreMarks module
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
-- [ ] Add multiple-players-team-switch functions to TG teams menu - [Issue #3](https://github.com/KissLick/TeamGames/issues/3)
 - [ ] Add fixed player skins to extras
 - [ ] Check reported buggy HE battle - fixed?
 - [ ] Add cookie settings for nobullet marks?
@@ -12,6 +11,7 @@ To do list
 
 ---
 
+- [x] Add multiple-players-team-switch functions to TG teams menu - [Issue #3](https://github.com/KissLick/TeamGames/issues/3)
 - [x] HTML HintText phrase for CS:GO - [PullRequest #5](https://github.com/KissLick/TeamGames/pull/5)
 - [x] Rewrite `CreateConfigDirectoryIfNotExist`
 - [x] Plugins configs...
