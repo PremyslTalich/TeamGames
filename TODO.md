@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Update (create) MoreMarks wiki
 - [ ] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?)
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add fixed player skins to extras
