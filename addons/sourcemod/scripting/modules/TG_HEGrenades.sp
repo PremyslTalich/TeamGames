@@ -9,7 +9,7 @@ public Plugin:myinfo =
 	name = "[TG] HEGrenades",
 	author = "Raska",
 	description = "",
-	version = "0.4",
+	version = "0.5",
 	url = ""
 }
 
@@ -51,12 +51,8 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 
 	for (new i = 1; i <= MaxClients; i++)
 	{
-		if (!TG_IsPlayerRedOrBlue(i))
-			continue;
-
-		new iGrenade = GivePlayerItem(iClient, "weapon_hegrenade");
-		if (iGrenade != INVALID_ENT_REFERENCE) {
-			Client_SetActiveWeapon(iClient, iGrenade);
+		if (TG_IsPlayerRedOrBlue(i)) {
+			GiveGrenade(iClient);
 		}
 	}
 }
@@ -75,8 +71,29 @@ public Action:Event_HEGrenadeDetonate(Handle:hEvent, const String:sName[], bool:
 
 	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
 
-	if (TG_IsPlayerRedOrBlue(iClient))
-		Client_GiveWeapon(iClient, "weapon_hegrenade", true);
+	if (TG_IsPlayerRedOrBlue(iClient)) {
+		GiveGrenade(iClient);
+	}
 
 	return Plugin_Continue;
+}
+
+GiveGrenade(iClient)
+{
+	new iGrenade = CreateEntityByName("weapon_hegrenade");
+	if (GetEngineVersion() == Engine_CSGO) {
+		SetEntProp(iGrenade, Prop_Send, "m_iItemDefinitionIndex", 44);
+	}
+
+	DispatchSpawn(iGrenade);
+	EquipPlayerWeapon(iClient, iGrenade);
+
+	SetEntProp(iGrenade, Prop_Send, "m_iClip1", 1);
+
+	new iOffset = FindDataMapOffs(iClient, "m_iAmmo") + (GetEntProp(iGrenade, Prop_Data, "m_iPrimaryAmmoType") * 4);
+	SetEntData(iClient, iOffset, 1, 4, true);
+
+	if (GetEngineVersion() == Engine_CSGO) {
+		SetEntProp(iGrenade, Prop_Send, "m_iPrimaryReserveAmmoCount", 1);
+	}
 }
