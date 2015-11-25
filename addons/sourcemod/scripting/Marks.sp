@@ -71,7 +71,7 @@ bool:SpawnMark(iClient, TG_Team:iTeam, Float:fX, Float:fY, Float:fZ, Float:fTime
 	Call_PushFloat(fLife);
 	Call_Finish();
 
-	if (GetConVarBool(g_hMarkBlockDMG)) {
+	if (GetConVarInt(g_hMarkBlockDMG) == 1 || (GetConVarInt(g_hMarkBlockDMG) == 2 && iTeam == TG_RedTeam)) {
 		g_PlayerData[iClient][MarkBlockDMG] = true;
 
 		new iWeapon = Client_GetActiveWeapon(iClient);
