@@ -35,13 +35,13 @@ public OnPluginEnd()
 {
 	if (g_hSpawnedMarks == INVALID_HANDLE)
 		return;
-	
+
 	new iMarksCount = GetArraySize(g_hSpawnedMarks);
 	new iMark;
-	
+
 	for (new i = 0; i < iMarksCount; i++) {
 		iMark = GetArrayCell(g_hSpawnedMarks, i);
-		
+
 		if (IsValidEntity(iMark)) {
 			AcceptEntityInput(iMark, "LightOff");
 			AcceptEntityInput(iMark, "Kill");
@@ -398,7 +398,7 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 		DispatchKeyValue(iEnt, "rendercolor", sValue);
 
-		new bool:bPlayerAngle = ExistComponentKey(hComponent, "playerangle");		
+		new bool:bPlayerAngle = ExistComponentKey(hComponent, "playerangle");
 		GetComponentString(hComponent, "angles", sValue, sizeof(sValue), bPlayerAngle ? "180 0 0" : "-90 0 0");
 
 		new Float:fAngles[3];
@@ -442,7 +442,7 @@ SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
 		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 		DispatchKeyValue(iEnt, "rendercolor", sValue);
 
-		new bool:bPlayerAngle = ExistComponentKey(hComponent, "playerangle");		
+		new bool:bPlayerAngle = ExistComponentKey(hComponent, "playerangle");
 		GetComponentString(hComponent, "angles", sValue, sizeof(sValue), bPlayerAngle ? "180 0 0" : "-90 0 0");
 
 		new Float:fAngles[3];
@@ -524,9 +524,10 @@ SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
 		iColor[i] = StringToInt(sArg);
 	}
 
-	new Float:fWidth = GetComponentFloat(hComponent, "width", 1.0);
+	new Float:fWidthStart = GetComponentFloat(hComponent, "width-start", 1.0);
+	new Float:fWidthEnd = GetComponentFloat(hComponent, "width-end", 1.0);
 
-	TE_SetupBeamPoints(fStart, fEnd, iMaterial, iMaterial, 0, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SetupBeamPoints(fStart, fEnd, iMaterial, iMaterial, 0, 0, fLife, fWidthStart, fWidthEnd, 0, 0.0, iColor, 0);
 	TE_SendToAll();
 }
 
