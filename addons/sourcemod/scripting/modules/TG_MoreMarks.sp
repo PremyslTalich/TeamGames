@@ -526,8 +526,9 @@ SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
 
 	new Float:fWidthStart = GetComponentFloat(hComponent, "width-start", 1.0);
 	new Float:fWidthEnd = GetComponentFloat(hComponent, "width-end", 1.0);
+	new Float:fAmplitude = GetComponentFloat(hComponent, "amplitude", 0.0);
 
-	TE_SetupBeamPoints(fStart, fEnd, iMaterial, iMaterial, 0, 0, fLife, fWidthStart, fWidthEnd, 0, 0.0, iColor, 0);
+	TE_SetupBeamPoints(fStart, fEnd, iMaterial, 0, 0, 0, fLife, fWidthStart, fWidthEnd, 0, fAmplitude, iColor, 0);
 	TE_SendToAll();
 }
 
@@ -564,8 +565,9 @@ SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
 	}
 
 	new Float:fRadius = GetComponentFloat(hComponent, "radius", 32.0) * 2;
+	new Float:fAmplitude = GetComponentFloat(hComponent, "amplitude", 0.0);
 
-	TE_SetupBeamRingPoint(fOrigin, fRadius - 0.5, fRadius, iMaterial, iMaterial, 0, 0, fLife, GetComponentFloat(hComponent, "width", 1.0), 0.0, iColor, 0, 0);
+	TE_SetupBeamRingPoint(fOrigin, fRadius - 0.5, fRadius, iMaterial, 0, 0, 0, fLife, GetComponentFloat(hComponent, "width", 1.0), fAmplitude, iColor, 0, 0);
 	TE_SendToAll();
 }
 
