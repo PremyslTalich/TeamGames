@@ -547,7 +547,10 @@ SpawnRope(Float:fNodes[][3], iNodeCount, const String:sNodePrefix[], const Strin
 
 public Action:Timer_ActivateEntity(Handle:hTimer, any:iEntity)
 {
-	ActivateEntity(iEntity);
-	AcceptEntityInput(iEntity, "TurnOn");
+	if (IsValidEntity(iEntity)) {
+		ActivateEntity(iEntity);
+		AcceptEntityInput(iEntity, "TurnOn");
+	}
+	
 	return Plugin_Continue;
 }

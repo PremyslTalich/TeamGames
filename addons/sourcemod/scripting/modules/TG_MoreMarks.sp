@@ -198,21 +198,28 @@ LoadConfig()
 						do {
 							KvGetSectionName(hKV, sKey, sizeof(sKey));
 							KvGetString(hKV, NULL_STRING, sValue,  sizeof(sValue));
+							StringToLower(sKey);
 
 							switch (iType) {
 								case MM_Model: {
-									if (StrEqual(sKey, "model")) {
-										PrecacheModel(sValue);
+									if (StrEqual(sKey, "model", false)) {
+										PrecacheModel(sValue, true);
 									}
 								}
-								case MM_Tesla, MM_SmokeStack: {
-									if (StrEqual(sKey, "material")) {
-										PrecacheDecal(sValue);
+								case MM_Tesla: {
+									if (StrEqual(sKey, "material", false)) {
+										PrecacheDecal(sValue, true);
+									}
+								}
+								case MM_SmokeStack: {
+									if (StrEqual(sKey, "material", false)) {
+										ReplaceStringEx(sValue, sizeof(sValue), "materials/", "");
+										PrecacheDecal(sValue, true);
 									}
 								}
 								case MM_Beam, MM_Circle, MM_Sprite: {
-									if (StrEqual(sKey, "material")) {
-										SetTrieValue(hComponent, sKey, PrecacheModel(sValue));
+									if (StrEqual(sKey, "material", false)) {
+										SetTrieValue(hComponent, sKey, PrecacheModel(sValue, true));
 										continue;
 									}
 								}
@@ -239,7 +246,7 @@ LoadConfig()
 
 SpawnModel(Handle:hComponent, Float:fPos[3], &iRotorEntity, iClient)
 {
-	new String:sValue[PLATFORM_MAX_PATH], String:sArg[18], iArgPos;
+	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fOrigin[3];
 
 	new iModel = CreateEntityByName("prop_dynamic_override");
@@ -287,18 +294,12 @@ SpawnModel(Handle:hComponent, Float:fPos[3], &iRotorEntity, iClient)
 	DispatchKeyValue(iModel, "spawnflags", "4");
 
 	GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
-	fOrigin = fPos;
-	iArgPos = 0;
-	for (new i = 0; i < 3; i++) {
-		strcopy(sArg, sizeof(sArg), "0");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-		fOrigin[i] += StringToFloat(sArg);
-	}
-	Format(sValue, sizeof(sValue), "%f %f %f", fOrigin[0], fOrigin[1], fOrigin[2]);
-	DispatchKeyValue(iModel, "origin", sValue);
+	GetVectorFromString(sValue, fOrigin);
+	AddVectors(fPos, fOrigin, fOrigin);
+	DispatchKeyValueVector(iModel, "origin", fOrigin);
 
 	if (iRotation != 0) {
-		DispatchKeyValue(iRotor, "origin", sValue);
+		DispatchKeyValueVector(iRotor, "origin", fOrigin);
 		DispatchKeyValue(iRotor, "friction", "0");
 		DispatchKeyValue(iRotor, "dmg", "0");
 		DispatchKeyValue(iRotor, "solid", "0");
@@ -328,15 +329,20 @@ SpawnTesla(Handle:hComponent, Float:fPos[3])
 	new iEnt = CreateEntityByName("point_tesla");
 
 	if (iEnt != -1) {
-		new String:sValue[PLATFORM_MAX_PATH];
+		new String:sValue[PLATFORM_MAX_PATH], Float:fOrigin[3];
 
-		GetComponentString(hComponent, "material", sValue, sizeof(sValue), "sprites/physbeam.vmt");
+		GetComponentString(hComponent, "material", sValue, sizeof(sValue), "materials/sprites/physbeam.vmt");
 		DispatchKeyValue(iEnt, "texture", sValue);
 
 		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 		DispatchKeyValue(iEnt, "m_Color", sValue);
-
-		DispatchKeyValueFloat(iEnt, "m_flRadius", GetComponentFloat(hComponent, "radius", 75.0));
+		
+		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
+		GetVectorFromString(sValue, fOrigin);
+		AddVectors(fPos, fOrigin, fOrigin);
+		DispatchKeyValueVector(iEnt, "origin", fOrigin);
+		
+		DispatchKeyValueFloat(iEnt, "m_flRadius", GetComponentFloat(hComponent, "radius", 48.0));
 		DispatchKeyValueNum(iEnt, "beamcount_min", GetComponentInt(hComponent, "beamcount-min", 6));
 		DispatchKeyValueNum(iEnt, "beamcount_min", GetComponentInt(hComponent, "beamcount-max", 8));
 		DispatchKeyValueFloat(iEnt, "thick_min", GetComponentFloat(hComponent, "thickness-min", 2.0));
@@ -346,7 +352,7 @@ SpawnTesla(Handle:hComponent, Float:fPos[3])
 		DispatchKeyValueFloat(iEnt, "interval_min", GetComponentFloat(hComponent, "interval-min", 0.1));
 		DispatchKeyValueFloat(iEnt, "interval_max", GetComponentFloat(hComponent, "interval-max", 0.2));
 		DispatchSpawn(iEnt);
-		TeleportEntity(iEnt, fPos, NULL_VECTOR, NULL_VECTOR);
+		TeleportEntity(iEnt, fOrigin, NULL_VECTOR, NULL_VECTOR);
 
 		ActivateEntity(iEnt);
 		AcceptEntityInput(iEnt, "TurnOn");
@@ -361,20 +367,25 @@ SpawnSmokeStack(Handle:hComponent, Float:fPos[3])
 	new iEnt = CreateEntityByName("env_smokestack");
 
 	if (iEnt != -1) {
-		new String:sValue[PLATFORM_MAX_PATH];
+		new String:sValue[PLATFORM_MAX_PATH], Float:fOrigin[3];
 
-		GetComponentString(hComponent, "material", sValue, sizeof(sValue), "effects/redflare.vmt");
+		GetComponentString(hComponent, "material", sValue, sizeof(sValue), "materials/effects/redflare.vmt");
 		DispatchKeyValue(iEnt, "SmokeMaterial", sValue);
 
 		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 		DispatchKeyValue(iEnt, "rendercolor", sValue);
 
+		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
+		GetVectorFromString(sValue, fOrigin);
+		AddVectors(fPos, fOrigin, fOrigin);
+		DispatchKeyValueVector(iEnt, "origin", fOrigin);
+		
 		DispatchKeyValueNum(iEnt, "BaseSpread", GetComponentInt(hComponent, "radius", 48));
 		DispatchKeyValueNum(iEnt, "SpreadSpeed", GetComponentInt(hComponent, "spreadspeed", 0));
 		DispatchKeyValueNum(iEnt, "Speed", GetComponentInt(hComponent, "speed", 30));
-		DispatchKeyValueNum(iEnt, "StartSize", GetComponentInt(hComponent, "startsize", 8));
-		DispatchKeyValueNum(iEnt, "EndSize", GetComponentInt(hComponent, "endsize", 8));
-		DispatchKeyValueNum(iEnt, "Rate", GetComponentInt(hComponent, "emmision-rate", 24));
+		DispatchKeyValueNum(iEnt, "StartSize", GetComponentInt(hComponent, "size-start", 8));
+		DispatchKeyValueNum(iEnt, "EndSize", GetComponentInt(hComponent, "size-end", 8));
+		DispatchKeyValueNum(iEnt, "Rate", GetComponentInt(hComponent, "emmisionrate", 24));
 		DispatchKeyValueNum(iEnt, "JetLength", GetComponentInt(hComponent, "length", 32));
 		DispatchKeyValueNum(iEnt, "twist", GetComponentInt(hComponent, "twist", 0));
 		DispatchKeyValueNum(iEnt, "renderamt", GetComponentInt(hComponent, "alpha", 255));
@@ -382,7 +393,7 @@ SpawnSmokeStack(Handle:hComponent, Float:fPos[3])
 
 		ActivateEntity(iEnt);
 		AcceptEntityInput(iEnt, "TurnOn");
-		TeleportEntity(iEnt, fPos, NULL_VECTOR, NULL_VECTOR);
+		TeleportEntity(iEnt, fOrigin, NULL_VECTOR, NULL_VECTOR);
 	}
 
 	return iEnt;
@@ -401,7 +412,7 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 		new bool:bPlayerAngle = ExistComponentKey(hComponent, "playerangle");
 		GetComponentString(hComponent, "angles", sValue, sizeof(sValue), bPlayerAngle ? "180 0 0" : "-90 0 0");
 
-		new Float:fAngles[3];
+		new Float:fAngles[3], Float:fOrigin[3];
 		GetVectorFromString(sValue, fAngles);
 
 		if (bPlayerAngle) {
@@ -411,13 +422,18 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 		}
 
 		DispatchKeyValueVector(iEnt, "angles", fAngles);
+		
+		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
+		GetVectorFromString(sValue, fOrigin);
+		AddVectors(fPos, fOrigin, fOrigin);
+		DispatchKeyValueVector(iEnt, "origin", fOrigin);
 
-		DispatchKeyValueNum(iEnt, "StartSize", GetComponentInt(hComponent, "startsize", 4));
-		DispatchKeyValueNum(iEnt, "EndSize", GetComponentInt(hComponent, "endsize", 16));
-		DispatchKeyValueNum(iEnt, "SpreadSpeed", GetComponentInt(hComponent, "spreadspeed", 8));
+		DispatchKeyValueNum(iEnt, "StartSize", GetComponentInt(hComponent, "width-start", 4));
+		DispatchKeyValueNum(iEnt, "EndSize", GetComponentInt(hComponent, "width-end", 16));
 		DispatchKeyValueNum(iEnt, "Speed", GetComponentInt(hComponent, "speed", 32));
 		DispatchKeyValueNum(iEnt, "JetLength", GetComponentInt(hComponent, "length", 48));
-		DispatchKeyValueNum(iEnt, "renderamt", GetComponentInt(hComponent, "alpha", 150));
+		DispatchKeyValueNum(iEnt, "renderamt", GetComponentInt(hComponent, "alpha", 255));
+		DispatchKeyValue(iEnt, "SpreadSpeed", "8");
 		DispatchKeyValue(iEnt, "rollspeed", "4");
 		DispatchKeyValue(iEnt, "Rate", "16");
 		DispatchKeyValue(iEnt, "InitialState", "1");
@@ -425,7 +441,7 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 
 		ActivateEntity(iEnt);
 		AcceptEntityInput(iEnt, "TurnOn");
-		TeleportEntity(iEnt, fPos, NULL_VECTOR, NULL_VECTOR);
+		TeleportEntity(iEnt, fOrigin, NULL_VECTOR, NULL_VECTOR);
 	}
 
 	return iEnt;
@@ -436,7 +452,7 @@ SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
 	new iEnt = CreateEntityByName("point_spotlight");
 
 	if (iEnt != -1) {
-		new String:sValue[PLATFORM_MAX_PATH], String:sArg[18], iArgPos;
+		new String:sValue[PLATFORM_MAX_PATH];
 		new Float:fOrigin[3];
 
 		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
@@ -457,20 +473,13 @@ SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
 		DispatchKeyValueVector(iEnt, "angles", fAngles);
 
 		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
-		fOrigin = fPos;
-		iArgPos = 0;
-		for (new i = 0; i < 3; i++) {
-			strcopy(sArg, sizeof(sArg), "0");
-			iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-			fOrigin[i] += StringToFloat(sArg);
-		}
-		Format(sValue, sizeof(sValue), "%f %f %f", fOrigin[0], fOrigin[1], fOrigin[2]);
-		DispatchKeyValue(iEnt, "origin", sValue);
+		GetVectorFromString(sValue, fOrigin);
+		AddVectors(fPos, fOrigin, fOrigin);
+		DispatchKeyValueVector(iEnt, "origin", fOrigin);
 
 		DispatchKeyValueNum(iEnt, "spotlightwidth", GetComponentInt(hComponent, "width", 8));
 		DispatchKeyValueNum(iEnt, "spotlightlength", GetComponentInt(hComponent, "length", 32));
-		DispatchKeyValueNum(iEnt, "renderamt", GetComponentInt(hComponent, "alpha", 150));
+		DispatchKeyValueNum(iEnt, "renderamt", GetComponentInt(hComponent, "alpha", 255));
 		DispatchKeyValue(iEnt, "spawnflags", "3");
 		DispatchSpawn(iEnt);
 
@@ -484,7 +493,7 @@ SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
 
 SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
 {
-	new String:sValue[PLATFORM_MAX_PATH], String:sArg[18], iArgPos;
+	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fStart[3], Float:fEnd[3];
 	new iColor[4];
 	new iMaterial;
@@ -495,34 +504,16 @@ SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
 	}
 
 	GetComponentString(hComponent, "start", sValue, sizeof(sValue), "0 0 0");
-	fStart = fPos;
-	iArgPos = 0;
-	for (new i = 0; i < 3; i++) {
-		strcopy(sArg, sizeof(sArg), "48");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-		fStart[i] += StringToFloat(sArg);
-	}
-
+	GetVectorFromString(sValue, fStart);
+	AddVectors(fPos, fStart, fStart);
+	
 	GetComponentString(hComponent, "end", sValue, sizeof(sValue), "0 0 48");
-	fEnd = fPos;
-	iArgPos = 0;
-	for (new i = 0; i < 3; i++) {
-		strcopy(sArg, sizeof(sArg), "48");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-		fEnd[i] += StringToFloat(sArg);
-	}
-
+	GetVectorFromString(sValue, fEnd);
+	AddVectors(fPos, fEnd, fEnd);
+	
 	GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
-	iArgPos = 0;
-	for (new i = 0; i <  3; i++) {
-		strcopy(sArg, sizeof(sArg), "255");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-		iColor[i] = StringToInt(sArg);
-	}
+	GetVectorFromString(sValue, iColor, false);
 
 	new Float:fWidthStart = GetComponentFloat(hComponent, "width-start", 1.0);
 	new Float:fWidthEnd = GetComponentFloat(hComponent, "width-end", 1.0);
@@ -534,7 +525,7 @@ SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
 
 SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
 {
-	new String:sValue[PLATFORM_MAX_PATH], String:sArg[18], iArgPos;
+	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fOrigin[3];
 	new iColor[4];
 	new iMaterial;
@@ -545,24 +536,12 @@ SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
 	}
 
 	GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
-	fOrigin = fPos;
-	iArgPos = 0;
-	for (new i = 0; i < 3; i++) {
-		strcopy(sArg, sizeof(sArg), "0");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-		fOrigin[i] += StringToFloat(sArg);
-	}
+	GetVectorFromString(sValue, fOrigin);
+	AddVectors(fPos, fOrigin, fOrigin);
 
 	GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
-	iArgPos = 0;
-	for (new i = 0; i <  3; i++) {
-		strcopy(sArg, sizeof(sArg), "255");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-		iColor[i] = StringToInt(sArg);
-	}
+	GetVectorFromString(sValue, iColor, false);
 
 	new Float:fRadius = GetComponentFloat(hComponent, "radius", 32.0) * 2;
 	new Float:fAmplitude = GetComponentFloat(hComponent, "amplitude", 0.0);
@@ -573,9 +552,8 @@ SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
 
 SpawnSprite(Handle:hComponent, Float:fPos[3], Float:fLife)
 {
-	new String:sValue[PLATFORM_MAX_PATH], String:sArg[18], iArgPos;
+	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fOrigin[3];
-	new iColor[4];
 	new iMaterial;
 	GetTrieValue(hComponent, "material", iMaterial);
 
@@ -584,26 +562,10 @@ SpawnSprite(Handle:hComponent, Float:fPos[3], Float:fLife)
 	}
 
 	GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
-	fOrigin = fPos;
-	iArgPos = 0;
-	for (new i = 0; i < 3; i++) {
-		strcopy(sArg, sizeof(sArg), "0");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
+	GetVectorFromString(sValue, fOrigin);
+	AddVectors(fPos, fOrigin, fOrigin);
 
-		fOrigin[i] += StringToFloat(sArg);
-	}
-
-	GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
-	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
-	iArgPos = 0;
-	for (new i = 0; i <  3; i++) {
-		strcopy(sArg, sizeof(sArg), "255");
-		iArgPos += BreakString(sValue[iArgPos], sArg, sizeof(sArg));
-
-		iColor[i] = StringToInt(sArg);
-	}
-
-	TE_SetupGlowSprite(fOrigin, iMaterial, fLife, GetComponentFloat(hComponent, "size", 1.0), 255);
+	TE_SetupGlowSprite(fOrigin, iMaterial, fLife, GetComponentFloat(hComponent, "size", 1.0), GetComponentInt(hComponent, "brightness", 255));
 	TE_SendToAll();
 }
 
@@ -641,13 +603,18 @@ bool:ExistComponentKey(Handle:hComponent, const String:sKey[])
 	return (GetTrieValue(hComponent, sKey, iValue) || GetTrieString(hComponent, sKey, sValue, sizeof(sValue)));
 }
 
-GetVectorFromString(const String:sVector[], Float:fVector[3])
+GetVectorFromString(const String:sVector[], any:aVector[], bool:bIsFloat = true)
 {
 	new iArgPos, String:sArg[18];
 	for (new i = 0; i < 3; i++) {
-		strcopy(sArg, sizeof(sArg), "15");
+		strcopy(sArg, sizeof(sArg), "0");
 		iArgPos += BreakString(sVector[iArgPos], sArg, sizeof(sArg));
-		fVector[i] = StringToFloat(sArg);
+		
+		if (bIsFloat) {
+			aVector[i] = StringToFloat(sArg);
+		} else {
+			aVector[i] = StringToInt(sArg);
+		}
 	}
 }
 
@@ -671,5 +638,13 @@ MM_Types:GetMarkTypeFromName(const String:sMarkName[])
 		return MM_Sprite;
 	} else {
 		return MM_Invalid;
+	}
+}
+
+StringToLower(String:str[])
+{
+	new iLen = strlen(str);	
+	for (new i = 0; i < iLen; i++) {
+		str[i] = CharToLower(str[i]);
 	}
 }
