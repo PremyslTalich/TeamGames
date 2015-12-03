@@ -1,7 +1,8 @@
 To do list
 ==========
 
-- [ ] Update (create) MoreMarks wiki
+- [ ] Look at ColorVariables bug
+- [ ] Look at HeadShot only bug
 - [ ] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?)
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add fixed player skins to extras
@@ -9,6 +10,7 @@ To do list
 
 ---
 
+- [x] Update (create) MoreMarks wiki
 - [x] Test & publish MoreMarks module
 - [x] Check reported buggy HE battle - fixed?
 - [x] Add multiple-players-team-switch functions to TG teams menu - [Issue #3](https://github.com/KissLick/TeamGames/issues/3)
