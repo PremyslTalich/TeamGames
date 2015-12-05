@@ -1,15 +1,15 @@
 To do list
 ==========
 
-- [ ] Look at ColorVariables bug
-- [ ] Look at HeadShot only bug
-- [ ] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?)
+- [ ] Look at ColorVariables bug - should be fixed now, gonna have a look at it tomorrow
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
 
 ---
 
+- [x] Look at HeadShot only bug - bad model...
+- [X] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?) - bad model...
 - [x] Update (create) MoreMarks wiki
 - [x] Test & publish MoreMarks module
 - [x] Check reported buggy HE battle - fixed?
