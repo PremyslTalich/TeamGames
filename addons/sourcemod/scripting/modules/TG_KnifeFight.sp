@@ -52,7 +52,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 		SetHPMenu(iClient, sID);
 }
 
-public TG_OnGamePrepare(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
 {
 	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;

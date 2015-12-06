@@ -52,7 +52,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 		TG_StartGame(iClient, GAME_ID, _, _, true);
 }
 
-public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
 {
 	if (!StrEqual(id, GAME_ID, true))
 		return;

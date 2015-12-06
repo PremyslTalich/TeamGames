@@ -98,7 +98,7 @@ public SelectPlayerHandeler(iActivator, iClient, bool:bIsRandom)
 	}
 }
 
-public TG_OnGamePrepare(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
+public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
 {
 	if (!StrEqual(sID, GAME_ID, true))
 		return;
