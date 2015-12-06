@@ -7,7 +7,7 @@ To do list
 
 ---
 
-- [x] Look at ColorVariables bug - should be fixed now, gonna have a look at it tomorrow
+- [x] Look at ColorVariables bug - [Issue #6](https://github.com/KissLick/TeamGames/issues/6) - recompile TG with new ColorVariables
 - [x] Look at HeadShot only bug - bad model...
 - [X] Reported some weird bugs, gonna fix them soon (mistaken with nobullet marks?) - bad model...
 - [x] Update (create) MoreMarks wiki
