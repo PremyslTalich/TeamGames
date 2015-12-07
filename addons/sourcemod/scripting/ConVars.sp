@@ -96,32 +96,12 @@ GetConVarColorToArray(Handle:cvar, color[3])
 
 HookConVarsChange()
 {
-	HookConVarChange(g_hMenuPercent             , Hook_ConVarChange);
-	HookConVarChange(g_hRoundLimit              , Hook_ConVarChange);
-	HookConVarChange(g_hMoveSurvivors           , Hook_ConVarChange);
-	HookConVarChange(g_hSaveWeapons             , Hook_ConVarChange);
-	HookConVarChange(g_hRebelAttack             , Hook_ConVarChange);
-	HookConVarChange(g_hChangeTeamDelay         , Hook_ConVarChange);
-	HookConVarChange(g_hTeamDiff                , Hook_ConVarChange);
-	HookConVarChange(g_hTeamAttack              , Hook_ConVarChange);
-	HookConVarChange(g_hNotifyPlayerTeam        , Hook_ConVarChange);
-	HookConVarChange(g_hAllowMark               , Hook_ConVarChange);
-	HookConVarChange(g_hMarkLimit               , Hook_ConVarChange);
-	HookConVarChange(g_hMarkLife                , Hook_ConVarChange);
-	HookConVarChange(g_hMarkLaser               , Hook_ConVarChange);
-	HookConVarChange(g_hImportantMsg            , Hook_ConVarChange);
-	HookConVarChange(g_hAllowTeamPrefix         , Hook_ConVarChange);
-	HookConVarChange(g_hFenceType               , Hook_ConVarChange);
-	HookConVarChange(g_hFenceHeight             , Hook_ConVarChange);
-	HookConVarChange(g_hFenceNotify             , Hook_ConVarChange);
-	HookConVarChange(g_hFencePunishLength       , Hook_ConVarChange);
-	HookConVarChange(g_hFenceFreeze             , Hook_ConVarChange);
-	HookConVarChange(g_hFencePunishColorSettings, Hook_ConVarChange);
-	HookConVarChange(g_hFencePunishColor        , Hook_ConVarChange);
-	HookConVarChange(g_hForceAutoKick           , Hook_ConVarChange);
-	HookConVarChange(g_hForceTKPunish           , Hook_ConVarChange);
-	HookConVarChange(g_hFriendlyFire            , Hook_ConVarChange);
-	HookConVarChange(g_hFFReduction           	, Hook_ConVarChange);
+	HookConVarChange(g_hRoundLimit,        Hook_ConVarChange);
+	HookConVarChange(g_hFencePunishColor,  Hook_ConVarChange);
+	HookConVarChange(g_hForceAutoKick,     Hook_ConVarChange);
+	HookConVarChange(g_hForceTKPunish,     Hook_ConVarChange);
+	HookConVarChange(g_hFriendlyFire,      Hook_ConVarChange);
+	HookConVarChange(g_hFFReduction,       Hook_ConVarChange);
 }
 
 public Hook_ConVarChange(Handle:cvar, const String:oldVal[], const String:newVal[])

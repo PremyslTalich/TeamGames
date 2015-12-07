@@ -62,7 +62,7 @@ public Native_FencePlayerCross(Handle:hPlugin, iNumParams)
 	FencePunishPlayer(iClient, bCallForward);
 }
 
-public Native_TG_SpawnMark(Handle:hPlugin, iNumParams)
+public Native_SpawnMark(Handle:hPlugin, iNumParams)
 {
 	new Float:fPos[3];
 
@@ -922,7 +922,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_FenceDestroy", Native_FenceDestroy);
 	CreateNative("TG_FencePlayerCross", Native_FencePlayerCross);
 
-	CreateNative("TG_SpawnMark", Native_TG_SpawnMark);
+	CreateNative("TG_SpawnMark", Native_SpawnMark);
 
 	CreateNative("TG_GetTeamCount", Native_GetTeamCount);
 	CreateNative("TG_ClearTeam", Native_ClearTeam);
