@@ -47,7 +47,7 @@ TeamsMenu(iClient)
 	AddMenuItem(hMenu, "spacer", "spacer", ITEMDRAW_SPACER);
 	AddMenuItemFormat(hMenu, "AllNone", _, "%T", "MenuTeams-NoneTeamAll", iClient);
 
-	if (GetConVarBool(g_hAllowMultiSwitch)) {
+	if (GetConVarInt(g_hAllowMultiSwitch) > 0) {
 		AddMenuItemFormat(hMenu, "FiftyFifty", _, "%T", "MenuTeams-FiftyFiftyAll", iClient);
 		AddMenuItemFormat(hMenu, "AllRed", _, "%T", "MenuTeams-RedTeamAll", iClient);
 	}
@@ -73,6 +73,11 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 					SwitchToTeam(iClient, iUser, TG_RedTeam);
 				}
 			}
+
+			if (GetConVarInt(g_hAllowMultiSwitch) == 2) {
+				GamesMenu(iClient, TG_RedOnly);
+				return;
+			}
 		} else if (StrEqual(sKey, "FiftyFifty")) {
 			new iUsers[MAXPLAYERS + 1];
 			new TG_Team:iTeam = TG_RedTeam;
@@ -93,6 +98,11 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 			for (new i = 0; i < iUsersCount; i++) {
 				SwitchToTeam(iClient, iUsers[i], iTeam);
 				iTeam = TG_GetOppositeTeam(iTeam);
+			}
+
+			if (GetConVarInt(g_hAllowMultiSwitch) == 2) {
+				GamesMenu(iClient, TG_FiftyFifty);
+				return;
 			}
 		} else {
 			new target = GetClientAimTarget(iClient);
