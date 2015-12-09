@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Create game "Wild West" - revolver, first attack only
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
