@@ -35,8 +35,10 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 - Pistol zoom battle
 - Reload battle
 - Taser mania *(CS:GO only)*
+- WildWest *(CS:GO only)*
 
 ##Non-game modules
-- Warden
-- Bomb toss
-- Permanent fences
+- [Warden](https://github.com/KissLick/TeamGames/wiki/Warden-plugin)
+- [Bomb toss](https://github.com/KissLick/TeamGames/wiki/BombToss)
+- [Permanent fences](https://github.com/KissLick/TeamGames/wiki/Permanent-fences)
+- [MoreMarks](https://github.com/KissLick/TeamGames/wiki/oreMarks)
