@@ -2,10 +2,10 @@
 {
 	"GameName-FiftyFifty"
 	{
-		"en"		"Divoký západ"
+		"cze"		"Divoký západ"
 	}
 	"GameName-RedOnly"
 	{
-		"en"		"Divoký západ"
+		"cze"		"Divoký západ"
 	}
 }
