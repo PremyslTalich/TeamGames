@@ -41,4 +41,4 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 - [Warden](https://github.com/KissLick/TeamGames/wiki/Warden-plugin)
 - [Bomb toss](https://github.com/KissLick/TeamGames/wiki/BombToss)
 - [Permanent fences](https://github.com/KissLick/TeamGames/wiki/Permanent-fences)
-- [MoreMarks](https://github.com/KissLick/TeamGames/wiki/oreMarks)
+- [MoreMarks](https://github.com/KissLick/TeamGames/wiki/MoreMarks)
