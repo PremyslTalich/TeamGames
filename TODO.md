@@ -1,13 +1,13 @@
 To do list
 ==========
 
-- [ ] Create game "Wild West" - revolver, first attack only
 - [ ] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
 
 ---
 
+- [x] Create game "Wild West" - revolver, first attack only
 - [x] HookConVarsChange...
 - [x] Look at ColorVariables bug - [Issue #6](https://github.com/KissLick/TeamGames/issues/6) - recompile TG with new ColorVariables
 - [x] Look at HeadShot only bug - bad model...
