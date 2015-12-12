@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"en"		"Divoký západ"
+	}
+	"GameName-RedOnly"
+	{
+		"en"		"Divoký západ"
+	}
+}

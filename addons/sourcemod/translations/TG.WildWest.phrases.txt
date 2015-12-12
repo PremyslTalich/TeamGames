@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"en"		"Wild West"
+	}
+	"GameName-RedOnly"
+	{
+		"en"		"Wild West"
+	}
+}
