@@ -13,7 +13,7 @@ public Plugin:myinfo =
 	name = "[TG] WildWest",
 	author = "Raska",
 	description = "",
-	version = "0.1",
+	version = "0.2",
 	url = ""
 }
 
@@ -87,6 +87,11 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 			g_iPlayerRevolver[i] = -1;
 		}
 	}
+}
+
+public TG_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+{
+	g_iPlayerRevolver[iClient] = -1;
 }
 
 public Frame_BlockAttack2(any:iClient)
