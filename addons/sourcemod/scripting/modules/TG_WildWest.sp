@@ -66,7 +66,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 
 	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
 		TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, _, _, true);
-	} else {
+	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		TG_StartGame(iClient, GAME_ID_REDONLY, _, _, true);
 	}
 }
