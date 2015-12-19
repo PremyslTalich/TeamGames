@@ -1,4 +1,3 @@
-#define FENCE_PRECACHE_HALO "materials/sprites/glow01.vmt"
 #define FENCE_PRE_COLOR {0, 255, 0, 255}
 
 new g_iFenceColor[4];
@@ -6,8 +5,7 @@ new Float:g_fFenceWidth;
 new String:g_sFenceMaterial[PLATFORM_MAX_PATH];
 new String:g_sFenceCornerModel[PLATFORM_MAX_PATH];
 
-new g_iFenceMaterialPrecache = -1;
-new g_iFenceHalo = -1;
+new g_iFencePreMaterial = -1;
 
 new bool:g_bFencesMenuMapVisibility;
 
@@ -51,19 +49,19 @@ public Action:Timer_FenceRectanglePre(Handle:hTimer, Handle:hDataPack) // Rectan
 
 	GetClientAbsOrigin(iClient, fC);
 
-	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
+	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0);
 
 	fA[2] += 18.0;
 	if (GetConVarFloat(g_hFenceHeight) < fA[2])
 		return Plugin_Continue;
 
-	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
+	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0);
 
 	fA[2] += 18.0;
 	if (GetConVarFloat(g_hFenceHeight) < fA[2])
 		return Plugin_Continue;
 
-	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0, g_iFenceMaterialPrecache, g_iFenceHalo);
+	TempEnt_Square(fA, fC, 0.11, FENCE_PRE_COLOR, 1.0);
 
 	return Plugin_Continue;
 }
@@ -386,7 +384,7 @@ public Action:Timer_FenceFreezeOff(Handle:hTimer, any:iClient)
 	return Plugin_Continue;
 }
 
-TempEnt_Square(Float:fA[3], Float:fC[3], Float:fLife, iColor[4], Float:fWidth, iModel, iHalo)
+TempEnt_Square(Float:fA[3], Float:fC[3], Float:fLife, iColor[4], Float:fWidth)
 {
 	new Float:b[3];
 	new Float:d[3];
@@ -394,13 +392,13 @@ TempEnt_Square(Float:fA[3], Float:fC[3], Float:fLife, iColor[4], Float:fWidth, i
 	d = fA; d[0] = fC[0];
 	fC[2] = fA[2];
 
-	TE_SetupBeamPoints(fA, b, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SetupBeamPoints(fA, b, g_iFencePreMaterial, 0, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
 	TE_SendToAll();
-	TE_SetupBeamPoints(b, fC, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SetupBeamPoints(b, fC, g_iFencePreMaterial, 0, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
 	TE_SendToAll();
-	TE_SetupBeamPoints(fC, d, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SetupBeamPoints(fC, d, g_iFencePreMaterial, 0, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
 	TE_SendToAll();
-	TE_SetupBeamPoints(d, fA, iModel, iHalo, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
+	TE_SetupBeamPoints(d, fA, g_iFencePreMaterial, 0, 1, 0, fLife, fWidth, fWidth, 0, 0.0, iColor, 0);
 	TE_SendToAll();
 }
 

@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.9.0.5"
+#define _PLUGIN_VERSION "0.9.1.1"
 
 public Plugin:myinfo =
 {
@@ -207,7 +207,7 @@ public OnMapStart()
 
 	PrecacheSoundAny("buttons/blip2.wav", true);
 	PrecacheModel("models/props/cs_office/trash_can.mdl", true);
-	g_iFenceHalo = PrecacheModel(FENCE_PRECACHE_HALO);
+	g_iFencePreMaterial = PrecacheModel("materials/sprites/laserbeam.vmt");
 }
 
 public OnConfigsExecuted()

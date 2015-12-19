@@ -354,7 +354,6 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		g_iFenceColor[2] = DTC_GetArgNum(hArgs, 4, 255);
 		g_iFenceColor[3] = DTC_GetArgNum(hArgs, 5, 255);
 
-		g_iFenceMaterialPrecache = PrecacheModel(m_sFile);
 		ReplaceStringEx(m_sFile, sizeof(m_sFile), "materials/", "");
 		PrecacheModel(m_sFile);
 
