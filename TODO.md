@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] HotPotato add: custom potato model, laser line between victim and potato
+- [ ] HotPotato add: custom potato model, laser line between victim and potato - [Issue #13](https://github.com/KissLick/TeamGames/issues/13)
 - [ ] Add "round time lock" for TG menu and games
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
