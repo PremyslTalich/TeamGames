@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] HotPotato add: custom potato model, laser line between victim and potato
 - [ ] Add "round time lock" for TG menu and games
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
