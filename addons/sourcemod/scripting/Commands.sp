@@ -306,6 +306,11 @@ public Action:Command_MainMenu(iClient, iArgs)
 	}
 
 	if (GetClientTeam(iClient) == CS_TEAM_CT) {
+		if (GetTime() < g_iMenuTimeLock) {
+			CPrintToChat(iClient, "%t", "Menu-TimeLock", g_iMenuTimeLock - GetTime());
+			return Plugin_Handled;
+		}
+
 		if (!IsPlayerAlive(iClient)) {
 			CPrintToChat(iClient, "%t", "Menu-AliveOnly");
 			return Plugin_Handled;
@@ -357,7 +362,7 @@ MainMenu(iClient)
 	Call_Finish();
 
 	new Handle:hMenu = CreateMenu(MainMenu_Handler);
-	decl String:sTransMsg[256], String:sMenuItemName[TG_MODULE_NAME_LENGTH];
+	decl String:sMenuItemName[TG_MODULE_NAME_LENGTH];
 
 	SetMenuTitle(hMenu, "%T", "Menu-Title", iClient);
 
@@ -378,29 +383,42 @@ MainMenu(iClient)
 		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu", false)) {
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
 
-			if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || (!IsGameTypeAvailable(TG_RedOnly) && !IsGameTypeAvailable(TG_FiftyFifty)))
-				AddMenuItemFormat(hMenu, "Core_GamesMenu", ITEMDRAW_DISABLED, "%T", "Menu-Games", iClient);
-			else
-				AddMenuItemFormat(hMenu, "Core_GamesMenu", _, "%T", "Menu-Games", iClient);
+			if (GetTime() < g_iGamesTimeLock) {
+				AddMenuItemFormat(hMenu, "Core_GamesMenu", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
+			} else {
+				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || (!IsGameTypeAvailable(TG_RedOnly) && !IsGameTypeAvailable(TG_FiftyFifty)))
+					AddMenuItemFormat(hMenu, "Core_GamesMenu", ITEMDRAW_DISABLED, "%T", "Menu-Games", iClient);
+				else
+					AddMenuItemFormat(hMenu, "Core_GamesMenu", _, "%T", "Menu-Games", iClient);
+			}
+
 
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu-FiftyFifty", false)) {
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
 
-			if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_FiftyFifty))
-				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-FiftyFifty", iClient);
-			else
-				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", _, "%T", "Menu-Games-FiftyFifty", iClient);
+			if (GetTime() < g_iGamesTimeLock) {
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
+			} else {
+				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_FiftyFifty))
+					AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-FiftyFifty", iClient);
+				else
+					AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", _, "%T", "Menu-Games-FiftyFifty", iClient);
+			}
 
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu-RedOnly", false)) {
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
 
-			Format(sTransMsg, sizeof(sTransMsg), "%T", "Menu-Games-RedOnly", iClient);
-			if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_RedOnly))
-				AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", ITEMDRAW_DISABLED, "%T", "Menu-Games-RedOnly", iClient);
-			else
-				AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", _, "%T", "Menu-Games-RedOnly", iClient);
+			if (GetTime() < g_iGamesTimeLock) {
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
+			} else {
+				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_RedOnly))
+					AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", ITEMDRAW_DISABLED, "%T", "Menu-Games-RedOnly", iClient);
+				else
+					AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", _, "%T", "Menu-Games-RedOnly", iClient);
+			}
+
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 		} else if (StrEqual(g_MenuItemList[i][Id], "Core_FencesMenu", false)) {
 			if (GetConVarInt(g_hFenceType) == 0 || !g_bFencesMenuMapVisibility) {
@@ -417,14 +435,14 @@ MainMenu(iClient)
 				AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
 			}
 		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesRoundLimitInfo", false)) {
-			if (g_iRoundLimit == 0)
-				Format(sTransMsg, sizeof(sTransMsg), "%T", "Menu-NoMoreGames", iClient);
-			else if (g_iRoundLimit > 0)
-				Format(sTransMsg, sizeof(sTransMsg), "%T", "Menu-CountGamesInfo", iClient, g_iRoundLimit);
-
 			if (g_iRoundLimit > -1) {
 				AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
-				AddMenuItem(hMenu, "Core_GamesRoundLimitInfo", sTransMsg, ITEMDRAW_RAWLINE);
+
+				if (g_iRoundLimit == 0)
+					AddMenuItemFormat(hMenu, "Core_GamesRoundLimitInfo", ITEMDRAW_RAWLINE, "%T", "Menu-NoMoreGames", iClient);
+				else if (g_iRoundLimit > 0)
+					AddMenuItemFormat(hMenu, "Core_GamesRoundLimitInfo", ITEMDRAW_RAWLINE, "%T", "Menu-CountGamesInfo", iClient, g_iRoundLimit);
+
 			}
 
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);

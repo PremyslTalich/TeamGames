@@ -114,6 +114,10 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Main menu - lock/unlock
+	"Menu-TimeLock"
+	{
+		"cze"		"TeamGames menu bude odemčeno za {highlight}{1}{default} sekund !"
+	}
 	"Menu-AliveOnly" // msg for dead CT player trying open main menu
 	{
 		"cze"		"Pouze živí hráči mohou určovat teamy a vybírat hry !"
@@ -167,6 +171,10 @@
 	"Menu-NoMoreGames"
 	{
 		"cze"		"Už není možné spustit hru."
+	}
+	"Menu-Games-TimeLock"
+	{
+		"cze"		"Hry budou dostupné za {1} sekund !"
 	}
 //------------------------------------------------------------------------------------------------
 // Teams menu

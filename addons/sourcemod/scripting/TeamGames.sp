@@ -75,7 +75,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.9.1.1"
+#define _PLUGIN_VERSION "0.9.1.8"
 
 public Plugin:myinfo =
 {
@@ -100,6 +100,7 @@ public OnPluginStart()
 
 	g_hMenuPercent = 				CreateConVar("tg_menu_percent", 			"0.0", 			"How many percent of alive CTs must use !tg to unlock !tg menu (0.0 = no limit)", _, true, 0.0, true, 1.0);
 	g_hAllowMultiSwitch = 			CreateConVar("tg_menu_team_multiswitch",	"0",			"Allow multi switch functions in teams menu? (0 = no, 1 = yes, 2 = yes + jump to games menu)");
+	g_hMenuTimeLock = 				CreateConVar("tg_menu_timelock",			"0",			"Time lock for TeamGames menu. (in seconds)");
 
 	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow self damage, even in game");
 
@@ -110,6 +111,7 @@ public OnPluginStart()
 	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",			"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");
 	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",			"Frags added when prisoner killed in TG game.");
 	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",			"Score added when prisoner killed in TG game. (Only for CS:GO)");
+	g_hGamesTimeLock = 				CreateConVar("tg_game_timelock",			"0",			"Time lock for TG games. (in seconds)");
 
 	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
 	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",			"How should be teams differentiated? (0 = color, 1 = skin)");
@@ -269,6 +271,8 @@ public Action:Event_RoundStart(Handle:hEvent, const String:sName[], bool:bDontBr
 
 	g_bLockMenu = (GetConVarFloat(g_hMenuPercent) <= 0.0) ? false : true;
 	g_bTeamsLock = false;
+	g_iMenuTimeLock = GetTime() + GetConVarInt(g_hMenuTimeLock);
+	g_iGamesTimeLock = GetTime() + GetConVarInt(g_hGamesTimeLock);
 	g_iMarkLimitCounter = 0;
 
 	DestroyFence();

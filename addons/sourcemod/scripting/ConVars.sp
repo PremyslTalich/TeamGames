@@ -5,6 +5,7 @@ new Handle:g_hModuleDefVisibility;
 
 new Handle:g_hMenuPercent;
 new Handle:g_hAllowMultiSwitch;
+new Handle:g_hMenuTimeLock, g_iMenuTimeLock;
 
 new Handle:g_hSelfDamage;
 
@@ -14,6 +15,7 @@ new Handle:g_hMoveSurvivors;
 new Handle:g_hSaveWeapons;
 new Handle:g_hRebelAttack;
 new Handle:g_hKillFrags, Handle:g_hKillScore;
+new Handle:g_hGamesTimeLock, g_iGamesTimeLock;
 
 new Handle:g_hChangeTeamDelay;
 new Handle:g_hTeamDiff;
