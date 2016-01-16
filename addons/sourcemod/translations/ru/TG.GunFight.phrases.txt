@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"Оружейная битва"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"Оружейная битва"
+	}
+	"ChooseWeapon"
+	{
+		"ru"		"выбери оружие"
+	}
+}

@@ -1,0 +1,336 @@
+"Phrases"
+{
+//------------------------------------------------------------------------------------------------
+// Player moved to team
+	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
+	{
+		"#format"	"{1:s},{2:s}"
+		
+		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-redteam} красных {default} !"
+	}
+	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
+	{
+		"#format"	"{1:s},{2:s}"
+		
+		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-blueteam} синих {default} !"
+	}
+	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
+	{
+		"#format"	"{1:s}"
+		"ru"		"{1} Больше не в команде!"
+	}
+	"PlayerMove-RedTeam-Game"
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
+	}
+	"PlayerMove-BlueTeam-Gamee"
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
+	}
+//------------------------------------------------------------------------------------------------
+// Player team hints
+	"TeamHud-RedTeam" // hint msg for player in team red
+	{
+		"ru"		"Вы в команде красных!"
+	}
+	"TeamHud-BlueTeam" // hint msg for player in team blue
+	{
+		"ru"		"Вы в команде синих!"
+	}
+	"TeamHud-NoneTeam" // hint msg for player moved out of team
+	{
+		"ru"		"Вы не состоите ни в какой команде!"
+	}
+//------------------------------------------------------------------------------------------------
+// Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
+	"TeamPrefix-RedTeam" // player prefix in chat (team red)
+	{
+		"ru"		"[красные]"
+	}
+	"TeamPrefix-BlueTeam" // player prefix in chat (team blue)
+	{
+		"ru"		"[синие]"
+	}
+//------------------------------------------------------------------------------------------------
+// Game progress
+	"GamePreparation" // msg for all players when started preparation for game ({1} = game name)
+	{
+		"#format"	"{1:s}"
+		"ru"		"Подготовка к игре {tg-module}{1}{default} !!!"
+	}
+	"GamePreparation-Settings" // msg for all players when started preparation for game ({1} = game name, {2} = game settings)
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Подготовка к игре {tg-module}{1}{default} - {tg-settings}{2}{default} !!!"
+	}
+	"GameStart" // msg for all players when GameStart ({1} = game name)
+	{
+		"#format"	"{1:s}"
+		"ru"		"Игра {tg-module}{1}{default} начата !!!"
+	}
+	"GameStart-Settings" // msg for all players when GameStart ({1} = game name, {2} = game settings)
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Игра {tg-module}{1}{default} - {tg-settings}{2}{default} начата !!!"
+	}
+	"GameStop" // msg for all players when someone stop the game ({1} = player name)
+	{
+		"#format"	"{1:s}"
+		"ru"		"Игрок {player}{1}{default} завершил игру !!!"
+	}
+	"GameEnd"
+	{
+		"#format"	"{1:s}"
+		"ru"		"Игра {tg-module}{1}{default} завершена !!!"
+	}
+	"PlayerDeath-RedTeam" // msg for all players that player from team red died ({1} = red player name)
+	{
+		"#format"	"{1:s}"
+		"ru"		"Умер {1} из команды{tg-redteam} красных {default}!"
+	}
+	"PlayerDeath-BlueTeam" // msg for all players that player from team blue died ({1} = blue player name)
+	{
+		"#format"	"{1:s}"
+		"ru"		"Умер {1} из команды{tg-blueteam} синих{default} !"
+	}
+	"TeamWins-RedTeam" // msg for all players that team red wins
+	{
+		"ru"		"Команда {tg-redteam}красных{default} победила !!!"
+	}
+	"TeamWins-BlueTeam" // msg for all players that team blue wins
+	{
+		"ru"		"Команда {tg-blueteam}синих{default} победила !!!"
+	}
+	"TeamWins-Tie" // msg for all players that teams tied
+	{
+		"ru"		"Команды сыграли вничью !!!"
+	}
+	"TeamWins-Winner" // msg for all players that teams tied
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Игрок {tg-redteam}{1} {default}победил в игре {tg-module}{2}!"
+	}
+	"TeamWins-Winners" // msg for all players that teams tied
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Игроки {tg-redteam}{1} {default}победили в игре {tg-module}{2}!"
+	}
+//------------------------------------------------------------------------------------------------
+// Main menu - lock/unlock
+	"Menu-AliveOnly" // msg for dead CT player trying open main menu
+	{
+		"ru"		"Только живые игроки могут проводить игры !"
+	}
+	"Menu-CTOnly" // msg for T player trying open main menu
+	{
+		"ru"		"Только охранники могут проводить игры !"
+	}
+	"Menu-Locked" // msg for all players if somebody (must be CT and alive) try to open main menu and main menu is locked
+	{
+		"#format"	"{1:d},{2:d}"
+		"ru"		"{highlight}{1}/{2}{default} требуется {highlight} !tg{default} для разблокировки."
+	}
+	"Menu-Unlocked" // msg for all players when main menu is unlocked
+	{
+		"ru"		"{default}!tg меню{highlight} разблокированно!"
+	}
+//------------------------------------------------------------------------------------------------
+// Main menu
+	"Menu-Title"
+	{
+		"ru"		"Мини Игры:"
+	}
+	"Menu-Teams"
+	{
+		"en"		"Distribute to teams"
+		"ru"		"Распределить по командам"
+	}
+	"Menu-Games"
+	{
+		"ru"		"Выбрать игру"
+	}
+	"Menu-Games-FiftyFifty"
+	{
+		"ru"		"Выбрать игру (Команда на Команду)"
+	}
+	"Menu-Games-RedOnly"
+	{
+		"ru"		"Выбрать игру (Только Красные)"
+	}
+	"Menu-CreateFence"
+	{
+		"ru"		"Растянуть ринг"
+	}
+	"Menu-StopGame"
+	{
+		"ru"		"Отсановить игру !"
+	}
+	"Menu-CountGamesInfo"
+	{
+		"#format"	"{1:d}"
+		"ru"		"Вы можете сыграть {1} игр за этот раунд."
+	}
+	"Menu-NoMoreGames"
+	{
+		"ru"		"Пока что вы не можете играть в какую-либо игру."
+	}
+//------------------------------------------------------------------------------------------------
+// Teams menu
+	"MenuTeams-Title"
+	{
+		"ru"		"Переместить игрока в:"
+	}
+	"MenuTeams-RedTeam"
+	{
+		"ru"		"Команда Красных"
+	}
+	"MenuTeams-BlueTeam"
+	{
+		"ru"		"Команда Синих"
+	}
+	"MenuTeams-NoneTeam"
+	{
+		"ru"		"Без команды"
+	}
+	"MenuTeams-NoneTeamAll"
+	{
+		"ru"		"Исключить всех из команд"
+	}	
+	"MenuTeams-FiftyFiftyAll"
+	{
+		"ru"		"Поделить игроков на команды Синих и Красных"
+	}
+	"MenuTeams-RedTeamAll"
+	{
+		"ru"		"Всех в команду красных"
+	}
+//------------------------------------------------------------------------------------------------
+// Games menu
+	"MenuGames-Title"
+	{
+		"ru"		"Выбери игру:"
+	}
+	"MenuGames-Start-Title" // {1} = game name
+	{
+		"#format"	"{1:s}"
+		"ru"		"{1}"
+	}
+	"MenuGames-Start"
+	{
+		"ru"		"Начать игру*"
+	}
+	"MenuGames-RedOnlyHint"
+	{
+		"ru"		"Только красные"
+	}
+//------------------------------------------------------------------------------------------------
+// Games list menu
+	"MenuGamesList-Title"
+	{
+		"ru"		"Выбери тип игры:"
+	}
+	"MenuGamesList-FiftyFifty"
+	{
+		"ru"		"50/50 - Красные против Синих"
+	}
+	"MenuGamesList-RedOnly"
+	{
+		"ru"		"Только красные - Красные против друг друга"
+	}
+	"MenuGamesList-Title-FiftyFifty"
+	{
+		"ru"		"Red'N'Blue игры"
+	}
+	"MenuGamesList-Title-RedOnly"
+	{
+		"ru"		"Только красные - игры"
+	}
+	"MenuGamesList-Chosen-FiftyFifty"
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Игрок {1} выбрал игру {tg-module}{2}"
+	}
+	"MenuGamesList-Chosen-RedOnly"
+	{
+		"#format"	"{1:s},{2:s}"
+		"ru"		"Игрок {1}выбрал игру {tg-module}{2} {tg-redteam}(RedOnly)"
+	}
+//------------------------------------------------------------------------------------------------
+// Fences menu
+	"MenuFences-Confirm"
+	{
+		"ru"		"Подтвердить установку ринга"
+	}
+	"Fences-PlayerCross"
+	{
+		"#format"	"{1:s}"
+		"ru"		"Игрок {1} коснулся каната!"
+	}
+//------------------------------------------------------------------------------------------------
+// Player select menu
+	"MenuPlayerSelect-Title"
+	{
+		"ru"		"выбери игрока:"
+	}
+	"MenuPlayerSelect-Random"
+	{
+		"ru"		"*Случайный игрок"
+	}
+//------------------------------------------------------------------------------------------------
+// Visibility menu
+	"MenuVisibility-Title"
+	{
+		"ru"		"Выбери тип модуля:"
+	}
+	"MenuVisibility-MenuItems"
+	{
+		"ru"		"Пункты меню"
+	}
+	"MenuVisibility-Games"
+	{
+		"ru"		"Игры"
+	}
+	"MenuVisibility-SubTitle"
+	{
+		"ru"		"Проверено на видимость:"
+	}
+//------------------------------------------------------------------------------------------------
+// Game start errors
+	"StartGame-AnotherGameInProgress"
+	{
+		"ru"		"Другая игра в процессе!"
+	}
+	"StartGame-BadTeamRatio"
+	{
+		"ru"		"Плохое соотношение команд!"
+	}
+	"StartGame-AliveOnly"
+	{
+		"ru"		"Только живой игрок может начинать игру!"
+	}
+//------------------------------------------------------------------------------------------------
+// Rebel
+	"Rebel-PrisonersOnly"
+	{
+		"ru"	"Эту команду могут использовать только заключенные!"
+	}
+	"Rebel-AliveOnly"
+	{
+		"ru"	"Эту команду могут использовать только живые заключенные!"
+	}
+	"Rebel-InTeamOnly"
+	{
+		"ru"	"Эту команду могут использовать только заключенные из TG!"
+	}
+	"Rebel-NoGame"
+	{
+		"ru"	"Вы не можете использовать эту команду во время игры!"
+	}
+	"Rebel-Become"
+	{
+		"#format"	"{1:s}"
+		"ru"	"Игрок {highlight}{1}{default} стал бунтовщиком!"
+	}
+}

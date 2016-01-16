@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"Пистолетный бой с зумом"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"Пистолетный бой с зумом"
+	}
+	"ChooseWeapon"
+	{
+		"ru"		"выбери оружие"
+	}
+}

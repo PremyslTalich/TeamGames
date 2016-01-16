@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"ru"		"HE Гранаты"
+	}
+}
