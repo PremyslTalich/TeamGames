@@ -1,0 +1,23 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"ru"		"Горячая картошка"
+	}
+	"Menu-Title"
+	{
+		"ru"		"Выбери тип игры:"
+	}
+	"Menu-OneDeath"
+	{
+		"ru"		"До первой смерти"
+	}
+	"Menu-LastManStanding"
+	{
+		"ru"		"Последний герой"
+	}
+	"Menu-ChooseFirstPotato"
+	{
+		"ru"		"Выбери первую жертву"
+	}
+}

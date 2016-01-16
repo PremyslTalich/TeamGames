@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"Дикий запад"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"Дикий запад"
+	}
+}

@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"Бой на ножах"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"Бой на ножах"
+	}
+	"ChooseHP"
+	{
+		"ru"		"выбери уровень здоровья"
+	}
+}

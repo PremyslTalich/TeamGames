@@ -1,0 +1,31 @@
+"Phrases"
+{
+	"CreateFence"
+	{
+		"ru"		"Создать постоянный ринг"
+	}
+	"CreateFence-MenuTitle"
+	{
+		"ru"		"Наведите диагональный угол"
+	}
+	"CreatePointC"
+	{
+		"ru"		"Подтвердите установку ринга"
+	}
+	"FenceCreated"
+	{
+		"ru"		"{prefix}[PermanentFence]{default} Ринг создан"
+	}
+	"DeleteFence"
+	{
+		"ru"		"Удалить постоянный ринг"
+	}
+	"FenceDeleted"
+	{
+		"ru"		"{prefix}[PermanentFence]{default} Ринг удален."
+	}
+	"MustStandInFence"
+	{
+		"ru"		"{prefix}[PermanentFence]{highlight} Ты должен находится внутри ринга чтобы его удалить!"
+	}
+}

@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"Taser мания"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"Taser мания"
+	}
+}

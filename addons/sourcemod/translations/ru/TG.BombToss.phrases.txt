@@ -1,0 +1,27 @@
+"Phrases"
+{
+	"SpawnBomb"
+	{
+		"#format"	"{1:d}"
+		"ru"		"Сделать бомбу ({1})"
+	}
+	"SpawnTarget"
+	{
+		"ru"		"Лунка для метания бомб"
+	}
+	"BombInfo"
+	{
+		"#format"	"{1:s}"
+		"ru"		"Кинул: {1}"
+	}
+	"BombInfoWithTarget"
+	{
+		"#format"	"{1:s},{2:f}"
+		"ru"		"Кинул: {1} ({2})"
+	}
+	"TargetInfo"
+	{
+		"#format"	"{1:s},{2:f},{3:s},{4:f}"
+		"ru"		"Ближайший: {1} ({2})\nДальний: {3} ({4})"
+	}
+}

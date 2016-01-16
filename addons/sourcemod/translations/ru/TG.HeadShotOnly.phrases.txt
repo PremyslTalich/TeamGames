@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"HeadShot only бой"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"HeadShot only бой"
+	}
+	"ChooseWeapon"
+	{
+		"ru"		"выбери оружие"
+	}
+}

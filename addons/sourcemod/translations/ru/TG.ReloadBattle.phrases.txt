@@ -1,0 +1,15 @@
+"Phrases"
+{
+	"GameName-FiftyFifty"
+	{
+		"ru"		"Патрон - Перезарядка"
+	}
+	"GameName-RedOnly"
+	{
+		"ru"		"Патрон - Перезарядка"
+	}
+	"ChooseWeapon"
+	{
+		"ru"		"выбери оружие"
+	}
+}
