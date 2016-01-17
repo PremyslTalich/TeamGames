@@ -1,2 +1,0 @@
-materials/cable/bf_rope.vmt
-materials/cable/bf_rope.vtf
