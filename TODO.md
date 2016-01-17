@@ -1,6 +1,8 @@
 To do list
 ==========
 
+- [ ] Some super secret MoreMarks updates
+- [ ] Create first release and public TeamGames on SM forum (not before player skins)
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
 
