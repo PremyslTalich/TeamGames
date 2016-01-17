@@ -1,4 +1,4 @@
-#TeamGames
+# TeamGames
 
 Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many features:
 - Two [teams](https://github.com/KissLick/TeamGames/wiki/Teams), red and blue
@@ -15,7 +15,10 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 
 ***Found a bug?*** **[Issue](https://github.com/KissLick/TeamGames/issues/new?title=Not%20something%20like%20%22bug%22%20or%20%22problem%22%20pls...&labels=bug) it please, so I can fix it!** Do you know how to improve TeamGames? [Issue](https://github.com/KissLick/TeamGames/issues/new?title=Not%20something%20like%20%22improvement%22%20or%20%22good%20idea%22%20pls...&labels=improvement) you idea ;-)
 
-##Games
+### Special thanks to:
+- [SHAREN](https://github.com/SHAREN) - Bug reports, ideas and Russian translation
+
+## Games
 
 **RedOnly:**
 - Hot popato
