@@ -298,9 +298,13 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 			return;
 		}
 
-		g_Mark[iTeam][Sprite] = PrecacheModel(m_sFile);
+		PrecacheDecal(m_sFile);
+
+		strcopy(g_Mark[iTeam][Sprite], PLATFORM_MAX_PATH, m_sFile);
 		g_Mark[iTeam][High] = DTC_GetArgFloat(hArgs, 2, 12.0);
 		g_Mark[iTeam][Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
+		Format(g_Mark[iTeam][Color], PLATFORM_MAX_PATH, "%d %d %d", DTC_GetArgNum(hArgs, 4, 255), DTC_GetArgNum(hArgs, 5, 255), DTC_GetArgNum(hArgs, 6, 255));
+		g_Mark[iTeam][Alpha] = DTC_GetArgNum(hArgs, 7, 255);
 	} else if (StrEqual(sPrefixName, "MarkLaser")) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 

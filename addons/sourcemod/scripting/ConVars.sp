@@ -27,6 +27,8 @@ new Handle:g_hMarkLife;
 new Handle:g_hMarkLaser;
 new Handle:g_hMarkLimit, g_iMarkLimitCounter;
 new Handle:g_hMarkBlockDMG;
+new Handle:g_hMarkSpawnDelay;
+new Handle:g_hMarkInfinite;
 
 new Handle:g_hImportantMsg;
 new Handle:g_hAllowTeamPrefix;

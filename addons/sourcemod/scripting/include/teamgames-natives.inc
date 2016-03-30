@@ -77,9 +77,18 @@ native TG_FencePlayerCross(client, bool:callForward = true);
  * @param life 			Mark's life.
  * @param callForward 	Call forward TG_OnMarkSpawn?
  * @param counter 		Use marks counter (works only for valid clients).
- * @return 				True on success, false on failure.
+ * @param blockDMG 		Block DMG if mark is created by shooting and >Add 1 bullet to player's current weapon clip<.
+ * @return 				Mark handle on success, INVALID_HANDLE otherwise.
  */
-native bool:TG_SpawnMark(client, TG_Team:team, Float:position[3], Float:life = 0.0, bool:callForward = true, bool:counter = false);
+native Handle:TG_SpawnMark(client, TG_Team:team, Float:position[3], Float:life = 0.0, bool:callForward = true, bool:counter = false, bool:blockDMG = false);
+
+/**
+ * Destroy mark.
+ *
+ * @param mark 			Mark handle.
+ * @noreturn
+ */
+native TG_DestroyMark(Handle:mark);
 
 /**
  * Get count of players in the given TeamGames team.
@@ -332,9 +341,9 @@ functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
 
 /**
  * Opens menu for choosing player from TG team.
- * 
+ *
  * If there is only one player in selected TG teams, the menu is skiped and callback is called imediately.
- * 
+ *
  * @param client      	Client index to open menu for.
  * @param callBack      Callback function to call after player selection.
  * @param redTeam      	Allow Red team in menu.

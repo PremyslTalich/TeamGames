@@ -72,8 +72,14 @@ public Native_SpawnMark(Handle:hPlugin, iNumParams)
 	new Float:fTime = GetNativeCell(4);
 	new bool:bFireEvent = GetNativeCell(5);
 	new bool:bCount = GetNativeCell(6);
+	new bool:bBlockDMG = GetNativeCell(7);
 
-	return SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2], fTime, bCount, bFireEvent);
+	return _:SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2], fTime, bCount, bFireEvent, bBlockDMG);
+}
+
+public Native_DestroyMark(Handle:hPlugin, iNumParams)
+{
+	TriggerTimer(Handle:GetNativeCell(1));
 }
 
 public Native_GetTeamCount(Handle:hPlugin, iNumParams)
@@ -923,6 +929,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_FencePlayerCross", Native_FencePlayerCross);
 
 	CreateNative("TG_SpawnMark", Native_SpawnMark);
+	CreateNative("TG_DestroyMark", Native_DestroyMark);
 
 	CreateNative("TG_GetTeamCount", Native_GetTeamCount);
 	CreateNative("TG_ClearTeam", Native_ClearTeam);
@@ -959,8 +966,8 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_LogRoundMessage", Native_LogRoundMessage);
 	CreateNative("TG_LogGameMessage", Native_LogGameMessage);
 
-	Forward_OnTraceAttack = 	 		CreateGlobalForward("TG_OnTraceAttack", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, Param_CellByRef, 	Param_Cell, Param_Cell);
-	Forward_OnPlayerDamage = 	 		CreateGlobalForward("TG_OnPlayerDamage", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, Param_CellByRef, 	Param_Cell, Param_Cell);
+	Forward_OnTraceAttack = 	 		CreateGlobalForward("TG_OnTraceAttack", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, 	Param_CellByRef, 	Param_Cell, Param_Cell);
+	Forward_OnPlayerDamage = 	 		CreateGlobalForward("TG_OnPlayerDamage", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, 	Param_CellByRef, 	Param_Cell, Param_Cell);
 	Forward_OnPlayerDeath = 	 		CreateGlobalForward("TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_String, 		Param_Cell, Param_String);
 	Forward_OnPlayerTeam = 	 			CreateGlobalForward("TG_OnPlayerTeam", 					ET_Event, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnPlayerTeamPost = 	 		CreateGlobalForward("TG_OnPlayerTeamPost", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
@@ -973,7 +980,8 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnLaserFenceCrossed = 		CreateGlobalForward("TG_OnLaserFenceCrossed", 			ET_Ignore, 	Param_Cell, 		Param_FloatByRef);
 	Forward_OnLaserFenceDestroyed = 	CreateGlobalForward("TG_OnLaserFenceDestroyed", 		ET_Ignore, 	Param_Array, 		Param_Array);
 	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Event, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
-	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
+	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float, 		Param_Cell, 		Param_Cell);
+	Forward_OnMarkDestroyed = 			CreateGlobalForward("TG_OnMarkDestroyed", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGamePreparePre =  		CreateGlobalForward("TG_OnGamePreparePre",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
 	Forward_OnGamePrepare =  			CreateGlobalForward("TG_OnGamePrepare",					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);

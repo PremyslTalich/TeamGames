@@ -1,12 +1,14 @@
 #include <sourcemod>
 #include <teamgames>
 
+#define CONFIG "configs/teamgames/moremarks.cfg"
+
 public Plugin:myinfo =
 {
 	name = "[TG] MoreMarks",
 	author = "Raska",
 	description = "",
-	version = "0.1",
+	version = "0.2",
 	url = ""
 }
 
@@ -23,111 +25,137 @@ enum MM_Types
 	MM_Sprite
 }
 
-new Handle:g_hMark[3];
-new Handle:g_hSpawnedMarks;
+enum MM_LastMark
+{
+	LM_Client,
+	TG_Team:LM_Team,
+	Float:LM_Position[3],
+	String:LM_Mark[16]
+}
+
+new Handle:g_hMarks;
+new g_iLastMark[3][MM_LastMark];
+new Handle:g_hMarkTemplate[3];
+new Handle:g_hMarkLastTemplate[3];
+new Handle:g_hTempEntComponents;
 
 public OnPluginStart()
 {
-	HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
+	g_hMarks = CreateTrie();
+	g_hTempEntComponents = CreateArray();
+
+	CreateDirectoryPath(CONFIG, 511, true);
 }
 
 public OnPluginEnd()
 {
-	if (g_hSpawnedMarks == INVALID_HANDLE)
+	if (g_hMarks == INVALID_HANDLE)
 		return;
 
-	new iMarksCount = GetArraySize(g_hSpawnedMarks);
-	new iMark;
-
-	for (new i = 0; i < iMarksCount; i++) {
-		iMark = GetArrayCell(g_hSpawnedMarks, i);
-
-		if (IsValidEntity(iMark)) {
-			AcceptEntityInput(iMark, "LightOff");
-			AcceptEntityInput(iMark, "Kill");
-		}
-	}
+	KillAllComponents();
 }
 
-public OnConfigsExecuted()
+public OnMapStart()
 {
-	if (g_hSpawnedMarks != INVALID_HANDLE) {
-		CloseHandle(g_hSpawnedMarks);
-	}
-	g_hSpawnedMarks = CreateArray();
-
 	for (new iTeam = _:TG_RedTeam; iTeam <= _:TG_BlueTeam; ++iTeam) {
-		if (g_hMark[iTeam] != INVALID_HANDLE) {
-			CloseHandle(g_hMark[iTeam]);
+		if (g_hMarkTemplate[iTeam] != INVALID_HANDLE) {
+			CloseHandle(g_hMarkTemplate[iTeam]);
+			g_hMarkTemplate[iTeam] = INVALID_HANDLE;
 		}
 
-		g_hMark[iTeam] = CreateArray();
+		if (g_hMarkLastTemplate[iTeam] != INVALID_HANDLE) {
+			CloseHandle(g_hMarkLastTemplate[iTeam]);
+			g_hMarkLastTemplate[iTeam] = INVALID_HANDLE;
+		}
     }
 
 	LoadConfig();
 }
 
-public OnMapEnd()
+public TG_OnMarkSpawned(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Handle:hMark, iMarkEnt)
 {
-	if (g_hSpawnedMarks != INVALID_HANDLE) {
-		CloseHandle(g_hSpawnedMarks);
-		g_hSpawnedMarks = INVALID_HANDLE;
+	if (g_hMarkTemplate[iTeam] == INVALID_HANDLE) {
+		LogError("Missing %s mark definition in %s !", (iTeam == TG_RedTeam) ? "red" : "blue", CONFIG);
+		return;
 	}
 
-	for (new iTeam = _:TG_RedTeam; iTeam <= _:TG_BlueTeam; ++iTeam) {
-		if (g_hMark[iTeam] != INVALID_HANDLE) {
-			CloseHandle(g_hMark[iTeam]);
+	new Handle:hComponents;
+	new String:sMark[16];
+	Format(sMark, sizeof(sMark), "%d", _:hMark);
+
+	if (g_hMarkLastTemplate[iTeam] != INVALID_HANDLE) {
+		if (g_iLastMark[iTeam][LM_Mark] != '\0') {
+			if (GetTrieValue(g_hMarks, g_iLastMark[iTeam][LM_Mark], hComponents)) {
+				KillComponents(hComponents);
+
+				new Float:fLastMarkPos[3];
+				fLastMarkPos[0] = g_iLastMark[iTeam][LM_Position][0];
+				fLastMarkPos[1] = g_iLastMark[iTeam][LM_Position][1];
+				fLastMarkPos[2] = g_iLastMark[iTeam][LM_Position][2];
+
+				SpawnComponents(g_hMarkTemplate[iTeam], hComponents, fLastMarkPos, g_iLastMark[iTeam][LM_Client]);
+			}
+
+			// Just to be surely sure
+			strcopy(g_iLastMark[iTeam][LM_Mark], 16, "");
 		}
 
-		g_hMark[iTeam] = INVALID_HANDLE;
-    }
-}
-
-public Action:Event_RoundStart(Handle:hEvent, const String:sName[], bool:bDontBroadcast)
-{
-	if (g_hSpawnedMarks != INVALID_HANDLE) {
-		ClearArray(g_hSpawnedMarks);
-	} else {
-		g_hSpawnedMarks = CreateArray();
+		g_iLastMark[iTeam][LM_Client] = iClient;
+		g_iLastMark[iTeam][LM_Team] = iTeam;
+		g_iLastMark[iTeam][LM_Position][0] = fPos[0];
+		g_iLastMark[iTeam][LM_Position][1] = fPos[1];
+		g_iLastMark[iTeam][LM_Position][2] = fPos[2];
+		strcopy(g_iLastMark[iTeam][LM_Mark], 16, sMark);
 	}
 
-	return Plugin_Continue;
+	hComponents = CreateArray();
+	if (g_hMarkLastTemplate[iTeam] != INVALID_HANDLE) {
+		SpawnComponents(g_hMarkLastTemplate[iTeam], hComponents, fPos, iClient);
+	} else {
+		SpawnComponents(g_hMarkTemplate[iTeam], hComponents, fPos, iClient);
+	}
+	SetTrieValue(g_hMarks, sMark, hComponents);
 }
 
-public TG_OnMarkSpawned(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife)
+public TG_OnMarkDestroyed(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Handle:hMark, iMarkEnt)
 {
-	if (g_hMark[iTeam] != INVALID_HANDLE) {
-		new iComponentCount = GetArraySize(g_hMark[iTeam]);
+	new String:sMark[16];
+	new Handle:hComponents;
+	Format(sMark, sizeof(sMark), "%d", _:hMark);
+
+	if (GetTrieValue(g_hMarks, sMark, hComponents)) {
+		KillComponents(hComponents);
+		CloseHandle(hComponents);
+		RemoveFromTrie(g_hMarks, sMark);
+	}
+}
+
+SpawnComponents(Handle:hTemplate, Handle:hComponents, Float:fPos[3], iClient)
+{
+	if (hTemplate != INVALID_HANDLE) {
+		new iComponentsCount = GetArraySize(hTemplate);
 		new Handle:hComponent;
 		new MM_Types:iType;
 
-		for (new i = 0; i < iComponentCount; i++) {
-			hComponent = Handle:GetArrayCell(g_hMark[iTeam], i);
+		for (new i = 0; i < iComponentsCount; i++) {
+			hComponent = Handle:GetArrayCell(hTemplate, i);
 
 			if (GetTrieValue(hComponent, "__type__", iType)) {
 				switch (iType) {
-					case MM_Model, MM_Tesla, MM_SmokeStack, MM_SpotLight, MM_Steam: {
-						new iRotor = -1;
-						new iEnt = SpawnEntityComponent(iType, hComponent, fPos, iClient, iRotor);
+					case MM_Model, MM_Tesla, MM_SmokeStack, MM_SpotLight, MM_Steam, MM_Sprite: {
+						new iEnt = SpawnEntityComponent(iType, hComponent, fPos, iClient);
 
 						if (IsValidEntity(iEnt)) {
-							PushArrayCell(g_hSpawnedMarks, iEnt);
-							CreateTimer(fLife, Timer_RemoveMark, iEnt);
+							PushArrayCell(hComponents, iEnt);
 						}
+					}
+					case MM_Beam, MM_Circle: {
+						new iTempEnt = SpawnTempEntityComponent(iType, hComponent, fPos);
 
-						if (IsValidEntity(iRotor)) {
-							PushArrayCell(g_hSpawnedMarks, iRotor);
-							CreateTimer(fLife, Timer_RemoveMark, iRotor);
+						if (iTempEnt != 0) {
+							PushArrayCell(hComponents, iTempEnt);
+							PushArrayCell(g_hTempEntComponents, iTempEnt);
 						}
-					}
-					case MM_Beam: {
-						SpawnBeam(hComponent, fPos, fLife);
-					}
-					case MM_Circle: {
-						SpawnCircle(hComponent, fPos, fLife);
-					}
-					case MM_Sprite: {
-						SpawnSprite(hComponent, fPos, fLife);
 					}
 				}
 			}
@@ -135,11 +163,11 @@ public TG_OnMarkSpawned(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife)
 	}
 }
 
-SpawnEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3], iClient, iRotorEntity = -1)
+SpawnEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3], iClient)
 {
 	switch (iType) {
 		case MM_Model: {
-			return SpawnModel(hComponent, fPos, iRotorEntity, iClient);
+			return SpawnModel(hComponent, fPos, iClient);
 		}
 		case MM_Tesla: {
 			return SpawnTesla(hComponent, fPos);
@@ -153,105 +181,177 @@ SpawnEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3], iClient, 
 		case MM_SpotLight: {
 			return SpawnSpotLight(hComponent, fPos, iClient);
 		}
+		case MM_Sprite: {
+			return SpawnSprite(hComponent, fPos);
+		}
 	}
 
 	return -1;
 }
 
-public Action:Timer_RemoveMark(Handle:hTimer, any:iEnt)
+SpawnTempEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3])
 {
-	new i = FindValueInArray(g_hSpawnedMarks, iEnt);
-
-	if (i != -1) {
-		if (IsValidEntity(iEnt)) {
-			AcceptEntityInput(iEnt, "LightOff");
-			AcceptEntityInput(iEnt, "Kill");
+	switch (iType) {
+		case MM_Beam: {
+			return SpawnBeam(hComponent, fPos);
 		}
-
-		RemoveFromArray(g_hSpawnedMarks, i);
+		case MM_Circle: {
+			return SpawnCircle(hComponent, fPos);
+		}
 	}
+
+	return 0;
+}
+
+KillComponent(iComponentEntity)
+{
+	if (IsValidEntity(iComponentEntity)) {
+		new String:sClassName[64];
+		GetEntityClassname(iComponentEntity, sClassName, sizeof(sClassName));
+
+		if (StrEqual(sClassName, "prop_dynamic")) {
+			new iRotor = GetEntPropEnt(iComponentEntity, Prop_Send, "m_hOwnerEntity");
+
+			if (IsValidEntity(iRotor)) {
+				AcceptEntityInput(iRotor, "KillHierarchy");
+			}
+		} else {
+			AcceptEntityInput(iComponentEntity, "LightOff");
+			AcceptEntityInput(iComponentEntity, "Kill");
+		}
+	}
+}
+
+KillComponents(Handle:hComponents)
+{
+	new iCount = GetArraySize(hComponents);
+	new iComponent, iTempEnt;
+
+	for (new i = iCount - 1; i >= 0; i--) {
+		iComponent = GetArrayCell(hComponents, i);
+
+		KillComponent(iComponent);
+		RemoveFromArray(hComponents, i);
+
+		if ((iTempEnt = FindValueInArray(g_hTempEntComponents, iComponent)) != -1) {
+			RemoveFromArray(g_hTempEntComponents, iTempEnt);
+		}
+	}
+}
+
+KillAllComponents()
+{
+	new Handle:hMarks = CreateTrieSnapshot(g_hMarks);
+	new iMarksCount = TrieSnapshotLength(hMarks);
+	new String:sMark[16];
+	new Handle:hComponents;
+
+	for (new i = 0; i < iMarksCount; i++) {
+		if (GetTrieSnapshotKey(hMarks, i, sMark, sizeof(sMark)) > 0 && GetTrieValue(g_hMarks, sMark, hComponents)) {
+			KillComponents(hComponents);
+			CloseHandle(hComponents);
+		}
+	}
+
+	CloseHandle(hMarks);
 }
 
 LoadConfig()
 {
 	decl String:sPath[PLATFORM_MAX_PATH], String:sKey[64], String:sValue[64];
-	BuildPath(Path_SM, sPath, sizeof(sPath), "configs/teamgames/moremarks.cfg");
+	BuildPath(Path_SM, sPath, sizeof(sPath), CONFIG);
 
 	new Handle:hKV = CreateKeyValues("MoreMarks");
 
-	if (!FileToKeyValues(hKV, sPath))
+	if (!FileToKeyValues(hKV, sPath)) {
+		LogError("Cannot read from file %s !", CONFIG);
 		return;
+	}
 
 	new MM_Types:iType;
-	for (new iTeam = _:TG_RedTeam; iTeam <= _:TG_BlueTeam; ++iTeam) {
-		if (KvJumpToKey(hKV, (TG_Team:iTeam == TG_RedTeam) ? "red" : "blue" )) {
-			if (KvGotoFirstSubKey(hKV, false)) {
-				do {
-					new Handle:hComponent = CreateTrie();
+	new String:sMarkKey[48];
 
-					KvGetSectionName(hKV, sKey, sizeof(sKey));
-					iType = GetMarkTypeFromName(sKey);
-
-					SetTrieValue(hComponent, "__type__", _:iType);
-
-					if (KvGotoFirstSubKey(hKV, false)) {
-						do {
-							KvGetSectionName(hKV, sKey, sizeof(sKey));
-							KvGetString(hKV, NULL_STRING, sValue,  sizeof(sValue));
-							StringToLower(sKey);
-
-							switch (iType) {
-								case MM_Model: {
-									if (StrEqual(sKey, "model", false)) {
-										PrecacheModel(sValue, true);
-									}
-								}
-								case MM_Tesla: {
-									if (StrEqual(sKey, "material", false)) {
-										PrecacheDecal(sValue, true);
-									}
-								}
-								case MM_SmokeStack: {
-									if (StrEqual(sKey, "material", false)) {
-										ReplaceStringEx(sValue, sizeof(sValue), "materials/", "");
-										PrecacheDecal(sValue, true);
-									}
-								}
-								case MM_Beam, MM_Circle, MM_Sprite: {
-									if (StrEqual(sKey, "material", false)) {
-										SetTrieValue(hComponent, sKey, PrecacheModel(sValue, true));
-										continue;
-									}
-								}
-							}
-
-							SetTrieString(hComponent, sKey, sValue);
-						}
-						while (KvGotoNextKey(hKV, false));
-
-						KvGoBack(hKV);
+	for (new iLast = 0; iLast <= 1; ++iLast) {
+		for (new iTeam = _:TG_RedTeam; iTeam <= _:TG_BlueTeam; ++iTeam) {
+			Format(sMarkKey, sizeof(sMarkKey), "%s%s", (TG_Team:iTeam == TG_RedTeam) ? "red" : "blue", (iLast == 0) ? "" : "-last");
+			if (KvJumpToKey(hKV, sMarkKey)) {
+				if (KvGotoFirstSubKey(hKV, false)) {
+					if (iLast == 0) {
+						g_hMarkTemplate[iTeam] = CreateArray();
+					} else {
+						g_hMarkLastTemplate[iTeam] = CreateArray();
 					}
 
-					PushArrayCell(g_hMark[iTeam], hComponent);
-				}
-				while (KvGotoNextKey(hKV, false));
-			}
-		}
+					do {
+						new Handle:hComponent = CreateTrie();
 
-		KvRewind(hKV);
+						KvGetSectionName(hKV, sKey, sizeof(sKey));
+						iType = GetMarkTypeFromName(sKey);
+
+						SetTrieValue(hComponent, "__type__", _:iType);
+
+						if (KvGotoFirstSubKey(hKV, false)) {
+							do {
+								KvGetSectionName(hKV, sKey, sizeof(sKey));
+								KvGetString(hKV, NULL_STRING, sValue,  sizeof(sValue));
+								StringToLower(sKey);
+
+								switch (iType) {
+									case MM_Model: {
+										if (StrEqual(sKey, "model", false)) {
+											PrecacheModel(sValue, true);
+										}
+									}
+									case MM_Tesla, MM_Sprite: {
+										if (StrEqual(sKey, "material", false)) {
+											PrecacheDecal(sValue, true);
+										}
+									}
+									case MM_SmokeStack: {
+										if (StrEqual(sKey, "material", false)) {
+											ReplaceStringEx(sValue, sizeof(sValue), "materials/", "");
+											PrecacheDecal(sValue, true);
+										}
+									}
+									case MM_Beam, MM_Circle: {
+										if (StrEqual(sKey, "material", false)) {
+											SetTrieValue(hComponent, sKey, PrecacheModel(sValue, true));
+											continue;
+										}
+									}
+								}
+
+								SetTrieString(hComponent, sKey, sValue);
+							}
+							while (KvGotoNextKey(hKV, false));
+
+							KvGoBack(hKV);
+						}
+
+						if (iLast == 0) {
+							PushArrayCell(g_hMarkTemplate[iTeam], hComponent);
+						} else {
+							PushArrayCell(g_hMarkLastTemplate[iTeam], hComponent);
+						}
+					}
+					while (KvGotoNextKey(hKV, false));
+				}
+			}
+
+			KvRewind(hKV);
+		}
 	}
 
 	CloseHandle(hKV);
 }
 
-SpawnModel(Handle:hComponent, Float:fPos[3], &iRotorEntity, iClient)
+SpawnModel(Handle:hComponent, Float:fPos[3], iClient)
 {
 	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fOrigin[3];
 
 	new iModel = CreateEntityByName("prop_dynamic_override");
 	if (iModel == -1) {
-		AcceptEntityInput(iModel, "Kill");
 		return -1;
 	}
 
@@ -260,13 +360,10 @@ SpawnModel(Handle:hComponent, Float:fPos[3], &iRotorEntity, iClient)
 
 	if (iRotation != 0) {
 		if ((iRotor = CreateEntityByName("func_rotating")) == -1) {
-			AcceptEntityInput(iModel, "Kill");
-			AcceptEntityInput(iRotor, "Kill");
+			RemoveEdict(iModel);
 			return -1;
 		}
 	}
-
-	iRotorEntity = iRotor;
 
 	GetComponentString(hComponent, "angles", sValue, sizeof(sValue), "0 0 0");
 
@@ -319,6 +416,7 @@ SpawnModel(Handle:hComponent, Float:fPos[3], &iRotorEntity, iClient)
 		SetVariantString("!activator");
 		AcceptEntityInput(iModel, "SetParent", iRotor, iRotor);
 		SetEntPropEnt(iModel, Prop_Send, "m_hEffectEntity", iRotor);
+		SetEntPropEnt(iModel, Prop_Send, "m_hOwnerEntity", iRotor);
 	}
 
 	return iModel;
@@ -336,12 +434,12 @@ SpawnTesla(Handle:hComponent, Float:fPos[3])
 
 		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 		DispatchKeyValue(iEnt, "m_Color", sValue);
-		
+
 		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
 		GetVectorFromString(sValue, fOrigin);
 		AddVectors(fPos, fOrigin, fOrigin);
 		DispatchKeyValueVector(iEnt, "origin", fOrigin);
-		
+
 		DispatchKeyValueFloat(iEnt, "m_flRadius", GetComponentFloat(hComponent, "radius", 48.0));
 		DispatchKeyValueNum(iEnt, "beamcount_min", GetComponentInt(hComponent, "beamcount-min", 6));
 		DispatchKeyValueNum(iEnt, "beamcount_min", GetComponentInt(hComponent, "beamcount-max", 8));
@@ -379,7 +477,7 @@ SpawnSmokeStack(Handle:hComponent, Float:fPos[3])
 		GetVectorFromString(sValue, fOrigin);
 		AddVectors(fPos, fOrigin, fOrigin);
 		DispatchKeyValueVector(iEnt, "origin", fOrigin);
-		
+
 		DispatchKeyValueNum(iEnt, "BaseSpread", GetComponentInt(hComponent, "radius", 48));
 		DispatchKeyValueNum(iEnt, "SpreadSpeed", GetComponentInt(hComponent, "spreadspeed", 0));
 		DispatchKeyValueNum(iEnt, "Speed", GetComponentInt(hComponent, "speed", 30));
@@ -422,7 +520,7 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 		}
 
 		DispatchKeyValueVector(iEnt, "angles", fAngles);
-		
+
 		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
 		GetVectorFromString(sValue, fOrigin);
 		AddVectors(fPos, fOrigin, fOrigin);
@@ -491,7 +589,7 @@ SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
 	return iEnt;
 }
 
-SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
+SpawnBeam(Handle:hComponent, Float:fPos[3])
 {
 	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fStart[3], Float:fEnd[3];
@@ -500,30 +598,76 @@ SpawnBeam(Handle:hComponent, Float:fPos[3], Float:fLife)
 	GetTrieValue(hComponent, "material", iMaterial);
 
 	if (iMaterial == 0) {
-		return;
+		return 0;
 	}
 
 	GetComponentString(hComponent, "start", sValue, sizeof(sValue), "0 0 0");
 	GetVectorFromString(sValue, fStart);
 	AddVectors(fPos, fStart, fStart);
-	
+
 	GetComponentString(hComponent, "end", sValue, sizeof(sValue), "0 0 48");
 	GetVectorFromString(sValue, fEnd);
 	AddVectors(fPos, fEnd, fEnd);
-	
+
 	GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
 	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
 	GetVectorFromString(sValue, iColor, false);
 
-	new Float:fWidthStart = GetComponentFloat(hComponent, "width-start", 1.0);
-	new Float:fWidthEnd = GetComponentFloat(hComponent, "width-end", 1.0);
-	new Float:fAmplitude = GetComponentFloat(hComponent, "amplitude", 0.0);
+	new Handle:hDataPack;
+	new iBeam = -1 * _:CreateDataTimer(0.1, Timer_DrawBeam, hDataPack, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+	WritePackFloat(hDataPack, fStart[0]);
+	WritePackFloat(hDataPack, fStart[1]);
+	WritePackFloat(hDataPack, fStart[2]);
+	WritePackFloat(hDataPack, fEnd[0]);
+	WritePackFloat(hDataPack, fEnd[1]);
+	WritePackFloat(hDataPack, fEnd[2]);
+	WritePackCell(hDataPack, iColor[0]);
+	WritePackCell(hDataPack, iColor[1]);
+	WritePackCell(hDataPack, iColor[2]);
+	WritePackCell(hDataPack, iColor[3]);
+	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "width-start", 1.0));
+	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "width-end", 1.0));
+	WritePackCell(hDataPack, iMaterial);
+	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "amplitude", 0.0));
 
-	TE_SetupBeamPoints(fStart, fEnd, iMaterial, 0, 0, 0, fLife, fWidthStart, fWidthEnd, 0, fAmplitude, iColor, 0);
-	TE_SendToAll();
+	return iBeam;
 }
 
-SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
+public Action:Timer_DrawBeam(Handle:hTimer, Handle:hDataPack)
+{
+	if (FindValueInArray(g_hTempEntComponents, -1 * _:hTimer) == -1) {
+		return Plugin_Stop;
+	}
+
+	new Float:fStart[3], Float:fEnd[3], Float:fWidthStart, Float:fWidthEnd, Float:fAmplitude;
+	new iColor[4], iMaterial;
+
+	ResetPack(hDataPack);
+	fStart[0] = ReadPackFloat(hDataPack);
+	fStart[1] = ReadPackFloat(hDataPack);
+	fStart[2] = ReadPackFloat(hDataPack);
+
+	fEnd[0] = ReadPackFloat(hDataPack);
+	fEnd[1] = ReadPackFloat(hDataPack);
+	fEnd[2] = ReadPackFloat(hDataPack);
+
+	iColor[0] = ReadPackCell(hDataPack);
+	iColor[1] = ReadPackCell(hDataPack);
+	iColor[2] = ReadPackCell(hDataPack);
+	iColor[3] = ReadPackCell(hDataPack);
+
+	fWidthStart = ReadPackFloat(hDataPack);
+	fWidthEnd = ReadPackFloat(hDataPack);
+	iMaterial = ReadPackCell(hDataPack);
+	fAmplitude = ReadPackFloat(hDataPack);
+
+	TE_SetupBeamPoints(fStart, fEnd, iMaterial, 0, 0, 0, 0.19, fWidthStart, fWidthEnd, 0, fAmplitude, iColor, 0);
+	TE_SendToAll();
+
+	return Plugin_Continue;
+}
+
+SpawnCircle(Handle:hComponent, Float:fPos[3])
 {
 	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fOrigin[3];
@@ -532,7 +676,7 @@ SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
 	GetTrieValue(hComponent, "material", iMaterial);
 
 	if (iMaterial == 0) {
-		return;
+		return 0;
 	}
 
 	GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
@@ -543,30 +687,81 @@ SpawnCircle(Handle:hComponent, Float:fPos[3], Float:fLife)
 	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
 	GetVectorFromString(sValue, iColor, false);
 
-	new Float:fRadius = GetComponentFloat(hComponent, "radius", 32.0) * 2;
-	new Float:fAmplitude = GetComponentFloat(hComponent, "amplitude", 0.0);
+	new Handle:hDataPack;
+	new iCircle = -1 * _:CreateDataTimer(0.1, Timer_DrawCircle, hDataPack, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+	WritePackFloat(hDataPack, fOrigin[0]);
+	WritePackFloat(hDataPack, fOrigin[1]);
+	WritePackFloat(hDataPack, fOrigin[2]);
+	WritePackCell(hDataPack, iColor[0]);
+	WritePackCell(hDataPack, iColor[1]);
+	WritePackCell(hDataPack, iColor[2]);
+	WritePackCell(hDataPack, iColor[3]);
+	WritePackFloat(hDataPack, (GetComponentFloat(hComponent, "radius", 32.0) * 2));
+	WritePackCell(hDataPack, iMaterial);
+	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "width", 1.0));
+	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "amplitude", 0.0));
 
-	TE_SetupBeamRingPoint(fOrigin, fRadius - 0.5, fRadius, iMaterial, 0, 0, 0, fLife, GetComponentFloat(hComponent, "width", 1.0), fAmplitude, iColor, 0, 0);
-	TE_SendToAll();
+	return iCircle;
 }
 
-SpawnSprite(Handle:hComponent, Float:fPos[3], Float:fLife)
+public Action:Timer_DrawCircle(Handle:hTimer, Handle:hDataPack)
 {
-	new String:sValue[PLATFORM_MAX_PATH];
-	new Float:fOrigin[3];
-	new iMaterial;
-	GetTrieValue(hComponent, "material", iMaterial);
-
-	if (iMaterial == 0) {
-		return;
+	if (FindValueInArray(g_hTempEntComponents, -1 * _:hTimer) == -1) {
+		return Plugin_Stop;
 	}
 
-	GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
-	GetVectorFromString(sValue, fOrigin);
-	AddVectors(fPos, fOrigin, fOrigin);
+	new Float:fOrigin[3], Float:fRadius, Float:fWidth, Float:fAmplitude;
+	new iColor[4], iMaterial;
 
-	TE_SetupGlowSprite(fOrigin, iMaterial, fLife, GetComponentFloat(hComponent, "size", 1.0), GetComponentInt(hComponent, "brightness", 255));
+	ResetPack(hDataPack);
+	fOrigin[0] = ReadPackFloat(hDataPack);
+	fOrigin[1] = ReadPackFloat(hDataPack);
+	fOrigin[2] = ReadPackFloat(hDataPack);
+
+	iColor[0] = ReadPackCell(hDataPack);
+	iColor[1] = ReadPackCell(hDataPack);
+	iColor[2] = ReadPackCell(hDataPack);
+	iColor[3] = ReadPackCell(hDataPack);
+
+	fRadius = ReadPackFloat(hDataPack);
+	iMaterial = ReadPackCell(hDataPack);
+	fWidth = ReadPackFloat(hDataPack);
+	fAmplitude = ReadPackFloat(hDataPack);
+
+	TE_SetupBeamRingPoint(fOrigin, fRadius - 0.5, fRadius, iMaterial, 0, 0, 0, 0.19, fWidth, fAmplitude, iColor, 0, 0);
 	TE_SendToAll();
+
+	return Plugin_Continue;
+}
+
+SpawnSprite(Handle:hComponent, Float:fPos[3])
+{
+	new iSprite = CreateEntityByName("env_sprite");
+
+	if (iSprite != -1) {
+		new String:sValue[PLATFORM_MAX_PATH];
+		new Float:fOrigin[3];
+
+		GetComponentString(hComponent, "position", sValue, sizeof(sValue), "0 0 0");
+		GetVectorFromString(sValue, fOrigin);
+		AddVectors(fPos, fOrigin, fOrigin);
+
+		GetComponentString(hComponent, "material", sValue, sizeof(sValue), "");
+		DispatchKeyValue(iSprite, "model", sValue);
+		DispatchKeyValueFloat(iSprite, "scale", GetComponentFloat(hComponent, "size", 1.0));
+
+		DispatchKeyValue(iSprite, "rendermode", "5");
+		DispatchKeyValue(iSprite, "spawnflags", "1");
+
+		GetComponentString(hComponent, "color", sValue, sizeof(sValue), "255 255 255");
+		DispatchKeyValue(iSprite, "rendercolor", sValue);
+		DispatchKeyValueNum(iSprite, "RenderAmt", GetComponentInt(hComponent, "alpha", 255));
+
+		DispatchSpawn(iSprite);
+		TeleportEntity(iSprite, fOrigin, NULL_VECTOR, NULL_VECTOR);
+	}
+
+	return iSprite;
 }
 
 GetComponentInt(Handle:hComponent, const String:sKey[], iDefaultValue)
@@ -609,7 +804,7 @@ GetVectorFromString(const String:sVector[], any:aVector[], bool:bIsFloat = true)
 	for (new i = 0; i < 3; i++) {
 		strcopy(sArg, sizeof(sArg), "0");
 		iArgPos += BreakString(sVector[iArgPos], sArg, sizeof(sArg));
-		
+
 		if (bIsFloat) {
 			aVector[i] = StringToFloat(sArg);
 		} else {
@@ -643,7 +838,7 @@ MM_Types:GetMarkTypeFromName(const String:sMarkName[])
 
 StringToLower(String:str[])
 {
-	new iLen = strlen(str);	
+	new iLen = strlen(str);
 	for (new i = 0; i < iLen; i++) {
 		str[i] = CharToLower(str[i]);
 	}

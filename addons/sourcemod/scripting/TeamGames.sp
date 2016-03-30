@@ -45,6 +45,7 @@ new Handle:Forward_OnLaserFenceCrossed;
 new Handle:Forward_OnLaserFenceDestroyed;
 new Handle:Forward_OnMarkSpawn;
 new Handle:Forward_OnMarkSpawned;
+new Handle:Forward_OnMarkDestroyed;
 new Handle:Forward_OnGameStartMenu;
 new Handle:Forward_OnGamePreparePre;
 new Handle:Forward_OnGamePrepare;
@@ -75,7 +76,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.9.1.10"
+#define _PLUGIN_VERSION "0.10.1.44"
 
 public Plugin:myinfo =
 {
@@ -123,6 +124,8 @@ public OnPluginStart()
 	g_hMarkLife = 					CreateConVar("tg_mark_life",				"20.0",			"How many seconds should be one mark spawned", _, true, 0.5, true, 600.0);
 	g_hMarkLaser = 					CreateConVar("tg_mark_laser",				"0.4",			"Mark spawn laser life (in seconds) (0.0 = no laser).", _, true, 0.0, true, 600.0);
 	g_hMarkBlockDMG = 				CreateConVar("tg_mark_nobullet",			"1",			"Mark spawning will not consume ammo and deal damage. (0 = false, 1 = true, 2 = true only for red mark)");
+	g_hMarkSpawnDelay = 			CreateConVar("tg_mark_spawndelay",			"0.0",			"Mark spawn delay (for each player). (0.0 = no delay)");
+	g_hMarkInfinite = 				CreateConVar("tg_mark_infinitemarks",		"1",			"If you attempt to spawn mark over limit (tg_mark_limit + 1), oldest mark is removed to allow spawn new mark. (1 = true, 0 = false)");
 
 	g_hImportantMsg = 				CreateConVar("tg_chat_doubleimportant",		"1",			"Print important messages twice (translations: GamePreparation, GameStart, TeamWins-RedTeam, TeamWins-BlueTeam and TeamWins-Tie)? (1 = true, 0 = false)"); //
 	g_hAllowTeamPrefix = 			CreateConVar("tg_chat_teamprefix",			"1",			"Use chat name prefix (for player in team red or team blue)? (1 = true, 0 = false) (requires plugin \"simple-chatprocessor.smx\")");
@@ -232,6 +235,16 @@ public OnConfigsExecuted()
 public OnMapEnd()
 {
 	g_hNotifyTimer = INVALID_HANDLE;
+
+	if (g_hMarks != INVALID_HANDLE) {
+		for (new i = GetArraySize(g_hMarks) - 1; i >= 0; i--) {
+			TriggerTimer(Handle:GetArrayCell(g_hMarks, i));
+		}
+
+		// kinda paranoid...
+		CloseHandle(g_hMarks);
+		g_hMarks = INVALID_HANDLE;
+	}
 }
 
 public OnClientPutInServer(iClient)
@@ -280,6 +293,17 @@ public Action:Event_RoundStart(Handle:hEvent, const String:sName[], bool:bDontBr
 	for (new i = 1; i <= MaxClients; i++) {
 		ClearPlayerData(i);
 		ClearPlayerEquipment(i);
+	}
+
+	if (g_hMarks != INVALID_HANDLE) {
+		for (new i = GetArraySize(g_hMarks) - 1; i >= 0; i--) {
+			TriggerTimer(Handle:GetArrayCell(g_hMarks, i));
+		}
+
+		// kinda paranoid...
+		ClearArray(g_hMarks);
+	} else {
+		g_hMarks = CreateArray();
 	}
 
 	TG_LogMessage("RoundStart", "");

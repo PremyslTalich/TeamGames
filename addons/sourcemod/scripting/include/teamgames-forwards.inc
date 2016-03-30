@@ -108,9 +108,24 @@ forward Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:lif
  * @param team 			Player team.
  * @param position 		Mark position.
  * @param life 			Mark life.
+ * @param mark 			Mark handle.
+ * @param markent 		Mark entity (env_sprite) or INVALID_ENT_REFERENCE if entity wasn't created.
  * @noreturn
  */
-forward TG_OnMarkSpawned(client, TG_Team:team, Float:position[3], Float:life);
+forward TG_OnMarkSpawned(client, TG_Team:team, Float:position[3], Float:life, Handle:mark, markent);
+
+/**
+ * Called right after the mark was destroyed.
+ *
+ * @param client 		Client index.
+ * @param team 			Player team.
+ * @param position 		Mark position.
+ * @param life 			Mark life.
+ * @param mark 			Mark handle.
+ * @param markent 		Mark entity (env_sprite) or INVALID_ENT_REFERENCE if entity wasn't created.
+ * @noreturn
+ */
+forward TG_OnMarkDestroyed(client, TG_Team:team, Float:position[3], Float:life, Handle:mark, markent);
 
 /**
  * Called before game start menu is opened.
