@@ -165,7 +165,7 @@
 	}
 	"Menu-StopGame"
 	{
-		"ru"		"Отсановить игру !"
+		"ru"		"Остановить игру !"
 	}
 	"Menu-CountGamesInfo"
 	{
