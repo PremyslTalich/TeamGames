@@ -1,13 +1,17 @@
 To do list
 ==========
 
-- [ ] Some super secret MoreMarks updates
+- [ ] Add new mark material
+- [ ] Update marks & TG_MoreMarks wiki
+- [ ] Update API site (marks)
+- [ ] Add ConVars for binding actions on buyammo1, buyammo2 and +lookatweapon commands
 - [ ] Create first release and public TeamGames on SM forum (not before player skins)
 - [ ] Add fixed player skins to extras
 - [ ] Fix updater link & file - *not yet*
 
 ---
 
+- [x] Some super secret MoreMarks updates
 - [x] HotPotato add: custom potato model, laser line between victim and potato - [Issue #13](https://github.com/KissLick/TeamGames/issues/13)
 - [x] Add "round time lock" for TG menu and games
 - [x] Update fences wiki (+ extras?) - [Issue #2](https://github.com/KissLick/TeamGames/issues/2)
