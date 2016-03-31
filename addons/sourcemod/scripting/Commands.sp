@@ -67,7 +67,7 @@ public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
 				iTeam = TG_BlueTeam;
 			}
 
-			SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2]);
+			SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2], _, _, _, false);
 		}
 	} else {
 		if (Call_OnMenuSelect(TG_MenuItem, sAction, iClient) != Plugin_Continue)
