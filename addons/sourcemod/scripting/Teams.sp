@@ -65,54 +65,28 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		if (StrEqual(sKey, "AllNone")) {
 			ClearTeams();
 		} else if (StrEqual(sKey, "AllRed")) {
-			new TG_Team:iTeam;
-
-			for (new iUser = 1; iUser <= MaxClients; iUser++) {
-				iTeam = TG_GetPlayerTeam(iUser);
-				if (iTeam == TG_NoneTeam || iTeam == TG_BlueTeam) {
-					SwitchToTeam(iClient, iUser, TG_RedTeam);
-				}
-			}
+			SwitchAllToRedTeam(iClient);
 
 			if (GetConVarInt(g_hAllowMultiSwitch) == 2) {
 				GamesMenu(iClient, TG_RedOnly);
 				return;
 			}
 		} else if (StrEqual(sKey, "FiftyFifty")) {
-			new iUsers[MAXPLAYERS + 1];
-			new TG_Team:iTeam = TG_RedTeam;
-			new iUsersCount;
-
-			for (new iUser = 1; iUser <= MaxClients; iUser++) {
-				if (TG_GetPlayerTeam(iUser) != TG_ErrorTeam) {
-					iUsers[iUsersCount] = iUser;
-					iUsersCount++;
-				}
-			}
-
-			if ((iUsersCount & 1) == 1) {
-				iUsersCount--;
-				SwitchToTeam(iClient, iUsers[iUsersCount], TG_NoneTeam);
-			}
-
-			for (new i = 0; i < iUsersCount; i++) {
-				SwitchToTeam(iClient, iUsers[i], iTeam);
-				iTeam = TG_GetOppositeTeam(iTeam);
-			}
+			SwitchAllFiftyFifty(iClient);
 
 			if (GetConVarInt(g_hAllowMultiSwitch) == 2) {
 				GamesMenu(iClient, TG_FiftyFifty);
 				return;
 			}
 		} else {
-			new target = GetClientAimTarget(iClient);
-			if (target > 0) {
+			new iTarget = GetClientAimTarget(iClient);
+			if (iTarget > 0) {
 				#if defined DEBUG
-				LogMessage("[TG DEBUG] Switch player %N to iTeam %d (%s).", target, _:TG_GetTeamFromString(sKey), sKey);
+				LogMessage("[TG DEBUG] Switch player %N to iTeam %d (%s).", iTarget, _:TG_GetTeamFromString(sKey), sKey);
 				#endif
 
 				new TG_Team:iTeam = TG_GetTeamFromString(sKey);
-				SwitchToTeam(iClient, target, iTeam);
+				SwitchToTeam(iClient, iTarget, iTeam);
 			}
 
 		}
@@ -120,6 +94,42 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		TeamsMenu(iClient);
 	} else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack) {
 		MainMenu(iClient);
+	}
+}
+
+SwitchAllToRedTeam(iClient)
+{
+	new TG_Team:iTeam;
+
+	for (new iUser = 1; iUser <= MaxClients; iUser++) {
+		iTeam = TG_GetPlayerTeam(iUser);
+		if (iTeam == TG_NoneTeam || iTeam == TG_BlueTeam) {
+			SwitchToTeam(iClient, iUser, TG_RedTeam);
+		}
+	}
+}
+
+SwitchAllFiftyFifty(iClient)
+{
+	new iUsers[MAXPLAYERS + 1];
+	new TG_Team:iTeam = TG_RedTeam;
+	new iUsersCount;
+
+	for (new iUser = 1; iUser <= MaxClients; iUser++) {
+		if (TG_GetPlayerTeam(iUser) != TG_ErrorTeam) {
+			iUsers[iUsersCount] = iUser;
+			iUsersCount++;
+		}
+	}
+
+	if ((iUsersCount & 1) == 1) {
+		iUsersCount--;
+		SwitchToTeam(iClient, iUsers[iUsersCount], TG_NoneTeam);
+	}
+
+	for (new i = 0; i < iUsersCount; i++) {
+		SwitchToTeam(iClient, iUsers[i], iTeam);
+		iTeam = TG_GetOppositeTeam(iTeam);
 	}
 }
 

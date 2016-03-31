@@ -7,6 +7,10 @@ new Handle:g_hMenuPercent;
 new Handle:g_hAllowMultiSwitch;
 new Handle:g_hMenuTimeLock, g_iMenuTimeLock;
 
+new Handle:g_hBindActionBuyAmmo1, String:g_sBindActionBuyAmmo1[64];
+new Handle:g_hBindActionBuyAmmo2, String:g_sBindActionBuyAmmo2[64];
+new Handle:g_hBindActionLookAtWeapon, String:g_sBindActionLookAtWeapon[64];
+
 new Handle:g_hSelfDamage;
 
 new Handle:g_hCheckTeams;
@@ -49,6 +53,13 @@ new Handle:g_hFFReduction;
 LoadConVars()
 {
 	g_iRoundLimit = GetConVarInt(g_hRoundLimit);
+
+	GetConVarString(g_hBindActionBuyAmmo1, 		g_sBindActionBuyAmmo1, 		sizeof(g_sBindActionBuyAmmo1));
+	TrimString(g_sBindActionBuyAmmo1);
+	GetConVarString(g_hBindActionBuyAmmo2, 		g_sBindActionBuyAmmo2, 		sizeof(g_sBindActionBuyAmmo2));
+	TrimString(g_sBindActionBuyAmmo2);
+	GetConVarString(g_hBindActionLookAtWeapon, 	g_sBindActionLookAtWeapon, 	sizeof(g_sBindActionLookAtWeapon));
+	TrimString(g_sBindActionLookAtWeapon);
 
 	GetConVarColorToArray(g_hFencePunishColor, g_iFencePunishColor);
 
@@ -100,12 +111,15 @@ GetConVarColorToArray(Handle:cvar, color[3])
 
 HookConVarsChange()
 {
-	HookConVarChange(g_hRoundLimit,        Hook_ConVarChange);
-	HookConVarChange(g_hFencePunishColor,  Hook_ConVarChange);
-	HookConVarChange(g_hForceAutoKick,     Hook_ConVarChange);
-	HookConVarChange(g_hForceTKPunish,     Hook_ConVarChange);
-	HookConVarChange(g_hFriendlyFire,      Hook_ConVarChange);
-	HookConVarChange(g_hFFReduction,       Hook_ConVarChange);
+	HookConVarChange(g_hRoundLimit,        		Hook_ConVarChange);
+	HookConVarChange(g_hBindActionBuyAmmo1, 	Hook_ConVarChange);
+	HookConVarChange(g_hBindActionBuyAmmo2, 	Hook_ConVarChange);
+	HookConVarChange(g_hBindActionLookAtWeapon,	Hook_ConVarChange);
+	HookConVarChange(g_hFencePunishColor,  		Hook_ConVarChange);
+	HookConVarChange(g_hForceAutoKick,     		Hook_ConVarChange);
+	HookConVarChange(g_hForceTKPunish,     		Hook_ConVarChange);
+	HookConVarChange(g_hFriendlyFire,      		Hook_ConVarChange);
+	HookConVarChange(g_hFFReduction,       		Hook_ConVarChange);
 }
 
 public Hook_ConVarChange(Handle:cvar, const String:oldVal[], const String:newVal[])

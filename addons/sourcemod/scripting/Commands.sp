@@ -1,5 +1,96 @@
 new bool:g_bLockMenu;
 
+public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
+{
+	if (!Client_IsValid(iClient, true) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_CT) {
+		return Plugin_Continue;
+	}
+
+	new String:sAction[64];
+
+	if (StrEqual(sCommand, "buyammo1", false) && g_sBindActionBuyAmmo1[0] != '\0') {
+		strcopy(sAction, sizeof(sAction), g_sBindActionBuyAmmo1);
+	} else if (StrEqual(sCommand, "buyammo2", false) && g_sBindActionBuyAmmo2[0] != '\0') {
+		strcopy(sAction, sizeof(sAction), g_sBindActionBuyAmmo2);
+	} else if (StrEqual(sCommand, "+lookatweapon", false) && g_sBindActionLookAtWeapon[0] != '\0') {
+		strcopy(sAction, sizeof(sAction), g_sBindActionLookAtWeapon);
+	} else {
+		return Plugin_Continue;
+	}
+
+	if (StrEqual(sAction, "Core_SwitchToRedTeam", false) || StrEqual(sAction, "Core_SwitchToBlueTeam", false) || StrEqual(sAction, "Core_SwitchToNoneTeam", false)) {
+		new TG_Team:iTeam;
+
+		if (StrContains(sAction[13], "red", false) == 0) {
+			iTeam = TG_RedTeam;
+		} else if (StrContains(sAction[13], "blue", false) == 0) {
+			iTeam = TG_BlueTeam;
+		} else if (StrContains(sAction[13], "none", false) == 0) {
+			iTeam = TG_NoneTeam;
+		}
+
+		new iTarget = GetClientAimTarget(iClient);
+		if (iTarget > 0) {
+			SwitchToTeam(iClient, iTarget, iTeam);
+		}
+	} else if (StrEqual(sAction, "Core_SwitchAllToNoneTeam", false)) {
+		ClearTeams();
+	} else if (StrContains(sAction, "Core_SwitchAllToRedTeam", false) == 0) {
+		SwitchAllToRedTeam(iClient);
+
+		if (StrEqual(sAction, "Core_SwitchAllToRedTeamJumpToGames", false)) {
+			GamesMenu(iClient, TG_RedOnly);
+		}
+	} else if (StrContains(sAction, "Core_SwitchAllFiftyFifty", false) == 0) {
+		SwitchAllFiftyFifty(iClient);
+
+		if (StrEqual(sAction, "Core_SwitchAllFiftyFiftyJumpToGames", false)) {
+			GamesMenu(iClient, TG_FiftyFifty);
+		}
+	} else if ((StrEqual(sAction, "Core_SpawnRedMark", false) || StrEqual(sAction, "Core_SpawnBlueMark", false)) && g_PlayerData[iClient][AbleToMark]) {
+		new Float:fAngles[3], Float:fOrigin[3];
+
+		GetClientEyeAngles(iClient, fAngles);
+		GetClientEyePosition(iClient, fOrigin);
+
+		new Handle:hTrace = TR_TraceRayFilterEx(fOrigin, fAngles, MASK_SHOT, RayType_Infinite, MarkTraceFilter);
+
+		if (TR_DidHit(hTrace)) {
+			new Float:fPos[3];
+			new TG_Team:iTeam;
+
+			TR_GetEndPosition(fPos, hTrace);
+
+			if (StrContains(sAction[10], "red", false) == 0) {
+				iTeam = TG_RedTeam;
+			} else {
+				iTeam = TG_BlueTeam;
+			}
+
+			SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2]);
+		}
+	} else {
+		if (Call_OnMenuSelect(TG_MenuItem, sAction, iClient) != Plugin_Continue)
+			return Plugin_Continue;
+
+		Call_OnMenuSelected(TG_MenuItem, sAction, iClient);
+
+		if (StrContains(sAction, "Core_", false) == 0) {
+			CoreMenuItemsActions(iClient, sAction);
+		}
+	}
+
+	return Plugin_Continue;
+}
+
+public bool:MarkTraceFilter(iEntity, iContentsMask)
+{
+	if (Client_IsIngame(iEntity))
+		return false;
+
+	return true;
+}
+
 public Action:Command_SetTeam(iClient, iArgs)
 {
 	if (!Client_IsValid(iClient, true))

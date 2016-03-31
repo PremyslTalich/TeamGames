@@ -76,7 +76,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.10.1.44"
+#define _PLUGIN_VERSION "0.10.2.1"
 
 public Plugin:myinfo =
 {
@@ -94,54 +94,58 @@ public OnPluginStart()
 
 	CreateConVar("tg_version", _PLUGIN_VERSION, "TeamGames core version (not changeable)", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_DONTRECORD);
 
-	g_hAutoUpdate = 				CreateConVar("tg_autoupdate", 				"1", 			"Should TeamGames use plugin Updater? (https://forums.alliedmods.net/showthread.php?t=169095) (1 = true, 0 = false)");
-	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 		"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are hold forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
+	g_hAutoUpdate = 				CreateConVar("tg_autoupdate", 				"1", 						"Should TeamGames use plugin Updater? (https://forums.alliedmods.net/showthread.php?t=169095) (1 = true, 0 = false)");
+	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 					"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are hold forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
 
-	g_hModuleDefVisibility = 		CreateConVar("tg_module_defvisibility",		"1", 			"Default visibility of new modules (might not work properly). (1 = visible, 0 = invisible)");
+	g_hModuleDefVisibility = 		CreateConVar("tg_module_defvisibility",		"1", 						"Default visibility of new modules (might not work properly). (1 = visible, 0 = invisible)");
 
-	g_hMenuPercent = 				CreateConVar("tg_menu_percent", 			"0.0", 			"How many percent of alive CTs must use !tg to unlock !tg menu (0.0 = no limit)", _, true, 0.0, true, 1.0);
-	g_hAllowMultiSwitch = 			CreateConVar("tg_menu_team_multiswitch",	"0",			"Allow multi switch functions in teams menu? (0 = no, 1 = yes, 2 = yes + jump to games menu)");
-	g_hMenuTimeLock = 				CreateConVar("tg_menu_timelock",			"0",			"Time lock for TeamGames menu. (in seconds)");
+	g_hMenuPercent = 				CreateConVar("tg_menu_percent", 			"0.0", 						"How many percent of alive CTs must use !tg to unlock !tg menu (0.0 = no limit)", _, true, 0.0, true, 1.0);
+	g_hAllowMultiSwitch = 			CreateConVar("tg_menu_team_multiswitch",	"0",						"Allow multi switch functions in teams menu? (0 = no, 1 = yes, 2 = yes + jump to games menu)");
+	g_hMenuTimeLock = 				CreateConVar("tg_menu_timelock",			"0",						"Time lock for TeamGames menu. (in seconds)");
 
-	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 			"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow self damage, even in game");
+	g_hBindActionBuyAmmo1 = 		CreateConVar("tg_bindaction_buyammo1",		"Core_SwitchToRedTeam",		"Bind action on buyammo1 (key ,) command. For actions look at https://github.com/KissLick/TeamGames/wiki/Bind-actions");
+	g_hBindActionBuyAmmo2 = 		CreateConVar("tg_bindaction_buyammo2",		"Core_SwitchToBlueTeam",	"Bind action on buyammo2 (key .) command. For actions look at https://github.com/KissLick/TeamGames/wiki/Bind-actions");
+	g_hBindActionLookAtWeapon = 	CreateConVar("tg_bindaction_lookatweapon",	"Core_MainMenu",			"Bind action on +lookatweapon (key v) command. For actions look at https://github.com/KissLick/TeamGames/wiki/Bind-actions");
 
-	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 			"How many games can be played in one round? (-1 = no limit)");
-	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"1", 			"Check teams before starting FiftyFifty game.");
-	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",			"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
-	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",			"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
-	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",			"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");
-	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",			"Frags added when prisoner killed in TG game.");
-	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",			"Score added when prisoner killed in TG game. (Only for CS:GO)");
-	g_hGamesTimeLock = 				CreateConVar("tg_game_timelock",			"0",			"Time lock for TG games. (in seconds)");
+	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 						"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow self damage, even in game");
 
-	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 			"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
-	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",			"How should be teams differentiated? (0 = color, 1 = skin)");
-	g_hTeamAttack = 				CreateConVar("tg_team_attack",				"0",			"Can Ts in different teams (excluding none team) attack each other even if there is no game? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
-	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",			"Location for notifications about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud\n\t4 = screen overlay (this might break other overlays!)");
+	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 						"How many games can be played in one round? (-1 = no limit)");
+	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"1", 						"Check teams before starting FiftyFifty game.");
+	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",						"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
+	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",						"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
+	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",						"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");
+	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",						"Frags added when prisoner killed in TG game.");
+	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",						"Score added when prisoner killed in TG game. (Only for CS:GO)");
+	g_hGamesTimeLock = 				CreateConVar("tg_game_timelock",			"0",						"Time lock for TG games. (in seconds)");
 
-	g_hAllowMark = 					CreateConVar("tg_mark_allow",				"1",			"Should be marks enabled? (1 = true, 0 = false)");
-	g_hMarkLimit = 					CreateConVar("tg_mark_limit",				"20",			"How many marks can be spawned at the moment");
-	g_hMarkLife = 					CreateConVar("tg_mark_life",				"20.0",			"How many seconds should be one mark spawned", _, true, 0.5, true, 600.0);
-	g_hMarkLaser = 					CreateConVar("tg_mark_laser",				"0.4",			"Mark spawn laser life (in seconds) (0.0 = no laser).", _, true, 0.0, true, 600.0);
-	g_hMarkBlockDMG = 				CreateConVar("tg_mark_nobullet",			"1",			"Mark spawning will not consume ammo and deal damage. (0 = false, 1 = true, 2 = true only for red mark)");
-	g_hMarkSpawnDelay = 			CreateConVar("tg_mark_spawndelay",			"0.0",			"Mark spawn delay (for each player). (0.0 = no delay)");
-	g_hMarkInfinite = 				CreateConVar("tg_mark_infinitemarks",		"1",			"If you attempt to spawn mark over limit (tg_mark_limit + 1), oldest mark is removed to allow spawn new mark. (1 = true, 0 = false)");
+	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 						"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
+	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",						"How should be teams differentiated? (0 = color, 1 = skin)");
+	g_hTeamAttack = 				CreateConVar("tg_team_attack",				"0",						"Can Ts in different teams (excluding none team) attack each other even if there is no game? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
+	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",						"Location for notifications about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud\n\t4 = screen overlay (this might break other overlays!)");
 
-	g_hImportantMsg = 				CreateConVar("tg_chat_doubleimportant",		"1",			"Print important messages twice (translations: GamePreparation, GameStart, TeamWins-RedTeam, TeamWins-BlueTeam and TeamWins-Tie)? (1 = true, 0 = false)"); //
-	g_hAllowTeamPrefix = 			CreateConVar("tg_chat_teamprefix",			"1",			"Use chat name prefix (for player in team red or team blue)? (1 = true, 0 = false) (requires plugin \"simple-chatprocessor.smx\")");
+	g_hAllowMark = 					CreateConVar("tg_mark_allow",				"1",						"Should be marks enabled? (1 = true, 0 = false)");
+	g_hMarkLimit = 					CreateConVar("tg_mark_limit",				"20",						"How many marks can be spawned at the moment");
+	g_hMarkLife = 					CreateConVar("tg_mark_life",				"20.0",						"How many seconds should be one mark spawned", _, true, 0.5, true, 600.0);
+	g_hMarkLaser = 					CreateConVar("tg_mark_laser",				"0.4",						"Mark spawn laser life (in seconds) (0.0 = no laser).", _, true, 0.0, true, 600.0);
+	g_hMarkBlockDMG = 				CreateConVar("tg_mark_nobullet",			"1",						"Mark spawning will not consume ammo and deal damage. (0 = false, 1 = true, 2 = true only for red mark)");
+	g_hMarkSpawnDelay = 			CreateConVar("tg_mark_spawndelay",			"0.0",						"Mark spawn delay (for each player). (0.0 = no delay)");
+	g_hMarkInfinite = 				CreateConVar("tg_mark_infinitemarks",		"1",						"If you attempt to spawn mark over limit (tg_mark_limit + 1), oldest mark is removed to allow spawn new mark. (1 = true, 0 = false)");
 
-	g_hFenceType = 					CreateConVar("tg_fence_type",				"1",			"Fence type:\n\t0 = fence is turned off\n\t1 = beam fence\n\t2 = rope fence");
-	g_hFenceHeight = 				CreateConVar("tg_fence_height",				"72.0",			"Height of fence. (Player can jump over fence)", _, true, 12.0, true, 1024.0);
-	g_hFenceNotify = 				CreateConVar("tg_fence_notify",				"2",			"Notify in chat that player crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
-	g_hFencePunishLength = 			CreateConVar("tg_fence_punishlength",		"0.75",			"Time in seconds to punish (color and freeze) player who crossed laser fence.", _, true, 0.0, true, 600.0);
-	g_hFenceFreeze = 				CreateConVar("tg_fence_freeze",				"2",			"Freeze player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
-	g_hFencePunishColorSettings = 	CreateConVar("tg_fence_color",				"1",			"Color player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
-	g_hFencePunishColor = 			CreateConVar("tg_fence_punishcolor",		"000000",		"RRGGBB (hex rgb) - color used on punished player");
+	g_hImportantMsg = 				CreateConVar("tg_chat_doubleimportant",		"1",						"Print important messages twice (translations: GamePreparation, GameStart, TeamWins-RedTeam, TeamWins-BlueTeam and TeamWins-Tie)? (1 = true, 0 = false)"); //
+	g_hAllowTeamPrefix = 			CreateConVar("tg_chat_teamprefix",			"1",						"Use chat name prefix (for player in team red or team blue)? (1 = true, 0 = false) (requires plugin \"simple-chatprocessor.smx\")");
 
-	g_hForceAutoKick = 				CreateConVar("tg_cvar_autokick",			"1",			"Force set convar \"mp_autokick 0\" every map start? (1 = true, 0 = false)");
-	g_hForceTKPunish = 				CreateConVar("tg_cvar_tkpunish",			"1",			"Force set convar \"mp_tkpunish 0\" every map start? (1 = true, 0 = false)");
-	g_hFriendlyFire = 				CreateConVar("tg_cvar_friendlyfire",		"1",			"0 = do nothing \"mp_friendlyfire\"\n1 = set \"mp_friendlyfire 1\" every map start (after configs are loaded)\n2 = set \"mp_friendlyfire 1\" when game is in progress and set \"mp_friendlyfire 0\" otherwise.");
-	g_hFFReduction = 				CreateConVar("tg_cvar_ff_reduction",		"1",			"Force set convar \"ff_damage_reduction_bullets\", \"ff_damage_reduction_grenade\", \"ff_damage_reduction_grenade_self\" and \"ff_damage_reduction_other\" to \"1\" every map start? Only for CS:GO. (1 = true, 0 = false)");
+	g_hFenceType = 					CreateConVar("tg_fence_type",				"1",						"Fence type:\n\t0 = fence is turned off\n\t1 = beam fence\n\t2 = rope fence");
+	g_hFenceHeight = 				CreateConVar("tg_fence_height",				"72.0",						"Height of fence. (Player can jump over fence)", _, true, 12.0, true, 1024.0);
+	g_hFenceNotify = 				CreateConVar("tg_fence_notify",				"2",						"Notify in chat that player crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
+	g_hFencePunishLength = 			CreateConVar("tg_fence_punishlength",		"0.75",						"Time in seconds to punish (color and freeze) player who crossed laser fence.", _, true, 0.0, true, 600.0);
+	g_hFenceFreeze = 				CreateConVar("tg_fence_freeze",				"2",						"Freeze player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
+	g_hFencePunishColorSettings = 	CreateConVar("tg_fence_color",				"1",						"Color player who crossed laser fence.\n\t0 = no\n\t1 = yes\n\t2 = only when game is in progress)");
+	g_hFencePunishColor = 			CreateConVar("tg_fence_punishcolor",		"000000",					"RRGGBB (hex rgb) - color used on punished player");
+
+	g_hForceAutoKick = 				CreateConVar("tg_cvar_autokick",			"1",						"Force set convar \"mp_autokick 0\" every map start? (1 = true, 0 = false)");
+	g_hForceTKPunish = 				CreateConVar("tg_cvar_tkpunish",			"1",						"Force set convar \"mp_tkpunish 0\" every map start? (1 = true, 0 = false)");
+	g_hFriendlyFire = 				CreateConVar("tg_cvar_friendlyfire",		"1",						"0 = do nothing \"mp_friendlyfire\"\n1 = set \"mp_friendlyfire 1\" every map start (after configs are loaded)\n2 = set \"mp_friendlyfire 1\" when game is in progress and set \"mp_friendlyfire 0\" otherwise.");
+	g_hFFReduction = 				CreateConVar("tg_cvar_ff_reduction",		"1",						"Force set convar \"ff_damage_reduction_bullets\", \"ff_damage_reduction_grenade\", \"ff_damage_reduction_grenade_self\" and \"ff_damage_reduction_other\" to \"1\" every map start? Only for CS:GO. (1 = true, 0 = false)");
 
 	RegConsoleCmd("sm_tg", 			Command_MainMenu, 	"TeamGames main menu");
 	RegConsoleCmd("sm_games", 		Command_GamesList,	"List of all loaded games.");
@@ -154,6 +158,10 @@ public OnPluginStart()
 	RegAdminCmd("sm_tglist",  		Command_ModulesList, 		ADMFLAG_GENERIC,	"List of all games and custom (modules) menu items.");
 	RegAdminCmd("sm_tgvisible", 	Command_Visible, 		 	ADMFLAG_GENERIC, 	"Set modules visibility (allow/disallow them to appear in tg menu).");
 	RegAdminCmd("sm_tgupdate", 		Command_Update, 		 	ADMFLAG_ROOT, 		"Check and try to update TeamGames via updater.smx");
+
+	AddCommandListener(Command_BindAction, "buyammo1");
+	AddCommandListener(Command_BindAction, "buyammo2");
+	AddCommandListener(Command_BindAction, "+lookatweapon");
 
 	HookEvent("round_start", 	Event_RoundStart, 	EventHookMode_Post);
 	HookEvent("round_end", 		Event_RoundEnd, 	EventHookMode_Pre);
