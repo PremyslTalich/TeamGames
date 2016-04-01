@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Generate & upload plugin config
 - [ ] Add new mark material - and update wiki
 - [ ] Update API site (marks)
 - [ ] Add fixed player skins to extras
