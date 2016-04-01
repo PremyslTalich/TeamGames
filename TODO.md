@@ -1,15 +1,15 @@
 To do list
 ==========
 
-- [ ] Add new mark material
-- [ ] Update marks & TG_MoreMarks wiki
+- [ ] Add new mark material - and update wiki
 - [ ] Update API site (marks)
-- [ ] Create first release and public TeamGames on SM forum (not before player skins)
 - [ ] Add fixed player skins to extras
+- [ ] Create first release and public TeamGames on SM forum (not before player skins)
 - [ ] Fix updater link & file - *not yet*
 
 ---
 
+- [x] Update marks & TG_MoreMarks wiki
 - [x] Add ConVars for binding actions on buyammo1, buyammo2 and +lookatweapon commands
 - [x] Some super secret MoreMarks updates
 - [x] HotPotato add: custom potato model, laser line between victim and potato - [Issue #13](https://github.com/KissLick/TeamGames/issues/13)
