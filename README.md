@@ -3,7 +3,7 @@
 Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many features:
 - Two [teams](https://github.com/KissLick/TeamGames/wiki/Teams), red and blue
 - Team based [games](https://github.com/KissLick/TeamGames/wiki/Games)
-- Two different [marks](https://github.com/KissLick/TeamGames/wiki/Marks) (each for one team)
+- Two different [marks](https://github.com/KissLick/TeamGames/wiki/Marks) (each for one team and expandable with [MoreMarks module](https://github.com/KissLick/TeamGames/wiki/MoreMarks))
 - [Fences](https://github.com/KissLick/TeamGames/wiki/Fences) (reacts only to prisoners and according to server settings)
 - Fully in translations files and using [ColorVariables](https://github.com/KissLick/ColorVariables)
 - Use [SourceMod override system](https://wiki.alliedmods.net/Overriding_Command_Access_%28SourceMod%29) to [restrict module access](https://github.com/KissLick/TeamGames/wiki/Module-config#overriding-menu-items-access) player by player
