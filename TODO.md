@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Add permission check for binded actions
 - [ ] Generate & upload plugin config
 - [ ] Add new mark material - and update wiki
 - [ ] Update API site (marks)
