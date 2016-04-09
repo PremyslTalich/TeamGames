@@ -18,6 +18,10 @@ public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
 		return Plugin_Continue;
 	}
 
+	if (!TG_CheckModuleAccess(iClient, TG_MenuItem, sAction)) {
+		return Plugin_Continue;
+	}
+
 	if (StrEqual(sAction, "Core_SwitchToRedTeam", false) || StrEqual(sAction, "Core_SwitchToBlueTeam", false) || StrEqual(sAction, "Core_SwitchToNoneTeam", false)) {
 		new TG_Team:iTeam;
 
