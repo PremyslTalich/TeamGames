@@ -1,7 +1,6 @@
 To do list
 ==========
 
-- [ ] Add permission check for binded actions
 - [ ] Generate & upload plugin config
 - [ ] Add new mark material - and update wiki
 - [ ] Update API site (marks)
@@ -11,6 +10,7 @@ To do list
 
 ---
 
+- [x] Add permission check for binded actions
 - [x] Update marks & TG_MoreMarks wiki
 - [x] Add ConVars for binding actions on buyammo1, buyammo2 and +lookatweapon commands
 - [x] Some super secret MoreMarks updates
