@@ -10,7 +10,7 @@ public Plugin:myinfo =
 	name = "[TG] Warden",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
 }
 
@@ -20,12 +20,14 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.Warden.phrases");
 
-	g_hAdmins = 		CreateConVar("sm_tg_warden_admins", 		"1", 	"Treat admins as warden.");
-	g_hMenu = 			CreateConVar("sm_tg_warden_menu", 			"1", 	"Only warden can use TG menu.");
-	g_hTeams = 			CreateConVar("sm_tg_warden_teams", 			"1", 	"Only warden can use TG teams.");
-	g_hGames = 			CreateConVar("sm_tg_warden_games", 			"1", 	"Only warden can use TG games.");
-	g_hMarks = 			CreateConVar("sm_tg_warden_marks", 			"1", 	"Only warden can use TG marks.");
-	g_hFences = 		CreateConVar("sm_tg_warden_fences", 		"1", 	"Only warden can use TG fence.");
+	g_hAdmins = CreateConVar("tgm_warden_admins", 	"1", "Treat admins as warden.");
+	g_hMenu = 	CreateConVar("tgm_warden_menu", 	"1", "Only warden can use TG menu.");
+	g_hTeams = 	CreateConVar("tgm_warden_teams", 	"1", "Only warden can use TG teams.");
+	g_hGames = 	CreateConVar("tgm_warden_games", 	"1", "Only warden can use TG games.");
+	g_hMarks = 	CreateConVar("tgm_warden_marks", 	"1", "Only warden can use TG marks.");
+	g_hFences = CreateConVar("tgm_warden_fences", 	"1", "Only warden can use TG fence.");
+
+	AutoExecConfig(_, _, "sourcemod/teamgames");
 }
 
 public Action:TG_OnMenuDisplay(client)

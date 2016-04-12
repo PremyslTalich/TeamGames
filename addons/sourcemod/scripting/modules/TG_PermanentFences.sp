@@ -43,7 +43,7 @@ public Plugin:myinfo = {
 	name = "[TG] PermanentFeces",
 	author = "Raska",
 	description = "",
-	version = "0.1",
+	version = "0.2",
 	url = ""
 }
 
@@ -51,9 +51,11 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.PermanentFeces.phrases");
 
-	g_hFenceType = CreateConVar("sm_tg_pfence_type", "0", "0 = beam fence, 1 = rope fence");
+	g_hFenceType = CreateConVar("tgm_permanentfences_type", "0", "0 = beam fence, 1 = rope fence");
 
 	HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
+
+	AutoExecConfig(_, _, "sourcemod/teamgames");
 }
 
 public OnLibraryAdded(const String:name[])

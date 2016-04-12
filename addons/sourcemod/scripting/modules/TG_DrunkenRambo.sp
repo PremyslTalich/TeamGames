@@ -12,7 +12,7 @@ public Plugin:myinfo =
 	name = "[TG] DrunkenRambo",
 	author = "Raska",
 	description = "",
-	version = "0.7",
+	version = "0.8",
 	url = ""
 }
 
@@ -32,13 +32,15 @@ public OnPluginStart()
 	LoadTranslations("TG.DrunkenRambo.phrases");
 	g_iEngVersion = GetEngineVersion();
 
-	g_hFogEnable = CreateConVar("tg_dr_fog_enable", "1", "Enable fog for rambo? (1 = yes, 0 = no)");
-	g_hFogColor = CreateConVar("tg_dr_fog_color", "255 0 0", "RGB color code of the fog.");
-	g_hFogDistance = CreateConVar("tg_dr_fog_distance", "448.0", "Distance from rambo, where the \"fog wall\" starts.", _, true, 64.0);
+	g_hFogEnable =   CreateConVar("tgm_drunkenrambo_fog_enable", 	"1", 		"Enable fog for rambo? (1 = yes, 0 = no)");
+	g_hFogColor =    CreateConVar("tgm_drunkenrambo_fog_color", 	"255 0 0", 	"RGB color code of the fog.");
+	g_hFogDistance = CreateConVar("tgm_drunkenrambo_fog_distance",  "448.0", 	"Distance from rambo, where the \"fog wall\" starts.", _, true, 64.0);
 
 	HookConVarChange(g_hFogEnable, OnConVarChanged);
 	HookConVarChange(g_hFogColor, OnConVarChanged);
 	HookConVarChange(g_hFogDistance, OnConVarChanged);
+
+	AutoExecConfig(_, _, "sourcemod/teamgames");
 }
 
 public OnConVarChanged(Handle:hConVar, const String:sOldValue[], const String:sNewValue[])

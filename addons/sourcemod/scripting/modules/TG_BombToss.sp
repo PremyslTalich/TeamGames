@@ -30,7 +30,7 @@ public Plugin:myinfo =
 	name = "[TG] BombToss",
 	author = "Raska",
 	description = "",
-	version = "0.7",
+	version = "0.8",
 	url = ""
 }
 
@@ -38,11 +38,13 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.BombToss.phrases");
 
-	g_hOneBomb = CreateConVar("sm_tg_bombtoss_onebomb", "1", "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
-	g_hMaxBombs = CreateConVar("sm_tg_bombtoss_maxbombs", "32", "Maximum number of bombs spawned at once.");
+	g_hOneBomb =  CreateConVar("tgm_bombtoss_onebomb",  "1",  "Prisoners can carry only one bomb. This is not just for this plugin, but for all bombs on server.");
+	g_hMaxBombs = CreateConVar("tgm_bombtoss_maxbombs", "32", "Maximum number of bombs spawned at once.");
 
 	HookEvent("round_start", 	Event_RoundStart, 	EventHookMode_Post);
 	HookEvent("bullet_impact", Event_BulletImpact, EventHookMode_Post);
+
+	AutoExecConfig(_, _, "sourcemod/teamgames");
 }
 
 public OnLibraryAdded(const String:name[])

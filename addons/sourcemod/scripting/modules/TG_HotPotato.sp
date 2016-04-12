@@ -28,10 +28,10 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.HotPotato.phrases");
 
-	g_hHeathColor = CreateConVar("sm_tg_hp_enablecolor", "1", "Color players in shades of red according to their health level."); // add healthbar option here
-	g_hDamage = CreateConVar("sm_tg_hp_damage", "2", "Amount of damage to deal to victim");
-	g_hDamageInterval = CreateConVar("sm_tg_hp_damageinterval", "0.2", "Interval between dealing damage to victim", _, true, 0.1, true, 10.0);
-	g_hVictimSpeed = CreateConVar("sm_tg_hp_victimspeed", "1.1", "Set speed of victim (in percentages)");
+	g_hHeathColor = 	CreateConVar("tgm_hotpotato_enablecolor", 	 "1", 	"Color players in shades of red according to their health level."); // add healthbar option here
+	g_hDamage = 		CreateConVar("tgm_hotpotato_damage", 		 "2", 	"Amount of damage to deal to victim");
+	g_hDamageInterval = CreateConVar("tgm_hotpotato_damageinterval", "0.2", "Interval between dealing damage to victim", _, true, 0.1, true, 10.0);
+	g_hVictimSpeed = 	CreateConVar("tgm_hotpotato_victimspeed", 	 "1.1", "Set speed of victim (in percentages)");
 
 	HookEvent("bomb_pickup",  Event_BombPickUp, EventHookMode_Post);
 
@@ -133,7 +133,7 @@ public Action:Hook_WeaponDrop(iClient, iWeapon)
 public Frame_DropedPotato(any:data)
 {
 	if (IsValidEntity(g_iPotato)) {
-		
+
 		if (ExistBeam()) {
 			DispatchKeyValue(g_iPotato, "targetname", "TG_HotPotato-Bomb");
 			ActivateEntity(g_iBeam);
@@ -151,7 +151,7 @@ public Action:Timer_SlapClient(Handle:hTimer)
 
 	if (g_hDamageTimer == INVALID_HANDLE)
 		return Plugin_Stop;
-	
+
 	new iOldHealth = GetClientHealth(iClient);
 	new iNewHealth = iOldHealth - GetConVarInt(g_hDamage);
 
@@ -172,7 +172,7 @@ public Action:Timer_SlapClient(Handle:hTimer)
 			}
 		}
 	}
-	
+
 	return Plugin_Continue;
 }
 
@@ -180,7 +180,7 @@ public Action:Event_BombPickUp(Handle:event, const String:name[], bool:dontBroad
 {
 	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if (TG_IsCurrentGameID(GAME_ID) && TG_GetPlayerTeam(iClient) == TG_RedTeam) {		
+	if (TG_IsCurrentGameID(GAME_ID) && TG_GetPlayerTeam(iClient) == TG_RedTeam) {
 		if (iClient == g_iVictim) {
 			if (ExistBeam())
 				AcceptEntityInput(g_iBeam, "TurnOff");
@@ -213,10 +213,10 @@ public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_Player
 
 	if (iClient != g_iVictim)
 		return;
-	
+
 	if (IsValidEntity(g_iPotato))
 		RemoveEdict(g_iPotato);
-	
+
 	RemoveClientVictim();
 
 	if (g_bToLastMan && TG_GetTeamCount(TG_RedTeam) > 1) {
@@ -285,7 +285,7 @@ public SelectPlayerHandeler(activator, iClient, bool:IsRandom)
 	if (Client_IsIngame(iClient)) {
 		new String:sSettings[48];
 		new Handle:hDataPack = CreateDataPack();
-		
+
 		Format(sSettings, sizeof(sSettings), "%t", (g_bToLastMan) ? "Menu-LastManStanding" : "Menu-OneDeath");
 		WritePackCell(hDataPack, iClient);
 
@@ -297,12 +297,12 @@ MakeClientVictim(iClient, bool:bGiveBomb)
 {
 	if (g_iVictim == iClient)
 		return;
-	
+
 	RemoveClientVictim();
-	
+
 	g_iVictim = iClient;
 	SetEntPropFloat(g_iVictim, Prop_Data, "m_flLaggedMovementValue", GetConVarFloat(g_hVictimSpeed));
-	
+
 	if (bGiveBomb) {
 		if (Client_IsIngame(g_iVictim)) {
 			Client_RemoveAllWeapons(g_iVictim);
@@ -312,13 +312,13 @@ MakeClientVictim(iClient, bool:bGiveBomb)
 		DispatchKeyValue(g_iPotato, "targetname", "TG_HotPotato-Bomb");
 		DispatchSpawn(g_iPotato);
 		CreateTimer(0.1, Timer_Bomb);
-		
+
 		if (IsModelPrecached(g_sPotatoModel))
 			SDKHook(g_iPotato, SDKHook_Think, Hook_BombThink);
 	}
-	
+
 	CreateBeam();
-	
+
 	TG_LogGameMessage(GAME_ID, _, "Player %N has the hot potato.", iClient);
 }
 
@@ -335,12 +335,12 @@ CreateBeam()
 		if (IsValidEntity(g_iBeam) && g_iBeam != 0) {
 			RemoveEdict(g_iBeam);
 		}
-		
+
 		g_iBeam = CreateEntityByName("env_beam");
 
 		if (IsValidEntity(g_iBeam)) {
 			DispatchKeyValue(g_iBeam, "targetname", "TG_HotPotato-Beam");
-			
+
 			DispatchKeyValue(g_iBeam, "texture", g_sBeamModel);
 			DispatchKeyValueFormat(g_iBeam, "BoltWidth", "%f", g_fBeamWidth);
 			DispatchKeyValue(g_iBeam, "life", "0");
@@ -349,17 +349,17 @@ CreateBeam()
 			DispatchKeyValue(g_iBeam, "TextureScroll", "0");
 			DispatchKeyValue(g_iBeam, "LightningStart", "TG_HotPotato-Beam");
 			DispatchKeyValue(g_iBeam, "LightningEnd", "TG_HotPotato-Bomb");
-			
+
 			DispatchSpawn(g_iBeam);
 			ActivateEntity(g_iBeam);
 			AcceptEntityInput(g_iBeam, "TurnOff");
-			
+
 			new Float:fVictimPos[3];
 			GetClientAbsOrigin(g_iVictim, fVictimPos);
 			fVictimPos[2] += 48.0;
-			
+
 			TeleportEntity(g_iBeam, fVictimPos, NULL_VECTOR, NULL_VECTOR);
-			
+
 			SetVariantString("!activator");
 			AcceptEntityInput(g_iBeam, "SetParent", g_iVictim);
 		}
@@ -380,7 +380,7 @@ RemoveClientVictim()
 {
 	if (Client_IsIngame(g_iVictim))
 		SetEntPropFloat(g_iVictim, Prop_Data, "m_flLaggedMovementValue", 1.0);
-	
+
 	g_iVictim = 0;
 }
 
