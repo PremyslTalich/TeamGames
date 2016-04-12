@@ -2,7 +2,6 @@ To do list
 ==========
 
 - [ ] Generate & upload plugin config
-- [ ] Add new mark material - and update wiki
 - [ ] Update API site (marks)
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and public TeamGames on SM forum (not before player skins)
@@ -10,6 +9,7 @@ To do list
 
 ---
 
+- [x] Add new mark material - and update wiki
 - [x] Add permission check for binded actions
 - [x] Update marks & TG_MoreMarks wiki
 - [x] Add ConVars for binding actions on buyammo1, buyammo2 and +lookatweapon commands
