@@ -1,4 +1,2 @@
-materials/decals/custom/redstar.vmt
-materials/decals/custom/redstar.vtf
-materials/decals/custom/bluestar.vmt
-materials/decals/custom/bluestar.vtf
+materials/tg/marks/star.vmt
+materials/tg/marks/star.vtf
