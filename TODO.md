@@ -1,14 +1,13 @@
 To do list
 ==========
 
-- [ ] Generate & upload plugin config
 - [ ] Update API site (marks)
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and public TeamGames on SM forum (not before player skins)
-- [ ] Fix updater link & file - *not yet*
 
 ---
 
+- [x] Generate & upload plugin config
 - [x] Add new mark material - and update wiki
 - [x] Add permission check for binded actions
 - [x] Update marks & TG_MoreMarks wiki
