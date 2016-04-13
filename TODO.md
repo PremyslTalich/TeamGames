@@ -1,7 +1,8 @@
 To do list
 ==========
 
-- [ ] Update API site (marks)
+- [ ] Rename FiftyFifty game type
+- [ ] Update API site
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and public TeamGames on SM forum (not before player skins)
 
