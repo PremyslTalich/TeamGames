@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Add healthbar to HotPotato
 - [ ] Rename FiftyFifty game type
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
