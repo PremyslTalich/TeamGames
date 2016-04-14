@@ -25,8 +25,8 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 ## Games
 
 **RedOnly:**
-- Hot popato
-- Drunken Rambo
+- [Hot popato](https://github.com/KissLick/TeamGames/wiki/HotPotato)
+- [Drunken Rambo](https://github.com/KissLick/TeamGames/wiki/DrunkenRambo)
 
 **FiftyFifty:**
 - HE grenades
