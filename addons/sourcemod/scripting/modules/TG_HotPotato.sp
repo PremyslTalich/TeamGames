@@ -42,7 +42,7 @@ public OnPluginStart()
 {
 	LoadTranslations("TG.HotPotato.phrases");
 
-	g_hHeathCheck = 	CreateConVar("tgm_hotpotato_healthcheck", 	 "2", 	"1 = Color players in shades of red according to their health level.\n2 = Show healthbar above players.");
+	g_hHeathCheck = 	CreateConVar("tgm_hotpotato_healthcheck", 	 "2", 	"0 = Nothing\n1 = Color players in shades of red according to their health level.\n2 = Show healthbar above players.");
 	g_hDamage = 		CreateConVar("tgm_hotpotato_damage", 		 "2", 	"Amount of damage to deal to victim");
 	g_hDamageInterval = CreateConVar("tgm_hotpotato_damageinterval", "0.2", "Interval between dealing damage to victim", _, true, 0.1, true, 10.0);
 	g_hVictimSpeed = 	CreateConVar("tgm_hotpotato_victimspeed", 	 "1.1", "Set speed of victim (in percentages)");
