@@ -10,7 +10,7 @@ To do list
 
 ---
 
-- [x] Add forwards TG_OnDownloadsStart and TG_OnDownloadsEnd
+- [x] Add forwards `TG_OnDownloadsStart` and `TG_OnDownloadsEnd`
 - [x] Add healthbar to HotPotato
 - [x] Generate & upload plugin config
 - [x] Add new mark material - and update wiki
