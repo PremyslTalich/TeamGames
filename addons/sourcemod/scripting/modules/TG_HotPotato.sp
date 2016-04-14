@@ -71,6 +71,13 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		Format(name, maxSize, "%T", "GameName", client);
 }
 
+public TG_OnDownloadsStart()
+{
+	for (new i = 1; i <= 10; i++) {
+		g_iHPBarTemplate[0][Used] = false;
+	}
+}
+
 public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bool:bKnown)
 {
 	if (StrEqual(sPrefixName, DOWNLOAD_POTATO, false)) {
