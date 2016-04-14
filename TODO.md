@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Fix module ConVars on wiki
 - [ ] Add Games to Server masters section on wiki
 - [ ] Add modules files to downloads config (commented?)
 - [ ] Rename FiftyFifty game type
