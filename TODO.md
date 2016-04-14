@@ -1,7 +1,6 @@
 To do list
 ==========
 
-- [ ] Add healthbar to HotPotato
 - [ ] Rename FiftyFifty game type
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
@@ -9,6 +8,7 @@ To do list
 
 ---
 
+- [x] Add healthbar to HotPotato
 - [x] Generate & upload plugin config
 - [x] Add new mark material - and update wiki
 - [x] Add permission check for binded actions
