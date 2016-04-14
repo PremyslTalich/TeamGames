@@ -1,8 +1,6 @@
 To do list
 ==========
 
-- [ ] Fix module ConVars on wiki
-- [ ] Add Games to Server masters section on wiki
 - [ ] Add modules files to downloads config (commented?)
 - [ ] Rename FiftyFifty game type
 - [ ] Update API site
@@ -11,6 +9,8 @@ To do list
 
 ---
 
+- [x] Fix module ConVars on wiki
+- [x] Add Games to Server masters section on wiki
 - [x] Add forwards `TG_OnDownloadsStart` and `TG_OnDownloadsEnd`
 - [x] Add healthbar to HotPotato
 - [x] Generate & upload plugin config
