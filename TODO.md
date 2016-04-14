@@ -1,7 +1,6 @@
 To do list
 ==========
 
-- [ ] Add modules files to downloads config (commented?)
 - [ ] Rename FiftyFifty game type
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
@@ -9,6 +8,7 @@ To do list
 
 ---
 
+- [x] Add modules files to downloads config (commented?)
 - [x] Fix module ConVars on wiki
 - [x] Add Games to Server masters section on wiki
 - [x] Add forwards `TG_OnDownloadsStart` and `TG_OnDownloadsEnd`
