@@ -5,30 +5,44 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID			"HotPotato"
-#define DOWNLOAD_POTATO	"HotPotato"
-#define DOWNLOAD_BEAM	"HotPotato-beam"
+#define GAME_ID				"HotPotato"
+#define DOWNLOAD_POTATO		"HotPotato"
+#define DOWNLOAD_BEAM		"HotPotato-beam"
+#define DOWNLOAD_HEALTHBAR	"HotPotato-healthbar"
 
 public Plugin:myinfo =
 {
 	name = "[TG] HotPotato",
 	author = "Raska",
 	description = "",
-	version = "0.4",
+	version = "0.5",
 	url = ""
 }
 
+enum HealhBar
+{
+	bool:Used,
+	String:Sprite[PLATFORM_MAX_PATH],
+	String:Color[12],
+	Alpha,
+	Float:Offset,
+	Float:Scale
+};
+
 new bool:g_bToLastMan;
-new g_iVictim, Handle:g_hVictimSpeed, Handle:g_hHeathColor;
+new g_iVictim, Handle:g_hVictimSpeed, Handle:g_hHeathCheck;
 new Handle:g_hDamage, Handle:g_hDamageTimer, Handle:g_hDamageInterval;
 new g_iPotato, String:g_sPotatoModel[PLATFORM_MAX_PATH];
 new g_iBeam, String:g_sBeamModel[PLATFORM_MAX_PATH], Float:g_fBeamWidth, g_iBeamColor[4];
+new g_iHPBarTemplate[11][HealhBar];
+new g_iPlayerHPBar[MAXPLAYERS + 1];
+new g_iPlayerHPBarEnt[MAXPLAYERS + 1];
 
 public OnPluginStart()
 {
 	LoadTranslations("TG.HotPotato.phrases");
 
-	g_hHeathColor = 	CreateConVar("tgm_hotpotato_enablecolor", 	 "1", 	"Color players in shades of red according to their health level."); // add healthbar option here
+	g_hHeathCheck = 	CreateConVar("tgm_hotpotato_healthcheck", 	 "2", 	"1 = Color players in shades of red according to their health level.\n2 = Show healthbar above players.");
 	g_hDamage = 		CreateConVar("tgm_hotpotato_damage", 		 "2", 	"Amount of damage to deal to victim");
 	g_hDamageInterval = CreateConVar("tgm_hotpotato_damageinterval", "0.2", "Interval between dealing damage to victim", _, true, 0.1, true, 10.0);
 	g_hVictimSpeed = 	CreateConVar("tgm_hotpotato_victimspeed", 	 "1.1", "Set speed of victim (in percentages)");
@@ -75,6 +89,26 @@ public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bo
 		g_iBeamColor[3] = DTC_GetArgNum(hArgs, 5, 255);
 
 		bKnown = true;
+	} else if (StrEqual(sPrefixName, DOWNLOAD_HEALTHBAR, false) && GetConVarInt(g_hHeathCheck) == 2) {
+		new iHealth = DTC_GetArgNum(hArgs, 1, 0) / 10;
+
+		switch (iHealth) {
+			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10: {
+				strcopy(g_iHPBarTemplate[iHealth][Sprite], PLATFORM_MAX_PATH, sFile);
+				PrecacheDecal(sFile);
+
+				g_iHPBarTemplate[iHealth][Offset] = DTC_GetArgFloat(hArgs, 2, 12.0);
+				g_iHPBarTemplate[iHealth][Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
+				Format(g_iHPBarTemplate[iHealth][Color], 12, "%d %d %d", DTC_GetArgNum(hArgs, 4, 255), DTC_GetArgNum(hArgs, 5, 255), DTC_GetArgNum(hArgs, 6, 255));
+				g_iHPBarTemplate[iHealth][Alpha] = DTC_GetArgNum(hArgs, 7, 255);
+
+				g_iHPBarTemplate[iHealth][Used] = true;
+				bKnown = true;
+			}
+			default: {
+				LogError("Bad file prefix argument \"1\" (file: \"%s\", prefix: \"%s\") !", sFile, sPrefixName);
+			}
+		}
 	}
 }
 
@@ -95,8 +129,17 @@ public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[],
 	if (Client_IsIngame(iUser)) {
 		for (new i = 1; i <= MaxClients; i++)
 		{
-			if (TG_IsPlayerRedOrBlue(i) && Client_IsIngame(i))
-				SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
+			if (!TG_IsPlayerRedOrBlue(i) || !Client_IsIngame(i))
+				continue;
+
+			SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
+
+			if (GetConVarInt(g_hHeathCheck) == 2) {
+				SDKHook(i, SDKHook_OnTakeDamagePost, Hook_OnTakeDamagePost);
+
+				g_iPlayerHPBar[i] = 0;
+				UpdateHealthBar(i);
+			}
 		}
 		MakeClientVictim(iUser, true);
 	} else {
@@ -130,6 +173,13 @@ public Action:Hook_WeaponDrop(iClient, iWeapon)
 	return Plugin_Continue;
 }
 
+public Hook_OnTakeDamagePost(iVictim, iAttacker, iInflictor, Float:fDamage, iDamageType)
+{
+	if (TG_IsCurrentGameID(GAME_ID) && TG_IsPlayerRedOrBlue(iVictim)) {
+		UpdateHealthBar(iVictim);
+	}
+}
+
 public Frame_DropedPotato(any:data)
 {
 	if (IsValidEntity(g_iPotato)) {
@@ -161,7 +211,7 @@ public Action:Timer_SlapClient(Handle:hTimer)
 	} else {
 		SetEntityHealth(iClient, iNewHealth);
 
-		if (GetConVarBool(g_hHeathColor)) {
+		if (GetConVarInt(g_hHeathCheck) == 1) {
 			if (iNewHealth > 90) {
 				SetEntityRenderColor(iClient, 255, 255, 255, 0);
 			} else if (iNewHealth > 10) {
@@ -170,6 +220,8 @@ public Action:Timer_SlapClient(Handle:hTimer)
 			} else {
 				SetEntityRenderColor(iClient, 255, 0, 0, 0);
 			}
+		} else if (GetConVarInt(g_hHeathCheck) == 2) {
+			UpdateHealthBar(iClient);
 		}
 	}
 
@@ -211,11 +263,18 @@ public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_Player
 		SetEntityRenderColor(iClient, 255, 255, 255, 0);
 	}
 
+	RemoveHealthBar(iClient);
+
+	SDKUnhook(iClient, SDKHook_WeaponDrop, 		 Hook_WeaponDrop);
+	SDKUnhook(iClient, SDKHook_OnTakeDamagePost, Hook_OnTakeDamagePost);
+
 	if (iClient != g_iVictim)
 		return;
 
-	if (IsValidEntity(g_iPotato))
+	if (IsValidEntity(g_iPotato)) {
 		RemoveEdict(g_iPotato);
+		g_iPotato = -1;
+	}
 
 	RemoveClientVictim();
 
@@ -323,7 +382,7 @@ MakeClientVictim(iClient, bool:bGiveBomb)
 }
 
 
-public Action:Timer_Bomb(Handle:hTImer)
+public Action:Timer_Bomb(Handle:hTimer)
 {
 	SetEntPropEnt(g_iPotato, Prop_Data, "m_hOwner", g_iVictim);
 	EquipPlayerWeapon(g_iVictim, g_iPotato);
@@ -369,6 +428,69 @@ CreateBeam()
 bool:ExistBeam()
 {
 	return (IsModelPrecached(g_sBeamModel) && IsValidEntity(g_iBeam) && g_iBeam != 0);
+}
+
+UpdateHealthBar(iClient)
+{
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient))
+		return;
+
+	new iHealth = RoundToCeil(GetClientHealth(iClient) / 10.0);
+
+	for (new i = iHealth; i < 11; i++) {
+		if (g_iPlayerHPBar[iClient] != i) {
+			if (g_iHPBarTemplate[i][Used]) {
+				RemoveHealthBar(iClient);
+
+				new iHealthBar;
+				if ((iHealthBar = AttachHealthBar(iClient, i)) != INVALID_ENT_REFERENCE) {
+					g_iPlayerHPBarEnt[iClient] = iHealthBar;
+					g_iPlayerHPBar[iClient] = i;
+				}
+
+				break;
+			}
+		} else {
+			break;
+		}
+	}
+}
+
+AttachHealthBar(iClient, iTemplate)
+{
+	new iSprite;
+	if ((iSprite = CreateEntityByName("env_sprite_oriented")) != INVALID_ENT_REFERENCE) {
+		new Float:fPos[3];
+		GetClientAbsOrigin(iClient, fPos);
+		fPos[2] += 73.0 + g_iHPBarTemplate[iTemplate][Offset];
+
+		DispatchKeyValue(iSprite, "model", g_iHPBarTemplate[iTemplate][Sprite]);
+		DispatchKeyValueFloat(iSprite, "scale", g_iHPBarTemplate[iTemplate][Scale]);
+
+		DispatchKeyValue(iSprite, "rendermode", "5");
+		DispatchKeyValue(iSprite, "spawnflags", "1");
+
+		DispatchKeyValue(iSprite, "rendercolor", g_iHPBarTemplate[iTemplate][Color]);
+		DispatchKeyValueNum(iSprite, "RenderAmt", g_iHPBarTemplate[iTemplate][Alpha]);
+
+		DispatchSpawn(iSprite);
+		TeleportEntity(iSprite, fPos, NULL_VECTOR, NULL_VECTOR);
+
+		SetVariantString("!activator");
+		AcceptEntityInput(iSprite, "SetParent", iClient);
+	}
+
+	return iSprite;
+}
+
+RemoveHealthBar(iClient)
+{
+	if (g_iPlayerHPBarEnt[iClient] != INVALID_ENT_REFERENCE && g_iPlayerHPBarEnt[iClient] != 0) {
+		RemoveEdict(g_iPlayerHPBarEnt[iClient]);
+		g_iPlayerHPBarEnt[iClient] = INVALID_ENT_REFERENCE;
+	}
+
+	g_iPlayerHPBar[iClient] = 0;
 }
 
 public Hook_BombThink(iEntity)
