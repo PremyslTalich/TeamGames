@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Check & Update core ConVars on wiki
 - [ ] Rename FiftyFifty game type
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
