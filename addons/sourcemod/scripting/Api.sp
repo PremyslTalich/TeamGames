@@ -993,7 +993,9 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnMenuDisplayed =  			CreateGlobalForward("TG_OnMenuDisplayed",				ET_Ignore, 	Param_Cell);
 	Forward_OnMenuSelect = 				CreateGlobalForward("TG_OnMenuSelect", 					ET_Event, 	Param_Cell, 		Param_String,		Param_Cell);
 	Forward_OnMenuSelected = 			CreateGlobalForward("TG_OnMenuSelected", 				ET_Ignore, 	Param_Cell, 		Param_String,		Param_Cell);
+	Forward_OnDownloadsStart =			CreateGlobalForward("TG_OnDownloadsStart", 				ET_Ignore);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
+	Forward_OnDownloadsEnd =			CreateGlobalForward("TG_OnDownloadsEnd", 				ET_Ignore);
 	Forward_AskModuleName =				CreateGlobalForward("TG_AskModuleName", 				ET_Ignore, 	Param_Cell,			Param_String,		Param_Cell, 		Param_String, 		Param_Cell, 		Param_CellByRef);
 
 	CreateModulesConfigFileIfNotExist();

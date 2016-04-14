@@ -288,6 +288,11 @@ forward TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client);
 forward TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status);
 
 /**
+ * Called right before core starts parsing the TeamGames downloads config.
+ */
+forward TG_OnDownloadsStart();
+
+/**
  * Called when core finds a prefixed file in TeamGames downloads config.
  *
  * Note: If it's called for your prefixed file, set arg. known as true! Otherwise, core will log error.
@@ -299,3 +304,8 @@ forward TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:n
  * @noreturn
  */
 forward TG_OnDownloadFile(String:file[], String:prefixName[], Handle:args, &bool:known);
+
+/**
+ * Called right after core ended parsing the TeamGames downloads config.
+ */
+forward TG_OnDownloadsEnd();

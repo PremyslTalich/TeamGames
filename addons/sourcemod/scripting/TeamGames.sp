@@ -58,7 +58,9 @@ new Handle:Forward_OnMenuDisplayed;
 new Handle:Forward_OnMenuSelect;
 new Handle:Forward_OnMenuSelected;
 new Handle:Forward_AskModuleName;
+new Handle:Forward_OnDownloadsStart;
 new Handle:Forward_OnDownloadFile;
+new Handle:Forward_OnDownloadsEnd;
 
 new EngineVersion:g_iEngineVersion;
 
@@ -76,7 +78,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.10.2.2"
+#define _PLUGIN_VERSION "0.11.0.1"
 
 public Plugin:myinfo =
 {
@@ -216,7 +218,14 @@ public OnMapStart()
 
 	CreateDirectoryPath(sPath, 511, true);
 	DTC_CreateConfig(sPath, DTC_OnCreateConfig);
+
+	Call_StartForward(Forward_OnDownloadsStart);
+	Call_Finish();
+
 	DTC_LoadConfig(sPath, DTC_OnFile);
+
+	Call_StartForward(Forward_OnDownloadsEnd);
+	Call_Finish();
 
 	PrecacheSoundAny("buttons/blip2.wav", true);
 	PrecacheModel("models/props/cs_office/trash_can.mdl", true);
