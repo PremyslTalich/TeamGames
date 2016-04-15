@@ -6,8 +6,8 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 - Two different [marks](https://github.com/KissLick/TeamGames/wiki/Marks) (each for one team and extensible with [MoreMarks module](https://github.com/KissLick/TeamGames/wiki/MoreMarks))
 - [Fences](https://github.com/KissLick/TeamGames/wiki/Fences) (reacts only to prisoners and according to server settings)
 - Fully in translations files and using [ColorVariables](https://github.com/KissLick/ColorVariables)
-- Use [SourceMod override system](https://wiki.alliedmods.net/Overriding_Command_Access_%28SourceMod%29) to [restrict module access](https://github.com/KissLick/TeamGames/wiki/Module-config#overriding-menu-items-access) player by player
-- Customize [TeamGames menu](https://github.com/KissLick/TeamGames/wiki/Module-config) as you wish
+- Use [SourceMod override system](https://wiki.alliedmods.net/Overriding_Command_Access_%28SourceMod%29) to [restrict module access](https://github.com/KissLick/TeamGames/wiki/TG-menu-&-Modules-config#overriding-menu-items-access) player by player
+- Customize [TeamGames menu](https://github.com/KissLick/TeamGames/wiki/TG-menu-&-Modules-config) as you wish
 - Using [[DTC] DownloadTableConfig](https://github.com/KissLick/DownloadTableConfig) to easily handle files and downloads
 - Keep [logs](https://github.com/KissLick/TeamGames/wiki/Logs) of TeamGames activities
 - [Warden plugin](https://github.com/KissLick/TeamGames/wiki/Warden-plugin) support
