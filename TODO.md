@@ -1,7 +1,8 @@
 To do list
 ==========
 
-- [ ] Rename FiftyFifty game type
+- [ ] Fix Grenade battle
+- [ ] Rename FiftyFifty game type - check, check, check...
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
