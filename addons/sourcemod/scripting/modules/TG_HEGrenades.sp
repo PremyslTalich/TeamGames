@@ -9,7 +9,7 @@ public Plugin:myinfo =
 	name = "[TG] HEGrenades",
 	author = "Raska",
 	description = "",
-	version = "0.5",
+	version = "0.6",
 	url = ""
 }
 
@@ -80,13 +80,7 @@ public Action:Event_HEGrenadeDetonate(Handle:hEvent, const String:sName[], bool:
 
 GiveGrenade(iClient)
 {
-	new iGrenade = CreateEntityByName("weapon_hegrenade");
-	if (GetEngineVersion() == Engine_CSGO) {
-		SetEntProp(iGrenade, Prop_Send, "m_iItemDefinitionIndex", 44);
-	}
-
-	DispatchSpawn(iGrenade);
-	EquipPlayerWeapon(iClient, iGrenade);
+	new iGrenade = GivePlayerItem(iClient, "weapon_hegrenade");
 
 	SetEntProp(iGrenade, Prop_Send, "m_iClip1", 1);
 
