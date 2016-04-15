@@ -3,7 +3,7 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID_FIFTYFIFTY		"WildWest-FiftyFifty"
+#define GAME_ID_TEAMGAME		"WildWest-TeamGame"
 #define GAME_ID_REDONLY			"WildWest-RedOnly"
 
 new g_iPlayerRevolver[MAXPLAYERS + 1];
@@ -34,14 +34,14 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_FIFTYFIFTY);
+		TG_RegGame(GAME_ID_TEAMGAME);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_TEAMGAME);
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
@@ -51,8 +51,8 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		Format(name, maxSize, "%T", "GameName-TeamGame", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
@@ -64,8 +64,8 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, _, _, true);
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		TG_StartGame(iClient, GAME_ID_TEAMGAME, _, _, true);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		TG_StartGame(iClient, GAME_ID_REDONLY, _, _, true);
 	}
@@ -73,7 +73,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
 
 public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 
 	for (new i = 1; i <= MaxClients; i++)

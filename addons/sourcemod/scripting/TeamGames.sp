@@ -78,7 +78,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.11.0.1"
+#define _PLUGIN_VERSION "0.12.0.2"
 
 public Plugin:myinfo =
 {
@@ -112,7 +112,7 @@ public OnPluginStart()
 	g_hSelfDamage = 				CreateConVar("tg_player_selfdmg", 			"0", 						"Allow self damage (only for Ts)?\n\t0 = No self damage\n\t1 = Allow self damage, but not in game\n\t2 = Allow self damage, even in game");
 
 	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 						"How many games can be played in one round? (-1 = no limit)");
-	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"1", 						"Check teams before starting FiftyFifty game.");
+	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"1", 						"Check teams before starting TeamGame game.");
 	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",						"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
 	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",						"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
 	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",						"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");

@@ -4,7 +4,7 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID_FIFTYFIFTY	"ReloadBattle-FiftyFifty"
+#define GAME_ID_TEAMGAME	"ReloadBattle-TeamGame"
 #define GAME_ID_REDONLY		"ReloadBattle-RedOnly"
 
 new String:g_sWeapon[64];
@@ -28,14 +28,14 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_FIFTYFIFTY);
+		TG_RegGame(GAME_ID_TEAMGAME);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_TEAMGAME);
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
@@ -45,8 +45,8 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		Format(name, maxSize, "%T", "GameName-TeamGame", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
@@ -54,7 +54,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 
 public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
-	if ((StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game) {
+	if ((StrEqual(sID, GAME_ID_TEAMGAME) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game) {
 		strcopy(g_sWeapon, sizeof(g_sWeapon), "");
 		SetWeaponMenu(iClient, sID);
 	}
@@ -62,7 +62,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 
 public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 
 	decl String:sWeapon[64];
@@ -84,7 +84,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 
 public Action:Event_WeaponFire(Handle:hEvent, const String:sName[], bool:bDontBroadcast)
 {
-	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
+	if (!TG_IsCurrentGameID(GAME_ID_TEAMGAME) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
 
 	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
@@ -150,8 +150,8 @@ public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		new Handle:hDataPack = CreateDataPack();
 		WritePackString(hDataPack, sKey);
 
-		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
-			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sWeaponName, hDataPack, true);
+		if (StrEqual(sID, GAME_ID_TEAMGAME)) {
+			TG_StartGame(iClient, GAME_ID_TEAMGAME, sWeaponName, hDataPack, true);
 		} else {
 			TG_StartGame(iClient, GAME_ID_REDONLY, sWeaponName, hDataPack, true);
 		}

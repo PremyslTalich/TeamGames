@@ -151,7 +151,7 @@
 	{
 		"ru"		"Выбрать игру"
 	}
-	"Menu-Games-FiftyFifty"
+	"Menu-Games-TeamGame"
 	{
 		"ru"		"Выбрать игру (Команда на Команду)"
 	}
@@ -231,7 +231,7 @@
 	{
 		"ru"		"Выбери тип игры:"
 	}
-	"MenuGamesList-FiftyFifty"
+	"MenuGamesList-TeamGame"
 	{
 		"ru"		"50/50 - Красные против Синих"
 	}
@@ -239,7 +239,7 @@
 	{
 		"ru"		"Только красные - Красные против друг друга"
 	}
-	"MenuGamesList-Title-FiftyFifty"
+	"MenuGamesList-Title-TeamGame"
 	{
 		"ru"		"Red'N'Blue игры"
 	}
@@ -247,7 +247,7 @@
 	{
 		"ru"		"Только красные - игры"
 	}
-	"MenuGamesList-Chosen-FiftyFifty"
+	"MenuGamesList-Chosen-TeamGame"
 	{
 		"#format"	"{1:s},{2:s}"
 		"ru"		"Игрок {1} выбрал игру {tg-module}{2}"

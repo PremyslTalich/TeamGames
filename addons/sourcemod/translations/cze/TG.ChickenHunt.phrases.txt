@@ -1,6 +1,6 @@
 "Phrases"
 {
-	"GameName-FiftyFifty"
+	"GameName-TeamGame"
 	{
 		"cze"		"Chicken hunt"
 	}
@@ -8,7 +8,7 @@
 	{
 		"cze"		"Chicken hunt"
 	}
-	"ScoreBoard-FiftyFifty"
+	"ScoreBoard-TeamGame"
 	{
 		"cze"		"<u>Zbývajících respawnů: {1}</u>\n<font color='#DC143C'><b>Červení:</b></font> {2}\n<font color='#1E90FF'><b>Modří:</b></font> {3}"
 	}

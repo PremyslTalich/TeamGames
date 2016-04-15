@@ -1,6 +1,6 @@
 "Phrases"
 {
-	"GameName-FiftyFifty"
+	"GameName-TeamGame"
 	{
 		"ru"		"Пистолетный бой с зумом"
 	}

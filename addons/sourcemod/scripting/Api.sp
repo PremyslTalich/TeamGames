@@ -588,7 +588,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 		CloseHandle(hWinners);
 		SetNativeCellRef(2, INVALID_HANDLE);
 	} else {
-		if (g_Game[GameType] == TG_FiftyFifty && TG_IsTeamRedOrBlue(iTeam)) {
+		if (g_Game[GameType] == TG_TeamGame && TG_IsTeamRedOrBlue(iTeam)) {
 			for (new i = 0; i < MAXPLAYERS + 1; i++) {
 				if ((iTeam == TG_RedTeam && g_Game[RedTeam][i] == 0) || (iTeam == TG_BlueTeam && g_Game[BlueTeam][i] == 0)) {
 					break;
@@ -630,7 +630,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				iCount1++;
 			}
 
-			if (g_Game[GameType] == TG_FiftyFifty && TG_GetPlayerTeam(i) == TG_BlueTeam) {
+			if (g_Game[GameType] == TG_TeamGame && TG_GetPlayerTeam(i) == TG_BlueTeam) {
 				Format(sTeam2, sizeof(sTeam2), "%s%L, ", sTeam2, i);
 				iCount2++;
 			}
@@ -648,7 +648,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 		TG_LogRoundMessage(   "GameEnd", "(ID: \"%s\")", g_Game[GameID]);
 		TG_LogRoundMessage(_, "{");
-		if (g_Game[GameType] == TG_FiftyFifty) {
+		if (g_Game[GameType] == TG_TeamGame) {
 			TG_LogRoundMessage(_, "\tWinner team: \"%s\"", (iTeam == TG_RedTeam) ? "RedTeam" : (iTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 			TG_LogRoundMessage(_, "");
 			TG_LogRoundMessage(_, "\tSurvivors RedTeam (%d):  \"%s\"", iCount1, sTeam1);
@@ -694,7 +694,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 		ClearTeams();
 	}
 
-	if (g_Game[GameType] == TG_FiftyFifty) {
+	if (g_Game[GameType] == TG_TeamGame) {
 		for (new iUser = 1; iUser <= MaxClients; iUser++) {
 			if (!IsClientInGame(iUser)) {
 				continue;
@@ -1092,7 +1092,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 		iErrorCode = 1;
 	}
 
-	if (g_GameList[iGameIndex][GameType] != TG_FiftyFifty || (g_GameList[iGameIndex][GameType] == TG_FiftyFifty && GetConVarBool(g_hCheckTeams))) {
+	if (g_GameList[iGameIndex][GameType] != TG_TeamGame || (g_GameList[iGameIndex][GameType] == TG_TeamGame && GetConVarBool(g_hCheckTeams))) {
 		if (bCheckTeams && !IsGameTypeAvailable(g_GameList[iGameIndex][GameType])) {
 			CPrintToChat(iClient, "%t", "StartGame-BadTeamRatio");
 			Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Bad teams ratio\")", 2, iClient, sName, sID);

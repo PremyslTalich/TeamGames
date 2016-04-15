@@ -148,9 +148,9 @@
 	{
 		"cze"		"Vybrat hru"
 	}
-	"Menu-Games-FiftyFifty"
+	"Menu-Games-TeamGame"
 	{
-		"cze"		"Vybrat hru (Fifty fifty)"
+		"cze"		"Vybrat hru (Pro teamy)"
 	}
 	"Menu-Games-RedOnly"
 	{
@@ -230,15 +230,15 @@
 	{
 		"cze"		"Vyberte typ hry:"
 	}
-	"MenuGamesList-FiftyFifty"
+	"MenuGamesList-TeamGame"
 	{
-		"cze"		"FiftyFifty - Červení proti Modrým"
+		"cze"		"TeamGame - Červení proti Modrým"
 	}
 	"MenuGamesList-RedOnly"
 	{
 		"cze"		"RedOnly - Červení proti Červeným"
 	}
-	"MenuGamesList-Title-FiftyFifty"
+	"MenuGamesList-Title-TeamGame"
 	{
 		"cze"		"Hry pro červené proti modrým"
 	}
@@ -246,7 +246,7 @@
 	{
 		"cze"		"Hry pouze pro červené"
 	}
-	"MenuGamesList-Chosen-FiftyFifty"
+	"MenuGamesList-Chosen-TeamGame"
 	{
 		"cze"		"Hráč {1} si vybral hru {tg-module}{2}"
 	}

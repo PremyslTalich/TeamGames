@@ -3,7 +3,7 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID_FIFTYFIFTY	"PistolZoomBattle-FiftyFifty"
+#define GAME_ID_TEAMGAME	"PistolZoomBattle-TeamGame"
 #define GAME_ID_REDONLY		"PistolZoomBattle-RedOnly"
 
 public Plugin:myinfo =
@@ -27,14 +27,14 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_FIFTYFIFTY);
+		TG_RegGame(GAME_ID_TEAMGAME);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_TEAMGAME);
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
@@ -44,8 +44,8 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		Format(name, maxSize, "%T", "GameName-TeamGame", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
@@ -53,13 +53,13 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 
 public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
-	if ((StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
+	if ((StrEqual(sID, GAME_ID_TEAMGAME) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
 		SetWeaponMenu(iClient, sID);
 }
 
 public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 
 	decl String:sWeapon[64];
@@ -86,7 +86,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 
 public Action:Event_WeaponFire(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
+	if (!TG_IsCurrentGameID(GAME_ID_TEAMGAME) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
 
 	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
@@ -106,7 +106,7 @@ public Action:Event_WeaponFire(Handle:event, const String:name[], bool:dontBroad
 
 public Action:Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
+	if (!TG_IsCurrentGameID(GAME_ID_TEAMGAME) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
 
 	new iClient = GetClientOfUserId(GetEventInt(event, "attacker"));
@@ -132,7 +132,7 @@ public Action:Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroad
 
 public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
+	if (!TG_IsCurrentGameID(GAME_ID_TEAMGAME) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
 
 	new iClient = GetClientOfUserId(GetEventInt(event, "attacker"));
@@ -151,7 +151,7 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 
 public TG_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
-	if (StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) {
+	if (StrEqual(sID, GAME_ID_TEAMGAME) || StrEqual(sID, GAME_ID_REDONLY)) {
 		if (TG_IsTeamRedOrBlue(iTeam) && Client_IsIngame(iClient)) {
 			SetEntProp(iClient, Prop_Send, "m_iFOV", 90);
 			SetEntProp(iClient, Prop_Send, "m_iDefaultFOV", 90);
@@ -202,8 +202,8 @@ public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		new Handle:hDataPack = CreateDataPack();
 		WritePackString(hDataPack, sKey);
 
-		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
-			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sWeaponName, hDataPack, true);
+		if (StrEqual(sID, GAME_ID_TEAMGAME)) {
+			TG_StartGame(iClient, GAME_ID_TEAMGAME, sWeaponName, hDataPack, true);
 		} else {
 			TG_StartGame(iClient, GAME_ID_REDONLY, sWeaponName, hDataPack, true);
 		}

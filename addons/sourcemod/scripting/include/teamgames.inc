@@ -88,7 +88,7 @@ enum TG_GameProgress
 enum TG_GameType
 {
 	TG_All_ = -1, // do not use this (Only core use this "type")
-	TG_FiftyFifty, // FiftyFifty game type: RedTeam vs. BlueTeam (by default both with the same number of players)
+	TG_TeamGame, // TeamGame game type: RedTeam vs. BlueTeam
 	TG_RedOnly // RedOnly game type: only red players are allowed
 };
 

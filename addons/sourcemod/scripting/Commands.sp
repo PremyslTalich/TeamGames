@@ -49,7 +49,7 @@ public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
 		SwitchAllFiftyFifty(iClient);
 
 		if (StrEqual(sAction, "Core_SwitchAllFiftyFiftyJumpToGames", false)) {
-			GamesMenu(iClient, TG_FiftyFifty);
+			GamesMenu(iClient, TG_TeamGame);
 		}
 	} else if ((StrEqual(sAction, "Core_SpawnRedMark", false) || StrEqual(sAction, "Core_SpawnBlueMark", false)) && g_PlayerData[iClient][AbleToMark]) {
 		new Float:fAngles[3], Float:fOrigin[3];
@@ -282,7 +282,7 @@ static DisplayGamesListMenu(iClient)
 		new Handle:hMenu = CreateMenu(GamesListMenu_Handler);
 		SetMenuTitle(hMenu, "%T", "MenuGamesList-Title", iClient);
 
-		AddMenuItemFormat(hMenu, "FiftyFifty", _, "%T", "MenuGamesList-FiftyFifty", iClient);
+		AddMenuItemFormat(hMenu, "TeamGame", _, "%T", "MenuGamesList-TeamGame", iClient);
 		AddMenuItemFormat(hMenu, "RedOnly", _, "%T", "MenuGamesList-RedOnly", iClient);
 
 		SetMenuExitBackButton(hMenu, true);
@@ -299,13 +299,13 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 			new Handle:hSubMenu = CreateMenu(GamesListSubMenu_Handler);
 
-			if (StrEqual(sKey, "FiftyFifty")) {
-				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-FiftyFifty", iClient);
-				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_FiftyFifty);
+			if (StrEqual(sKey, "TeamGame")) {
+				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-TeamGame", iClient);
+				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_TeamGame);
 
 				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
-					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_FiftyFifty) {
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_TeamGame) {
 						Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName));
 
 						AddMenuItem(hSubMenu, g_GameList[i][Id], sName);
@@ -349,7 +349,7 @@ public GamesListSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				}
 
 				Call_AskModuleName(sGameID, TG_Game, iUser, sGameName, sizeof(sGameName));
-				CPrintToChat(iUser, "%T", (iType == TG_FiftyFifty) ? "MenuGamesList-Chosen-FiftyFifty" : "MenuGamesList-Chosen-RedOnly", iUser, sClientName, sGameName);
+				CPrintToChat(iUser, "%T", (iType == TG_TeamGame) ? "MenuGamesList-Chosen-TeamGame" : "MenuGamesList-Chosen-RedOnly", iUser, sClientName, sGameName);
 			}
 		}
 		case MenuAction_Cancel: {
@@ -481,7 +481,7 @@ MainMenu(iClient)
 			if (GetTime() < g_iGamesTimeLock) {
 				AddMenuItemFormat(hMenu, "Core_GamesMenu", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
 			} else {
-				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || (!IsGameTypeAvailable(TG_RedOnly) && !IsGameTypeAvailable(TG_FiftyFifty)))
+				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || (!IsGameTypeAvailable(TG_RedOnly) && !IsGameTypeAvailable(TG_TeamGame)))
 					AddMenuItemFormat(hMenu, "Core_GamesMenu", ITEMDRAW_DISABLED, "%T", "Menu-Games", iClient);
 				else
 					AddMenuItemFormat(hMenu, "Core_GamesMenu", _, "%T", "Menu-Games", iClient);
@@ -489,16 +489,16 @@ MainMenu(iClient)
 
 
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
-		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu-FiftyFifty", false)) {
+		} else if (StrEqual(g_MenuItemList[i][Id], "Core_GamesMenu-TeamGame", false)) {
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
 
 			if (GetTime() < g_iGamesTimeLock) {
-				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-TeamGame", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
 			} else {
-				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_FiftyFifty))
-					AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-FiftyFifty", iClient);
+				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_TeamGame))
+					AddMenuItemFormat(hMenu, "Core_GamesMenu-TeamGame", ITEMDRAW_DISABLED, "%T", "Menu-Games-TeamGame", iClient);
 				else
-					AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", _, "%T", "Menu-Games-FiftyFifty", iClient);
+					AddMenuItemFormat(hMenu, "Core_GamesMenu-TeamGame", _, "%T", "Menu-Games-TeamGame", iClient);
 			}
 
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], 1);
@@ -506,7 +506,7 @@ MainMenu(iClient)
 			AddSeperatorToMenu(hMenu, g_MenuItemList[i][Separator], -1);
 
 			if (GetTime() < g_iGamesTimeLock) {
-				AddMenuItemFormat(hMenu, "Core_GamesMenu-FiftyFifty", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
+				AddMenuItemFormat(hMenu, "Core_GamesMenu-TeamGame", ITEMDRAW_DISABLED, "%T", "Menu-Games-TimeLock", iClient, g_iGamesTimeLock - GetTime());
 			} else {
 				if (g_Game[GameProgress] != TG_NoGame || GetCountAllGames() < 1 || g_iRoundLimit == 0 || !IsGameTypeAvailable(TG_RedOnly))
 					AddMenuItemFormat(hMenu, "Core_GamesMenu-RedOnly", ITEMDRAW_DISABLED, "%T", "Menu-Games-RedOnly", iClient);

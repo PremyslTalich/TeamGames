@@ -1,6 +1,6 @@
 "Phrases"
 {
-	"GameName-FiftyFifty"
+	"GameName-TeamGame"
 	{
 		"en"		"Chicken hunt"
 	}
@@ -8,7 +8,7 @@
 	{
 		"en"		"Chicken hunt"
 	}
-	"ScoreBoard-FiftyFifty"
+	"ScoreBoard-TeamGame"
 	{
 		"#format"	"{1:d},{2:d},{3:d}"
 		"en"		"<u>Remaining respawns: {1}</u>\n<font color='#DC143C'><b>Red:</b></font> {2}\n<font color='#1E90FF'><b>Blue:</b></font> {3}"

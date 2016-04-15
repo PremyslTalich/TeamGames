@@ -1,6 +1,6 @@
 "Phrases"
 {
-	"GameName-FiftyFifty"
+	"GameName-TeamGame"
 	{
 		"en"		"NoZoom battle"
 	}

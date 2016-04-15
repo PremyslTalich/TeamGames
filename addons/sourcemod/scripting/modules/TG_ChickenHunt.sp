@@ -5,7 +5,7 @@
 #include <emitsoundany>
 #include <colorvariables>
 
-#define GAME_ID_FIFTYFIFTY 	"ChickenHunt-FiftyFifty"
+#define GAME_ID_TEAMGAME 	"ChickenHunt-TeamGame"
 #define GAME_ID_REDONLY 	"ChickenHunt-RedOnly"
 #define WAVE_COUNT 			5
 
@@ -21,7 +21,7 @@ public Plugin:myinfo =
 new g_iTeamScore[3];
 new g_iPlayerScore[MAXPLAYERS + 1];
 new g_iWaveCount;
-new bool:g_bFiftyFifty;
+new bool:g_bTeamGame;
 new Handle:g_hChickens;
 new Handle:g_hCollisionTimer;
 new Handle:g_hPrintScoreTimer;
@@ -45,14 +45,14 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_FIFTYFIFTY);
+		TG_RegGame(GAME_ID_TEAMGAME);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_TEAMGAME);
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
@@ -72,8 +72,8 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		Format(name, maxSize, "%T", "GameName-TeamGame", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
@@ -85,8 +85,8 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 		return;
 	}
 
-	if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
-		TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, _, _, _, _, false);
+	if (StrEqual(sID, GAME_ID_TEAMGAME)) {
+		TG_StartGame(iClient, GAME_ID_TEAMGAME, _, _, _, _, false);
 	} else if (StrEqual(sID, GAME_ID_REDONLY)) {
 		TG_StartGame(iClient, GAME_ID_REDONLY, _, _, _, _, false);
 	}
@@ -94,15 +94,15 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 
 public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
 {
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		g_bFiftyFifty = true;
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		g_bTeamGame = true;
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		g_bFiftyFifty = false;
+		g_bTeamGame = false;
 	} else {
 		return;
 	}
 
-	if (g_bFiftyFifty) {
+	if (g_bTeamGame) {
 		g_iTeamScore[TG_RedTeam] = 0;
 		g_iTeamScore[TG_BlueTeam] = 0;
 	} else {
@@ -128,7 +128,7 @@ public Action:Timer_PrintScore(Handle:hTimer)
 
 public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:hDataPack)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 
 	for (new i = 1; i <= MaxClients; i++)
@@ -142,7 +142,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 
 public TG_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
-	if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
+	if (StrEqual(sID, GAME_ID_TEAMGAME)) {
 		TG_StopGame(TG_GetOppositeTeam(iTeam));
 	} else if (StrEqual(sID, GAME_ID_REDONLY) && iTeam == TG_RedTeam) {
 		new iWinner = Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1);
@@ -159,7 +159,7 @@ public TG_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigg
 
 public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, winners[], winnersCount)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 
 	KillChickens();
@@ -179,7 +179,7 @@ public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, winners[], winnersCount)
 
 public Action:TG_OnTraceAttack(bool:ingame, victim, &attacker, &inflictor, &Float:damage, &damagetype, &ammotype, hitbox, hitgroup)
 {
-	if (!TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
+	if (!TG_IsCurrentGameID(GAME_ID_TEAMGAME) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
 		return Plugin_Continue;
 
 	if (TG_IsPlayerRedOrBlue(victim) && TG_IsPlayerRedOrBlue(attacker)) {
@@ -202,7 +202,7 @@ bool:SpawnChickenWave()
 	g_hChickens = CreateArray();
 
 	for (new i = 1; i <= MaxClients; i++) {
-		if ((g_bFiftyFifty && !TG_IsPlayerRedOrBlue(i)) || (!g_bFiftyFifty && TG_GetPlayerTeam(i) != TG_RedTeam)) {
+		if ((g_bTeamGame && !TG_IsPlayerRedOrBlue(i)) || (!g_bTeamGame && TG_GetPlayerTeam(i) != TG_RedTeam)) {
 			continue;
 		}
 
@@ -258,7 +258,7 @@ public Hook_ChickenDeath(const String: sOutput[], iChicken, iClient, Float: fDel
 		if (GetArraySize(g_hChickens) == 0) {
 
 			if (!SpawnChickenWave()) {
-				if (g_bFiftyFifty) {
+				if (g_bTeamGame) {
 					TG_StopGame((g_iTeamScore[TG_RedTeam] == g_iTeamScore[TG_BlueTeam]) ? TG_NoneTeam : (g_iTeamScore[TG_RedTeam] > g_iTeamScore[TG_BlueTeam]) ? TG_RedTeam : TG_BlueTeam);
 				} else {
 					new iWinner = Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1);
@@ -335,7 +335,7 @@ public bool:Hook_ChickenCollide(entity, collisiongroup, contentsmask, bool:origi
 
 AddScore(iClient)
 {
-	if (g_bFiftyFifty) {
+	if (g_bTeamGame) {
 		g_iTeamScore[TG_GetPlayerTeam(iClient)]++;
 	} else {
 		g_iPlayerScore[iClient]++;
@@ -346,8 +346,8 @@ AddScore(iClient)
 
 PrintScore()
 {
-	if (g_bFiftyFifty) {
-		PrintHintTextToAll("%t", "ScoreBoard-FiftyFifty", g_iWaveCount, g_iTeamScore[TG_RedTeam], g_iTeamScore[TG_BlueTeam]);
+	if (g_bTeamGame) {
+		PrintHintTextToAll("%t", "ScoreBoard-TeamGame", g_iWaveCount, g_iTeamScore[TG_RedTeam], g_iTeamScore[TG_BlueTeam]);
 	} else {
 		new iHighest[2], iLowest[2];
 		decl String:sHighest[64], String:sLowest[64];

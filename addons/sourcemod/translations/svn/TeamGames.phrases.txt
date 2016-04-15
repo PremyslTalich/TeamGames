@@ -132,7 +132,7 @@
 	{
 		"svn"		"Izberi igro"
 	}
-	"Menu-Games-FiftyFifty"
+	"Menu-Games-TeamGame"
 	{
 		"svn"		"Izberi igro(Modri-Rdeci)"
 	}
@@ -202,15 +202,15 @@
 	{
 		"svn"		"Izberi vrsto igre:"
 	}
-	"MenuGamesList-FiftyFifty"
+	"MenuGamesList-TeamGame"
 	{
-		"svn"		"FiftyFifty - Rdeci vs. Modri"
+		"svn"		"TeamGame - Rdeci vs. Modri"
 	}
 	"MenuGamesList-RedOnly"
 	{
 		"svn"		"Samo Rdeci - Rdeci vs. Rdeci"
 	}
-	"MenuGamesList-Title-FiftyFifty"
+	"MenuGamesList-Title-TeamGame"
 	{
 		"svn"		"Red'N'Blue igre"
 	}
@@ -218,7 +218,7 @@
 	{
 		"svn"		"Igre samo za rdece"
 	}
-	"MenuGamesList-Chosen-FiftyFifty"
+	"MenuGamesList-Chosen-TeamGame"
 	{
 		"svn"		"Igralec {1} je glasoval {tg-module}{2}"
 	}

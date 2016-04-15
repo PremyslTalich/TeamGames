@@ -64,8 +64,8 @@ public GamesMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 TG_GameType:GetGameTypeByName(String:sTypeStr[])
 {
-	if (StrEqual(sTypeStr, "FiftyFifty", false))
-		return TG_FiftyFifty;
+	if (StrEqual(sTypeStr, "TeamGame", false))
+		return TG_TeamGame;
 	else if (StrEqual(sTypeStr, "RedOnly", false))
 		return TG_RedOnly;
 	else
@@ -75,7 +75,7 @@ TG_GameType:GetGameTypeByName(String:sTypeStr[])
 public TG_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
 	if (g_Game[GameProgress] != TG_NoGame && g_Game[EndOnTeamEmpty]) {
-		if (g_Game[GameType] == TG_FiftyFifty) {
+		if (g_Game[GameType] == TG_TeamGame) {
 			TG_StopGame(TG_GetOppositeTeam(iTeam));
 		} else if (g_Game[GameType] == TG_RedOnly && iTeam == TG_RedTeam) {
 			TG_StopGame(TG_RedTeam);

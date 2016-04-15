@@ -55,7 +55,7 @@ bool:IsModuleDisabled(TG_ModuleType:iType, const String:sID[])
 ClearGameStatusInfo()
 {
 	g_Game[GameProgress] = TG_NoGame;
-	g_Game[GameType] = TG_FiftyFifty;
+	g_Game[GameType] = TG_TeamGame;
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[GameSettings], TG_MODULE_NAME_LENGTH, "");
@@ -170,7 +170,7 @@ RemoveAllGames()
 
 bool:IsGameTypeAvailable(TG_GameType:iType)
 {
-	if (iType == TG_FiftyFifty) {
+	if (iType == TG_TeamGame) {
 		new iRed = GetCountPlayersInTeam(TG_RedTeam);
 		new iBlue = GetCountPlayersInTeam(TG_BlueTeam);
 

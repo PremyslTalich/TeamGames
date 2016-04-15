@@ -48,7 +48,7 @@ TeamsMenu(iClient)
 	AddMenuItemFormat(hMenu, "AllNone", _, "%T", "MenuTeams-NoneTeamAll", iClient);
 
 	if (GetConVarInt(g_hAllowMultiSwitch) > 0) {
-		AddMenuItemFormat(hMenu, "FiftyFifty", _, "%T", "MenuTeams-FiftyFiftyAll", iClient);
+		AddMenuItemFormat(hMenu, "TeamGame", _, "%T", "MenuTeams-FiftyFiftyAll", iClient);
 		AddMenuItemFormat(hMenu, "AllRed", _, "%T", "MenuTeams-RedTeamAll", iClient);
 	}
 
@@ -71,11 +71,11 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				GamesMenu(iClient, TG_RedOnly);
 				return;
 			}
-		} else if (StrEqual(sKey, "FiftyFifty")) {
+		} else if (StrEqual(sKey, "TeamGame")) {
 			SwitchAllFiftyFifty(iClient);
 
 			if (GetConVarInt(g_hAllowMultiSwitch) == 2) {
-				GamesMenu(iClient, TG_FiftyFifty);
+				GamesMenu(iClient, TG_TeamGame);
 				return;
 			}
 		} else {

@@ -165,9 +165,9 @@
 	{
 		"en"		"Choose game"
 	}
-	"Menu-Games-FiftyFifty"
+	"Menu-Games-TeamGame"
 	{
-		"en"		"Choose game (Fifty fifty)"
+		"en"		"Choose game (Team game)"
 	}
 	"Menu-Games-RedOnly"
 	{
@@ -250,15 +250,15 @@
 	{
 		"en"		"Choose game type:"
 	}
-	"MenuGamesList-FiftyFifty"
+	"MenuGamesList-TeamGame"
 	{
-		"en"		"FiftyFifty - Red vs. Blue"
+		"en"		"TeamGame - Red vs. Blue"
 	}
 	"MenuGamesList-RedOnly"
 	{
 		"en"		"RedOnly - Red vs. Red"
 	}
-	"MenuGamesList-Title-FiftyFifty"
+	"MenuGamesList-Title-TeamGame"
 	{
 		"en"		"Red'N'Blue games"
 	}
@@ -266,7 +266,7 @@
 	{
 		"en"		"RedOnly games"
 	}
-	"MenuGamesList-Chosen-FiftyFifty"
+	"MenuGamesList-Chosen-TeamGame"
 	{
 		"#format"	"{1:s},{2:s}"
 		"en"		"Player {1} has chosen game {tg-module}{2}"

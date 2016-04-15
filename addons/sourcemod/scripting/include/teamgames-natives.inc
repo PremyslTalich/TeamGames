@@ -128,7 +128,7 @@ native bool:TG_GetTeamsLock();
  * @param id			Game ID (!!! MUST BE UNIQUE !!!).
  * @return				0 on success, otherwise on failure.
  */
-native TG_RegGame(const String:id[], TG_GameType:type = TG_FiftyFifty);
+native TG_RegGame(const String:id[], TG_GameType:type = TG_TeamGame);
 
 /**
  * Check if the given module is registred.

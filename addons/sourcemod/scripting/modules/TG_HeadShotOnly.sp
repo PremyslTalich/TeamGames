@@ -4,7 +4,7 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID_FIFTYFIFTY	"HeadShotOnly-FiftyFifty"
+#define GAME_ID_TEAMGAME	"HeadShotOnly-TeamGame"
 #define GAME_ID_REDONLY		"HeadShotOnly-RedOnly"
 
 public Plugin:myinfo =
@@ -27,14 +27,14 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_FIFTYFIFTY);
+		TG_RegGame(GAME_ID_TEAMGAME);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_FIFTYFIFTY);
+	TG_RemoveGame(GAME_ID_TEAMGAME);
 	TG_RemoveGame(GAME_ID_REDONLY);
 }
 
@@ -44,8 +44,8 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_FIFTYFIFTY)) {
-		Format(name, maxSize, "%T", "GameName-FiftyFifty", client);
+	if (StrEqual(id, GAME_ID_TEAMGAME)) {
+		Format(name, maxSize, "%T", "GameName-TeamGame", client);
 	} else if (StrEqual(id, GAME_ID_REDONLY)) {
 		Format(name, maxSize, "%T", "GameName-RedOnly", client);
 	}
@@ -53,13 +53,13 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 
 public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
 {
-	if ((StrEqual(sID, GAME_ID_FIFTYFIFTY) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
+	if ((StrEqual(sID, GAME_ID_TEAMGAME) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
 		SetWeaponMenu(iClient, sID);
 }
 
 public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
 {
-	if (!StrEqual(sID, GAME_ID_FIFTYFIFTY) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
 		return;
 
 	decl String:sWeapon[64];
@@ -79,7 +79,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 public Action:TG_OnTraceAttack(bool:ingame, victim, &attacker, &inflictor, &Float:damage, &damagetype, &ammotype, hitbox, hitgroup)
 {
 	if (ingame && hitgroup != 1) {
-		if ((TG_IsCurrentGameID(GAME_ID_FIFTYFIFTY) && TG_InOppositeTeams(attacker, victim)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(attacker) == TG_GetPlayerTeam(victim))) {
+		if ((TG_IsCurrentGameID(GAME_ID_TEAMGAME) && TG_InOppositeTeams(attacker, victim)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(attacker) == TG_GetPlayerTeam(victim))) {
 			return Plugin_Handled;
 		}
 	}
@@ -130,8 +130,8 @@ public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		new Handle:hDataPack = CreateDataPack();
 		WritePackString(hDataPack, sKey);
 
-		if (StrEqual(sID, GAME_ID_FIFTYFIFTY)) {
-			TG_StartGame(iClient, GAME_ID_FIFTYFIFTY, sWeaponName, hDataPack, true);
+		if (StrEqual(sID, GAME_ID_TEAMGAME)) {
+			TG_StartGame(iClient, GAME_ID_TEAMGAME, sWeaponName, hDataPack, true);
 		} else {
 			TG_StartGame(iClient, GAME_ID_REDONLY, sWeaponName, hDataPack, true);
 		}
