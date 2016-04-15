@@ -22,6 +22,7 @@ public __pl_teamgames_SetNTVOptional()
 	MarkNativeAsOptional("TG_FenceDestroy");
 	MarkNativeAsOptional("TG_FencePlayerCross");
 	MarkNativeAsOptional("TG_SpawnMark");
+	MarkNativeAsOptional("TG_DestroyMark");
 	MarkNativeAsOptional("TG_GetTeamCount");
 	MarkNativeAsOptional("TG_ClearTeam");
 	MarkNativeAsOptional("TG_SetTeamsLock");
