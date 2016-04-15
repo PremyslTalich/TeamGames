@@ -1,7 +1,6 @@
 To do list
 ==========
 
-- [ ] Fix Grenade battle
 - [ ] Rename FiftyFifty game type - check, check, check...
   - [ ] Fix wiki...
 - [ ] Update API site
@@ -10,6 +9,7 @@ To do list
 
 ---
 
+- [x] Fix Grenade battle
 - [x] Check & Update core ConVars on wiki
 - [x] Add modules files to downloads config (commented?)
 - [x] Fix module ConVars on wiki
