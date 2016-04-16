@@ -1,8 +1,8 @@
 # TeamGames
 
 Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many features:
-- Two [teams](https://github.com/KissLick/TeamGames/wiki/Teams), red and blue
-- Team based [games](https://github.com/KissLick/TeamGames/wiki/Games)
+- Two [teams](https://github.com/KissLick/TeamGames/wiki/Teams), *Red* and *Blue*
+- Two types of [games](https://github.com/KissLick/TeamGames/wiki/Games) - *Red vs. Blue* and *Red team only*
 - Two different [marks](https://github.com/KissLick/TeamGames/wiki/Marks) (each for one team and extensible with [MoreMarks module](https://github.com/KissLick/TeamGames/wiki/MoreMarks))
 - [Fences](https://github.com/KissLick/TeamGames/wiki/Fences) (reacts only to prisoners and according to server settings)
 - Fully in translations files and using [ColorVariables](https://github.com/KissLick/ColorVariables)
@@ -24,16 +24,6 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 
 ## Games
 
-**RedOnly:**
-- [Hot popato](https://github.com/KissLick/TeamGames/wiki/HotPotato)
-- [Drunken Rambo](https://github.com/KissLick/TeamGames/wiki/DrunkenRambo)
-
-**FiftyFifty:**
-- HE grenades
-- Machines + 500 HP
-- Cocktail party *(CS:GO only)*
-
-**Both:**
 - Chicken hunt *(CS:GO only)*
 - Gun fight
 - HeadShot only
@@ -43,6 +33,15 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 - Reload battle
 - Taser mania *(CS:GO only)*
 - WildWest *(CS:GO only)*
+
+**Team games (Red vs. Blue) only:**
+- HE grenades
+- Machines + 500 HP
+- Cocktail party *(CS:GO only)*
+
+**Red team games only:**
+- [Hot popato](https://github.com/KissLick/TeamGames/wiki/HotPotato)
+- [Drunken Rambo](https://github.com/KissLick/TeamGames/wiki/DrunkenRambo)
 
 ##Non-game modules
 - [Warden](https://github.com/KissLick/TeamGames/wiki/Warden-plugin)
