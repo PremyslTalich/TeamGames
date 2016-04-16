@@ -3,6 +3,10 @@ To do list
 
 - [ ] Rename FiftyFifty game type - check, check, check...
   - [ ] Fix wiki...
+- [ ] Add core support for healthbars through natives
+  - `TG_AttachPlayerHealthBar(iClient, iMaxHealth, bool:bDestroyOnLeaveGame = true)`
+  - `TG_UpdatePlayerHealthBar(iClient)`
+  - `TG_DestoryPlayerHealthBar(iClient)`
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
