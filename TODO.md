@@ -3,6 +3,7 @@ To do list
 
 - [ ] Rename FiftyFifty game type - check, check, check...
   - [ ] Fix wiki...
+- [ ] Fix Taser mania game
 - [ ] Add core support for healthbars through natives
   - `TG_AttachPlayerHealthBar(iClient, iMaxHealth = 100, bool:bDestroyOnLeaveGame = true)`
   - `TG_UpdatePlayerHealthBar(iClient)`
