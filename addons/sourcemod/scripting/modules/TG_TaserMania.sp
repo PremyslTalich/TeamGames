@@ -74,7 +74,7 @@ public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], H
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
-		GivePlayerWeaponAndAmmo(i, "weapon_taser", 1, 1);
+		GivePlayerWeaponAndAmmo(i, "weapon_taser", 0, 2);
 	}
 }
 
@@ -86,8 +86,8 @@ public Action:Event_WeaponFire(Handle:hEvent, const String:sName[], bool:bDontBr
 	if ((TG_IsCurrentGameID(GAME_ID_TEAMGAME) && TG_IsPlayerRedOrBlue(iClient)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(iClient) == TG_RedTeam)) {
 		GetEventString(hEvent, "weapon", sWeapon, sizeof(sWeapon));
 
-		if (StrEqual(sWeapon, "taser")) {
-			SetPlayerWeaponAmmo(iClient, Client_GetActiveWeapon(iClient), _, 1);
+		if (StrEqual(sWeapon, "weapon_taser")) {
+			SetPlayerWeaponAmmo(iClient, Client_GetActiveWeapon(iClient), _, 2);
 		}
 	}
 
