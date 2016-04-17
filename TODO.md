@@ -1,8 +1,7 @@
 To do list
 ==========
 
-- [ ] Rename FiftyFifty game type - check, check, check...
-  - [x] Fix wiki...
+- [ ] Check ammo handling in games and unify somehow???
 - [ ] Add core support for healthbars through natives
   - `TG_AttachPlayerHealthBar(iClient, iMaxHealth = 100, bool:bDestroyOnLeaveGame = true)`
   - `TG_UpdatePlayerHealthBar(iClient)`
@@ -13,6 +12,8 @@ To do list
 
 ---
 
+- [x] Rename FiftyFifty game type - check, check, check...
+  - [x] Fix wiki...
 - [x] Fix Taser mania
 - [x] Fix Grenade battle
 - [x] Check & Update core ConVars on wiki
