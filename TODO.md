@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Block message `** You just saved XY by killing XZ! **`
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Add core support for healthbars through natives
   - `TG_AttachPlayerHealthBar(iClient, iMaxHealth = 100, bool:bDestroyOnLeaveGame = true)`
