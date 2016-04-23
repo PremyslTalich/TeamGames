@@ -1,18 +1,18 @@
 To do list
 ==========
 
-- [ ] Block message `** You just saved XY by killing XZ! **`
 - [ ] Check ammo handling in games and unify somehow???
-- [ ] Add core support for healthbars through natives
-  - `TG_AttachPlayerHealthBar(iClient, iMaxHealth = 100, bool:bDestroyOnLeaveGame = true)`
-  - `TG_UpdatePlayerHealthBar(iClient)`
-  - `TG_DestoryPlayerHealthBar(iClient)`
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
 
 ---
 
+- [x] Block message `** You just saved XY by killing XZ! **`
+- [x] Add core support for healthbars through natives
+  - `TG_AttachPlayerHealthBar(iClient, iMaxHealth = 100, bool:bDestroyOnLeaveGame = true)`
+  - `TG_UpdatePlayerHealthBar(iClient)`
+  - `TG_DestoryPlayerHealthBar(iClient)`
 - [x] Rename FiftyFifty game type - check, check, check...
   - [x] Fix wiki...
 - [x] Fix Taser mania
