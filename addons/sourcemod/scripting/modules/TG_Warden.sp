@@ -10,30 +10,29 @@ public Plugin:myinfo =
 	name = "[TG] Warden",
 	author = "Raska",
 	description = "",
-	version = "0.3",
+	version = "0.4",
 	url = ""
 }
 
-new Handle:g_hAdmins, Handle:g_hMenu, Handle:g_hTeams, Handle:g_hGames, Handle:g_hMarks, Handle:g_hFences;
+new Handle:g_hMenu, Handle:g_hTeams, Handle:g_hGames, Handle:g_hMarks, Handle:g_hFences;
 
 public OnPluginStart()
 {
 	LoadTranslations("TG.Warden.phrases");
 
-	g_hAdmins = CreateConVar("tgm_warden_admins", 	"1", "Treat admins as warden.");
-	g_hMenu = 	CreateConVar("tgm_warden_menu", 	"1", "Only warden can use TG menu.");
-	g_hTeams = 	CreateConVar("tgm_warden_teams", 	"1", "Only warden can use TG teams.");
-	g_hGames = 	CreateConVar("tgm_warden_games", 	"1", "Only warden can use TG games.");
-	g_hMarks = 	CreateConVar("tgm_warden_marks", 	"1", "Only warden can use TG marks.");
-	g_hFences = CreateConVar("tgm_warden_fences", 	"1", "Only warden can use TG fence.");
+	g_hMenu = 	CreateConVar("tgm_warden_menu", 	"1", "0 = Everyone can use TG menu.\n1 = Only warden can use TG menu.\n2 = Only warden and admins with access to sm_teamgames can use TG menu.");
+	g_hTeams = 	CreateConVar("tgm_warden_teams", 	"1", "0 = Everyone can use TG teams.\n1 = Only warden can use TG teams.\n2 = Only warden and admins with access to sm_teamgames can use TG teams.");
+	g_hGames = 	CreateConVar("tgm_warden_games", 	"1", "0 = Everyone can use TG games.\n1 = Only warden can use TG games.\n2 = Only warden and admins with access to sm_teamgames can use TG games.");
+	g_hMarks = 	CreateConVar("tgm_warden_marks", 	"1", "0 = Everyone can use TG marks.\n1 = Only warden can use TG marks.\n2 = Only warden and admins with access to sm_teamgames can use TG marks.");
+	g_hFences = CreateConVar("tgm_warden_fences", 	"1", "0 = Everyone can use TG fences.\n1 = Only warden can use TG fences.\n2 = Only warden and admins with access to sm_teamgames can use TG fences.");
 
 	AutoExecConfig(_, _, "sourcemod/teamgames");
 }
 
 public Action:TG_OnMenuDisplay(client)
 {
-	if (GetConVarBool(g_hMenu) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "%t", "AccessDenied");
+	if (GetConVarBool(g_hMenu) && !CheckWardenAccess(client, g_hMenu)) {
+		PrintClientAccessDenied(client)
 		return Plugin_Handled;
 	}
 
@@ -42,8 +41,8 @@ public Action:TG_OnMenuDisplay(client)
 
 public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSettings[], Handle:dataPack)
 {
-	if (GetConVarBool(g_hGames) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "%t", "AccessDenied");
+	if (!CheckWardenAccess(client, g_hGames)) {
+		PrintClientAccessDenied(client)
 		return Plugin_Handled;
 	}
 
@@ -52,18 +51,27 @@ public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSet
 
 public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client)
 {
-	if ((type == TG_Game || StrContains(id, "Core_GamesMenu", false) == 0) && GetConVarBool(g_hGames) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "%t", "AccessDenied");
+	if ((type == TG_Game || StrContains(id, "Core_GamesMenu", false) == 0) && !CheckWardenAccess(client, g_hGames)) {
+		PrintClientAccessDenied(client)
 		return Plugin_Handled;
 	}
 
-	if (StrEqual(id, "Core_FencesMenu") && GetConVarBool(g_hFences) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "%t", "AccessDenied");
+	if (StrEqual(id, "Core_FencesMenu") && !CheckWardenAccess(client, g_hFences)) {
+		PrintClientAccessDenied(client)
 		return Plugin_Handled;
 	}
 
-	if (StrEqual(id, "Core_TeamsMenu") && GetConVarBool(g_hTeams) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "%t", "AccessDenied");
+	if (StrEqual(id, "Core_TeamsMenu") && !CheckWardenAccess(client, g_hTeams)) {
+		PrintClientAccessDenied(client)
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+public Action:TG_OnPlayerTeam(client, activator, TG_Team:teamBefore, TG_Team:teamAfter)
+{
+	if (!CheckWardenAccess(activator, g_hTeams)) {
 		return Plugin_Handled;
 	}
 
@@ -72,7 +80,7 @@ public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client)
 
 public Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:life)
 {
-	if (GetConVarBool(g_hMarks) && !CheckWardenAccess(client)) {
+	if (!CheckWardenAccess(client, g_hMarks)) {
 		return Plugin_Handled;
 	}
 
@@ -81,15 +89,31 @@ public Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:life
 
 public Action:TG_OnLaserFenceCreate(client, Float:a[3], Float:c[3])
 {
-	if (GetConVarBool(g_hFences) && !CheckWardenAccess(client)) {
-		CPrintToChat(client, "%t", "AccessDenied");
+	if (!CheckWardenAccess(client, g_hFences)) {
+		PrintClientAccessDenied(client)
 		return Plugin_Handled;
 	}
 
 	return Plugin_Continue;
 }
 
-bool:CheckWardenAccess(iClient)
+bool:CheckWardenAccess(iClient, Handle:hConVar)
 {
-	return (warden_iswarden(iClient) || (GetConVarBool(g_hAdmins) && CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)));
+	new iAccess = GetConVarInt(hConVar);
+
+	if (iAccess == 0)
+		return true;
+
+	if ((iAccess == 1 || iAccess == 2) && warden_iswarden(iClient))
+		return true;
+
+	if (iAccess == 2 && CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC))
+		return true;
+
+	return false;
+}
+
+PrintClientAccessDenied(iClient)
+{
+	CPrintToChat(iClient, "%t", "AccessDenied");
 }
