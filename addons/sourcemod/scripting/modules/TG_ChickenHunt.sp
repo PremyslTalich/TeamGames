@@ -288,6 +288,9 @@ SpawnChicken(const Float:fPos[3])
 		DispatchKeyValue(iChicken, "skin", (GetRandomInt(0,1) == 0) ? "0" : "1");
 		DispatchSpawn(iChicken);
 
+		SetEntProp(iChicken, Prop_Send, "m_bShouldGlow", true);
+		SetEntProp(iChicken, Prop_Send, "m_nGlowStyle", 0);
+		SetEntPropFloat(iChicken, Prop_Send, "m_flGlowMaxDist", 10000000.0);
 		SetEntProp(iChicken, Prop_Data, "m_takedamage", 0, 1);
 
 		TeleportEntity(iChicken, fPos, NULL_VECTOR, NULL_VECTOR);
