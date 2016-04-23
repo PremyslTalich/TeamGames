@@ -549,6 +549,6 @@ public Action:Timer_ActivateEntity(Handle:hTimer, any:iEntity)
 		ActivateEntity(iEntity);
 		AcceptEntityInput(iEntity, "TurnOn");
 	}
-	
+
 	return Plugin_Continue;
 }

@@ -22,12 +22,6 @@ public Native_SetPlayerTeam(Handle:hPlugin, iNumParams)
 	return true;
 }
 
-public Native_IsGameTypeAvailable(Handle:hPlugin, iNumParams)
-{
-	new TG_GameType:iGameType = TG_GameType:GetNativeCell(1);
-	return IsGameTypeAvailable(iGameType);
-}
-
 public Native_LoadPlayerWeapons(Handle:hPlugin, iNumParams)
 {
 	new iClient = GetNativeCell(1);
@@ -38,6 +32,43 @@ public Native_LoadPlayerWeapons(Handle:hPlugin, iNumParams)
 	PlayerEquipmentLoad(iClient);
 
 	return true;
+}
+
+public Native_AttachPlayerHealthBar(Handle:hPlugin, iNumParams)
+{
+	new iClient = GetNativeCell(1);
+	new iMaxHealth = GetNativeCell(2);
+	new bool:bDestroyOnLeaveGame = bool:GetNativeCell(3);
+
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient) || iMaxHealth < 1)
+		return;
+
+	g_iPlayerHPBar[iClient][MaxHealth] = iMaxHealth;
+	g_iPlayerHPBar[iClient][AutomaticDestroy] = bDestroyOnLeaveGame;
+
+	UpdateHealthBar(iClient, false);
+}
+
+public Native_UpdatePlayerHealthBar(Handle:hPlugin, iNumParams)
+{
+	new iClient = GetNativeCell(1);
+
+	UpdateHealthBar(iClient);
+}
+
+public Native_DestroyPlayerHealthBar(Handle:hPlugin, iNumParams)
+{
+	new iClient = GetNativeCell(1);
+
+	RemoveHealthBar(iClient);
+	g_iPlayerHPBar[iClient][MaxHealth] = 0;
+	g_iPlayerHPBar[iClient][AutomaticDestroy] = true;
+}
+
+public Native_IsGameTypeAvailable(Handle:hPlugin, iNumParams)
+{
+	new TG_GameType:iGameType = TG_GameType:GetNativeCell(1);
+	return IsGameTypeAvailable(iGameType);
 }
 
 public Native_FenceCreate(Handle:hPlugin, iNumParams)
@@ -133,7 +164,8 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 
 	Call_AskModuleName(sID, TG_Game, LANG_SERVER, sName, sizeof(sName));
 
-	new TG_GameType:iType = GetNativeCell(2);
+	new TG_GameType:iType = TG_GameType:GetNativeCell(2);
+	new bool:bHealthBar = bool:GetNativeCell(3);
 	new iIndex = GetGameIndex(sID, false);
 
 	if (iIndex == -1) {
@@ -141,9 +173,10 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 		g_iGameListEnd++;
 
 		strcopy(g_GameList[iIndex][Id], TG_MODULE_ID_LENGTH, sID);
-		SaveGameToConfig(sID, sName);
+		SaveGameToConfig(sID, sName, bHealthBar);
 
 		g_GameList[iIndex][Visible] = GetConVarBool(g_hModuleDefVisibility);
+		g_GameList[iIndex][HealthBarVisibility] = bHealthBar;
 	}
 
 	g_GameList[iIndex][Used] = true;
@@ -924,6 +957,10 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 
 	CreateNative("TG_LoadPlayerWeapons", Native_LoadPlayerWeapons);
 
+	CreateNative("TG_AttachPlayerHealthBar", Native_AttachPlayerHealthBar);
+	CreateNative("TG_UpdatePlayerHealthBar", Native_UpdatePlayerHealthBar);
+	CreateNative("TG_DestroyPlayerHealthBar", Native_DestroyPlayerHealthBar);
+
 	CreateNative("TG_FenceCreate", Native_FenceCreate);
 	CreateNative("TG_FenceDestroy", Native_FenceDestroy);
 	CreateNative("TG_FencePlayerCross", Native_FencePlayerCross);
@@ -1134,6 +1171,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 	g_Game[GameStarter] = iClient;
 	g_Game[RemoveDrops] = bRemoveDropppedWeapons;
 	g_Game[EndOnTeamEmpty] = bEndOnTeamEmpty;
+	g_Game[HealthBarVisibility] = g_GameList[iGameIndex][HealthBarVisibility];
 
 	g_bTeamsLock = true;
 
@@ -1379,6 +1417,10 @@ Call_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrig
 	Call_PushCell(iTeam);
 	Call_PushCell(iTrigger);
 	Call_Finish();
+
+	if (g_iPlayerHPBar[iClient][AutomaticDestroy]) {
+		RemoveHealthBar(iClient);
+	}
 }
 
 Call_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)

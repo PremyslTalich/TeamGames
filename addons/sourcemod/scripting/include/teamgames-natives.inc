@@ -28,20 +28,47 @@ native TG_Team:TG_GetPlayerTeam(client);
 native bool:TG_SetPlayerTeam(activator, client, TG_Team:team);
 
 /**
- * Check if the given game type is available depending on TeamGames teams population.
- *
- * @param type			Game type.
- * $return 				True on success, false on failure.
- */
-native bool:TG_IsGameTypeAvailable(TG_GameType:type);
-
-/**
  * Loads saved player weapons, health and armor.
  *
  * @param client		Client index.
  * @return				True on success, false on failure.
  */
 native bool:TG_LoadPlayerWeapons(client);
+
+/**
+ * Attach HealthBar to player. Uses file prefix [HealthBar] in downloads config.
+ *
+ * @param client				Client index.
+ * @param maxHealth				Client max health level to calculate HealthBar percent level from.
+ * @param destroyOnLeaveGame	Automatically destroy HealthBar when client leaves TG game.
+ * @noreturn
+ */
+native TG_AttachPlayerHealthBar(client, maxHealth = 100, bool:destroyOnLeaveGame = true);
+
+/**
+ * Update HealthBar acording to player's health level.
+ *
+ * @param client				Client index.
+ * @noreturn
+ */
+native TG_UpdatePlayerHealthBar(client);
+
+/**
+ * Destroy player's HealthBar.
+ *
+ * @param client				Client index.
+ * @noreturn
+ */
+native TG_DestoryPlayerHealthBar(client);
+
+
+/**
+ * Check if the given game type is available depending on TeamGames teams population.
+ *
+ * @param type			Game type.
+ * $return 				True on success, false on failure.
+ */
+native bool:TG_IsGameTypeAvailable(TG_GameType:type);
 
 /**
  * Create fence from two points (a, c) on diagonale.
@@ -124,11 +151,12 @@ native bool:TG_GetTeamsLock();
 /**
  * Register Game to TeamGames.
  *
- * @param name			Game name (showed in games menu via TG_ShowGamesMenu).
  * @param id			Game ID (!!! MUST BE UNIQUE !!!).
+ * @param type			Game type.
+ * @param healthbar		Enemies can see HealthBars if true.
  * @return				0 on success, otherwise on failure.
  */
-native TG_RegGame(const String:id[], TG_GameType:type = TG_TeamGame);
+native TG_RegGame(const String:id[], TG_GameType:type = TG_TeamGame, bool:enemyhealthbar = true);
 
 /**
  * Check if the given module is registred.

@@ -15,7 +15,7 @@ public Plugin:myinfo =
 	name = "[TG] NoZoom",
 	author = "Raska",
 	description = "",
-	version = "0.4",
+	version = "0.5",
 	url = ""
 }
 
@@ -36,7 +36,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME);
+		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
@@ -78,6 +78,7 @@ public TG_OnGamePrepare(const String:id[], client, const String:GameSettings[], 
 			continue;
 
 		SetEntityHealth(i, 100);
+		TG_AttachPlayerHealthBar(i);
 		g_fDrawLaser[i] = Float:{0.0, 0.0, 0.0};
 	}
 

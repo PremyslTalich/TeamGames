@@ -69,6 +69,7 @@ new EngineVersion:g_iEngineVersion;
 #include "PlayerData.sp"
 #include "Games.sp"
 #include "Teams.sp"
+#include "HealthBar.sp"
 #include "LaserFences.sp"
 #include "Chat.sp"
 #include "Marks.sp"
@@ -78,7 +79,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.12.0.3"
+#define _PLUGIN_VERSION "0.13.0.13"
 
 public Plugin:myinfo =
 {
@@ -271,6 +272,9 @@ public OnClientPutInServer(iClient)
 
 	// SDKHook_OnTakeDamage - mainly because of molotovs
 	SDKHook(iClient, SDKHook_OnTakeDamage, Hook_OnTakeDamage);
+
+	// Updating HealthBar
+	SDKHook(iClient, SDKHook_OnTakeDamagePost, Hook_OnTakeDamagePost);
 }
 
 public OnClientDisconnect(iClient)
@@ -354,6 +358,11 @@ public Action:Hook_OnTakeDamage(iVictim, &iAttacker, &iInflictor, &Float:fDamage
 		// PrintToChatAll("Damage: %N -> %N = %d", iAttacker, iVictim, iReturnValue);
 
 	return iReturnValue;
+}
+
+public Hook_OnTakeDamagePost(iVictim, iAttacker, iInflictor, Float:fDamage, iDamageType)
+{
+	UpdateHealthBar(iVictim);
 }
 
 Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &Float:fDamage, &iDamageType, &iAmmoType = -1, iHitBox = -1, iHitGroup = -1)

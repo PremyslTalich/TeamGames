@@ -10,6 +10,7 @@ enum gamestatusinfo
 	String:GameID[TG_MODULE_ID_LENGTH],
 	String:DefaultName[TG_MODULE_NAME_LENGTH],
 	TG_GameType:GameType,
+	bool:HealthBarVisibility,
 	String:GameSettings[TG_GAME_SETTINGS_LENGTH],
 	Handle:GameDataPack,
 	bool:RemoveDrops,
@@ -56,6 +57,7 @@ ClearGameStatusInfo()
 {
 	g_Game[GameProgress] = TG_NoGame;
 	g_Game[GameType] = TG_TeamGame;
+	g_Game[HealthBarVisibility] = true;
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[GameSettings], TG_MODULE_NAME_LENGTH, "");
@@ -95,6 +97,7 @@ enum GameStruct
 	String:Id[TG_MODULE_ID_LENGTH],
     String:DefaultName[TG_MODULE_NAME_LENGTH],
     TG_GameType:GameType,
+	bool:HealthBarVisibility,
 	Separator
 }
 new g_GameList[MAX_GAMES][GameStruct];

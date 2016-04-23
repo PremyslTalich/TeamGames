@@ -9,7 +9,7 @@ public Plugin:myinfo =
 	name = "[TG] HEGrenades",
 	author = "Raska",
 	description = "",
-	version = "0.6",
+	version = "0.7",
 	url = ""
 }
 
@@ -21,7 +21,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames"))
-		TG_RegGame(GAME_ID);
+		TG_RegGame(GAME_ID, TG_TeamGame);
 }
 
 public OnPluginEnd()
@@ -52,7 +52,8 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 	for (new i = 1; i <= MaxClients; i++)
 	{
 		if (TG_IsPlayerRedOrBlue(i)) {
-			GiveGrenade(iClient);
+			GiveGrenade(i);
+			TG_AttachPlayerHealthBar(i);
 		}
 	}
 }

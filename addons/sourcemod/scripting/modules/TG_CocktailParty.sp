@@ -9,7 +9,7 @@ public Plugin:myinfo =
 	name = "[TG] CocktailParty",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
 }
 
@@ -30,7 +30,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames"))
-		TG_RegGame(GAME_ID);
+		TG_RegGame(GAME_ID, TG_TeamGame);
 }
 
 public OnPluginEnd()
@@ -63,6 +63,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 			continue;
 
 		Client_GiveWeapon(i, "weapon_molotov", true);
+		TG_AttachPlayerHealthBar(i);
 	}
 }
 

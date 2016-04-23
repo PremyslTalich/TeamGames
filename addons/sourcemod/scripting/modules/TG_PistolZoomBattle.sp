@@ -11,7 +11,7 @@ public Plugin:myinfo =
 	name = "[TG] PistolZoomBattle",
 	author = "Raska",
 	description = "",
-	version = "0.1",
+	version = "0.2",
 	url = ""
 }
 
@@ -27,7 +27,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME);
+		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
@@ -75,6 +75,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 		PlayerZoomLevel[i] = 90;
 		SetEntProp(i, Prop_Send, "m_iFOV", PlayerZoomLevel[i]);
 		SetEntProp(i, Prop_Send, "m_iDefaultFOV", PlayerZoomLevel[i]);
+		TG_AttachPlayerHealthBar(i);
 	}
 
 	HookEvent("weapon_fire", Event_WeaponFire, EventHookMode_Pre);

@@ -45,7 +45,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME);
+		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }

@@ -15,7 +15,7 @@ public Plugin:myinfo =
 	name = "[TG] ReloadBattle",
 	author = "Raska",
 	description = "",
-	version = "0.3",
+	version = "0.4",
 	url = ""
 }
 
@@ -28,7 +28,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME);
+		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
@@ -77,6 +77,7 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 			continue;
 
 		GivePlayerWeaponAndAmmo(i, sWeapon, 0, 1);
+		TG_AttachPlayerHealthBar(i);
 	}
 
 	HookEvent("weapon_fire", Event_WeaponFire);

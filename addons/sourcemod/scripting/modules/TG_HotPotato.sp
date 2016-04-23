@@ -34,9 +34,6 @@ new g_iVictim, Handle:g_hVictimSpeed, Handle:g_hHeathCheck;
 new Handle:g_hDamage, Handle:g_hDamageTimer, Handle:g_hDamageInterval;
 new g_iPotato, String:g_sPotatoModel[PLATFORM_MAX_PATH];
 new g_iBeam, String:g_sBeamModel[PLATFORM_MAX_PATH], Float:g_fBeamWidth, g_iBeamColor[4];
-new g_iHPBarTemplate[11][HealhBar];
-new g_iPlayerHPBar[MAXPLAYERS + 1];
-new g_iPlayerHPBarEnt[MAXPLAYERS + 1];
 
 public OnPluginStart()
 {
@@ -71,13 +68,6 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 		Format(name, maxSize, "%T", "GameName", client);
 }
 
-public TG_OnDownloadsStart()
-{
-	for (new i = 1; i <= 10; i++) {
-		g_iHPBarTemplate[0][Used] = false;
-	}
-}
-
 public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bool:bKnown)
 {
 	if (StrEqual(sPrefixName, DOWNLOAD_POTATO, false)) {
@@ -96,26 +86,6 @@ public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bo
 		g_iBeamColor[3] = DTC_GetArgNum(hArgs, 5, 255);
 
 		bKnown = true;
-	} else if (StrEqual(sPrefixName, DOWNLOAD_HEALTHBAR, false) && GetConVarInt(g_hHeathCheck) == 2) {
-		new iHealth = DTC_GetArgNum(hArgs, 1, 0) / 10;
-
-		switch (iHealth) {
-			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10: {
-				strcopy(g_iHPBarTemplate[iHealth][Sprite], PLATFORM_MAX_PATH, sFile);
-				PrecacheDecal(sFile);
-
-				g_iHPBarTemplate[iHealth][Offset] = DTC_GetArgFloat(hArgs, 2, 12.0);
-				g_iHPBarTemplate[iHealth][Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
-				Format(g_iHPBarTemplate[iHealth][Color], 12, "%d %d %d", DTC_GetArgNum(hArgs, 4, 255), DTC_GetArgNum(hArgs, 5, 255), DTC_GetArgNum(hArgs, 6, 255));
-				g_iHPBarTemplate[iHealth][Alpha] = DTC_GetArgNum(hArgs, 7, 255);
-
-				g_iHPBarTemplate[iHealth][Used] = true;
-				bKnown = true;
-			}
-			default: {
-				LogError("Bad file prefix argument \"1\" (file: \"%s\", prefix: \"%s\") !", sFile, sPrefixName);
-			}
-		}
 	}
 }
 
@@ -142,10 +112,7 @@ public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[],
 			SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
 
 			if (GetConVarInt(g_hHeathCheck) == 2) {
-				SDKHook(i, SDKHook_OnTakeDamagePost, Hook_OnTakeDamagePost);
-
-				g_iPlayerHPBar[i] = 0;
-				UpdateHealthBar(i);
+				TG_AttachPlayerHealthBar(i);
 			}
 		}
 		MakeClientVictim(iUser, true);
@@ -178,13 +145,6 @@ public Action:Hook_WeaponDrop(iClient, iWeapon)
 	}
 
 	return Plugin_Continue;
-}
-
-public Hook_OnTakeDamagePost(iVictim, iAttacker, iInflictor, Float:fDamage, iDamageType)
-{
-	if (TG_IsCurrentGameID(GAME_ID) && TG_IsPlayerRedOrBlue(iVictim)) {
-		UpdateHealthBar(iVictim);
-	}
 }
 
 public Frame_DropedPotato(any:data)
@@ -228,7 +188,7 @@ public Action:Timer_SlapClient(Handle:hTimer)
 				SetEntityRenderColor(iClient, 255, 0, 0, 0);
 			}
 		} else if (GetConVarInt(g_hHeathCheck) == 2) {
-			UpdateHealthBar(iClient);
+			TG_UpdatePlayerHealthBar(iClient);
 		}
 	}
 
@@ -270,10 +230,7 @@ public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_Player
 		SetEntityRenderColor(iClient, 255, 255, 255, 0);
 	}
 
-	RemoveHealthBar(iClient);
-
 	SDKUnhook(iClient, SDKHook_WeaponDrop, 		 Hook_WeaponDrop);
-	SDKUnhook(iClient, SDKHook_OnTakeDamagePost, Hook_OnTakeDamagePost);
 
 	if (iClient != g_iVictim)
 		return;
@@ -435,69 +392,6 @@ CreateBeam()
 bool:ExistBeam()
 {
 	return (IsModelPrecached(g_sBeamModel) && IsValidEntity(g_iBeam) && g_iBeam != 0);
-}
-
-UpdateHealthBar(iClient)
-{
-	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient))
-		return;
-
-	new iHealth = RoundToCeil(GetClientHealth(iClient) / 10.0);
-
-	for (new i = iHealth; i < 11; i++) {
-		if (g_iPlayerHPBar[iClient] != i) {
-			if (g_iHPBarTemplate[i][Used]) {
-				RemoveHealthBar(iClient);
-
-				new iHealthBar;
-				if ((iHealthBar = AttachHealthBar(iClient, i)) != INVALID_ENT_REFERENCE) {
-					g_iPlayerHPBarEnt[iClient] = iHealthBar;
-					g_iPlayerHPBar[iClient] = i;
-				}
-
-				break;
-			}
-		} else {
-			break;
-		}
-	}
-}
-
-AttachHealthBar(iClient, iTemplate)
-{
-	new iSprite;
-	if ((iSprite = CreateEntityByName("env_sprite_oriented")) != INVALID_ENT_REFERENCE) {
-		new Float:fPos[3];
-		GetClientAbsOrigin(iClient, fPos);
-		fPos[2] += 73.0 + g_iHPBarTemplate[iTemplate][Offset];
-
-		DispatchKeyValue(iSprite, "model", g_iHPBarTemplate[iTemplate][Sprite]);
-		DispatchKeyValueFloat(iSprite, "scale", g_iHPBarTemplate[iTemplate][Scale]);
-
-		DispatchKeyValue(iSprite, "rendermode", "5");
-		DispatchKeyValue(iSprite, "spawnflags", "1");
-
-		DispatchKeyValue(iSprite, "rendercolor", g_iHPBarTemplate[iTemplate][Color]);
-		DispatchKeyValueNum(iSprite, "RenderAmt", g_iHPBarTemplate[iTemplate][Alpha]);
-
-		DispatchSpawn(iSprite);
-		TeleportEntity(iSprite, fPos, NULL_VECTOR, NULL_VECTOR);
-
-		SetVariantString("!activator");
-		AcceptEntityInput(iSprite, "SetParent", iClient);
-	}
-
-	return iSprite;
-}
-
-RemoveHealthBar(iClient)
-{
-	if (g_iPlayerHPBarEnt[iClient] != INVALID_ENT_REFERENCE && g_iPlayerHPBarEnt[iClient] != 0) {
-		RemoveEdict(g_iPlayerHPBarEnt[iClient]);
-		g_iPlayerHPBarEnt[iClient] = INVALID_ENT_REFERENCE;
-	}
-
-	g_iPlayerHPBar[iClient] = 0;
 }
 
 public Hook_BombThink(iEntity)

@@ -118,7 +118,7 @@ SaveMenuItemToConfig(const String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODU
 	CloseHandle(hKV);
 }
 
-SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MODULE_NAME_LENGTH])
+SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MODULE_NAME_LENGTH], bHealthBar)
 {
 	#if defined DEBUG
 	LogMessage("[TG DEBUG] SaveGameToConfig(%s, %s)", sID, sName);
@@ -134,6 +134,10 @@ SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MO
 
 	KvJumpToKey(hKV, sID, true);
 	KvSetString(hKV, "name", sName);
+
+	if (!bHealthBar) {
+		KvSetNum(hKV, "enemyhealthbar", 0);
+	}
 
 	if (!GetConVarBool(g_hModuleDefVisibility)) {
 		KvSetNum(hKV, "visibility", 0);
@@ -234,6 +238,8 @@ LoadGamesMenuConfig()
 			KvGetSectionName(hKV, g_GameList[g_iGameListEnd][Id], TG_MODULE_ID_LENGTH);
 			g_GameList[g_iGameListEnd][Visible] = bool:KvGetNum(hKV, "visibility", 1);
 
+			g_GameList[g_iGameListEnd][HealthBarVisibility] = bool:KvGetNum(hKV, "enemyhealthbar", 1);
+
 			#if defined DEBUG
 			LogMessage("[TG DEBUG] \tAdded game(%d) sID = '%s', name = '%s'.", g_iGameListEnd, g_GameList[g_iGameListEnd][Id], g_GameList[g_iGameListEnd][DefaultName]);
 			#endif
@@ -256,7 +262,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 	LogMessage("[TG DEBUG] Download '%s' '%s'", sPrefixName, sFile);
 	#endif
 
-	if (StrEqual(sPrefixName, "GamePrepare")) {
+	if (StrEqual(sPrefixName, "GamePrepare", false)) {
 		new i = DTC_GetArgNum(hArgs, 1, 0);
 
 		if (i > 0 || i < 6) {
@@ -264,11 +270,11 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 			PrecacheSoundAny(m_sFile, true);
 			strcopy(g_sGamePrepare[i], PLATFORM_MAX_PATH, m_sFile);
 		}
-	} else if (StrEqual(sPrefixName, "GameStart")) {
+	} else if (StrEqual(sPrefixName, "GameStart", false)) {
 		ReplaceStringEx(m_sFile, sizeof(m_sFile), "sound/", "");
 		PrecacheSoundAny(m_sFile, true);
 		strcopy(g_sGameStart, PLATFORM_MAX_PATH, m_sFile);
-	} else if (StrEqual(sPrefixName, "GameEnd")) {
+	} else if (StrEqual(sPrefixName, "GameEnd", false)) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
@@ -280,7 +286,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		PrecacheSoundAny(m_sFile, true);
 
 		strcopy(g_sGameEnd[iTeam], PLATFORM_MAX_PATH, m_sFile);
-	} else if (StrEqual(sPrefixName, "PlayerSkin")) {
+	} else if (StrEqual(sPrefixName, "PlayerSkin", false)) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
@@ -290,7 +296,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 
 		PrecacheModel(m_sFile);
 		strcopy(g_sTeamSkin[iTeam], PLATFORM_MAX_PATH, m_sFile);
-	} else if (StrEqual(sPrefixName, "Mark")) {
+	} else if (StrEqual(sPrefixName, "Mark", false)) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
@@ -305,7 +311,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		g_Mark[iTeam][Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
 		Format(g_Mark[iTeam][Color], PLATFORM_MAX_PATH, "%d %d %d", DTC_GetArgNum(hArgs, 4, 255), DTC_GetArgNum(hArgs, 5, 255), DTC_GetArgNum(hArgs, 6, 255));
 		g_Mark[iTeam][Alpha] = DTC_GetArgNum(hArgs, 7, 255);
-	} else if (StrEqual(sPrefixName, "MarkLaser")) {
+	} else if (StrEqual(sPrefixName, "MarkLaser", false)) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
@@ -319,7 +325,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		g_Mark[iTeam][LaserColor][2] = DTC_GetArgNum(hArgs, 4, 255);
 		g_Mark[iTeam][LaserColor][3] = DTC_GetArgNum(hArgs, 5, 255);
 		g_Mark[iTeam][LaserWidth] = DTC_GetArgFloat(hArgs, 6, 1.0);
-	} else if (StrEqual(sPrefixName, "TeamOverlay")) {
+	} else if (StrEqual(sPrefixName, "TeamOverlay", false)) {
 		new TG_Team:iTeam = GetTGTeamFromDTCArg(hArgs, 1);
 
 		if (iTeam == TG_ErrorTeam) {
@@ -330,11 +336,11 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		ReplaceStringEx(m_sFile, sizeof(m_sFile), "materials/", "");
 		PrecacheDecal(m_sFile);
 		strcopy(g_Overlay[iTeam][OverlayName], PLATFORM_MAX_PATH, m_sFile);
-	} else if (StrEqual(sPrefixName, "RebelSound")) {
+	} else if (StrEqual(sPrefixName, "RebelSound", false)) {
 		ReplaceStringEx(m_sFile, sizeof(m_sFile), "sound/", "");
 		PrecacheSoundAny(m_sFile, true);
 		strcopy(g_sRebelSound, PLATFORM_MAX_PATH, m_sFile);
-	} else if (StrEqual(sPrefixName, "FenceCorner")) {
+	} else if (StrEqual(sPrefixName, "FenceCorner", false)) {
 		if (GetConVarInt(g_hFenceType) == 0 || IsFenceDisabledOnCurrentMap()) {
 			g_bFencesMenuMapVisibility = false;
 			return;
@@ -344,7 +350,7 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 
 		PrecacheModel(m_sFile);
 		strcopy(g_sFenceCornerModel, PLATFORM_MAX_PATH, m_sFile);
-	} else if (StrEqual(sPrefixName, "FenceMaterial")) {
+	} else if (StrEqual(sPrefixName, "FenceMaterial", false)) {
 		if (GetConVarInt(g_hFenceType) == 0 || IsFenceDisabledOnCurrentMap()) {
 			g_bFencesMenuMapVisibility = false;
 			return;
@@ -362,6 +368,23 @@ public DTC_OnFile(String:sFile[], String:sPrefixName[DTC_MAX_NAME_LEN], Handle:h
 		PrecacheModel(m_sFile);
 
 		strcopy(g_sFenceMaterial, PLATFORM_MAX_PATH, m_sFile);
+	} else if (StrEqual(sPrefixName, "HealthBar", false)) {
+		new iHealth = DTC_GetArgNum(hArgs, 1, 0) / 10;
+
+		if (iHealth >= 1 && iHealth <= 10) {
+			strcopy(g_iHPBarTemplate[iHealth][Sprite], PLATFORM_MAX_PATH, sFile);
+			PrecacheDecal(sFile);
+
+			g_iHPBarTemplate[iHealth][Offset] = DTC_GetArgFloat(hArgs, 2, 12.0);
+			g_iHPBarTemplate[iHealth][Scale] = DTC_GetArgFloat(hArgs, 3, 1.0);
+			Format(g_iHPBarTemplate[iHealth][Color], 12, "%d %d %d", DTC_GetArgNum(hArgs, 4, 255), DTC_GetArgNum(hArgs, 5, 255), DTC_GetArgNum(hArgs, 6, 255));
+			g_iHPBarTemplate[iHealth][Alpha] = DTC_GetArgNum(hArgs, 7, 255);
+
+			g_iHPBarTemplate[iHealth][Used] = true;
+			bKnown = true;
+		} else {
+			LogError("Bad file prefix argument \"1\" (file: \"%s\", prefix: \"%s\") !", sFile, sPrefixName);
+		}
 	} else {
 		bKnown = false;
 	}

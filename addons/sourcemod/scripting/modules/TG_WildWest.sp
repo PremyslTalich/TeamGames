@@ -13,7 +13,7 @@ public Plugin:myinfo =
 	name = "[TG] WildWest",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
 }
 
@@ -34,7 +34,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME);
+		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
@@ -80,6 +80,8 @@ public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[],
 	{
 		if (TG_IsPlayerRedOrBlue(i)) {
 			new iRevolver = GivePlayerWeaponAndAmmo(i, "weapon_revolver");
+
+			TG_AttachPlayerHealthBar(i);
 
 			g_iPlayerRevolver[i] = iRevolver;
 			RequestFrame(Frame_BlockAttack2, i);

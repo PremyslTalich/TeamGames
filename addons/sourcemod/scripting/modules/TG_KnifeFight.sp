@@ -11,7 +11,7 @@ public Plugin:myinfo =
 	name = "[TG] KnifeFight",
 	author = "Raska",
 	description = "",
-	version = "0.5",
+	version = "0.6",
 	url = ""
 }
 
@@ -23,7 +23,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:sName[])
 {
 	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME);
+		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
 		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
 	}
 }
@@ -67,6 +67,8 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 
 		Client_GiveWeapon(i, "weapon_knife", true);
 		SetEntityHealth(i, hp);
+
+		TG_AttachPlayerHealthBar(i, hp);
 	}
 }
 
