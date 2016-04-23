@@ -180,12 +180,12 @@ public Action:Timer_SlapClient(Handle:hTimer)
 
 		if (GetConVarInt(g_hHeathCheck) == 1) {
 			if (iNewHealth > 90) {
-				SetEntityRenderColor(iClient, 255, 255, 255, 0);
+				SetEntityRenderColor(iClient, 255, 255, 255, 255);
 			} else if (iNewHealth > 10) {
 				new iColor = RoundToNearest((iNewHealth - 10) * 3.1875);
-				SetEntityRenderColor(iClient, 255, iColor, iColor, 0);
+				SetEntityRenderColor(iClient, 255, iColor, iColor, 255);
 			} else {
-				SetEntityRenderColor(iClient, 255, 0, 0, 0);
+				SetEntityRenderColor(iClient, 255, 0, 0, 255);
 			}
 		} else if (GetConVarInt(g_hHeathCheck) == 2) {
 			TG_UpdatePlayerHealthBar(iClient);
@@ -227,7 +227,7 @@ public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_Player
 
 	if (Client_IsIngame(iClient)) {
 		SetEntPropFloat(iClient, Prop_Data, "m_flLaggedMovementValue", 1.0);
-		SetEntityRenderColor(iClient, 255, 255, 255, 0);
+		SetEntityRenderColor(iClient, 255, 255, 255, 255);
 	}
 
 	SDKUnhook(iClient, SDKHook_WeaponDrop, 		 Hook_WeaponDrop);
