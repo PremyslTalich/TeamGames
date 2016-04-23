@@ -20,6 +20,9 @@ public Action:Hook_TextMsg(UserMsg:iMsgId, Handle:hMsg, const iPlayers[], iPlaye
 	if (StrContains(sBuffer, "#Player_Cash_Award_Kill_Teammate") != -1)
 		return Plugin_Handled;
 
+	if (StrContains(sBuffer, "#Chat_SavePlayer") != -1)
+		return Plugin_Handled;
+
 	return Plugin_Continue;
 }
 
