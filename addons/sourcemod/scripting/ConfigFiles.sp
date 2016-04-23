@@ -118,7 +118,7 @@ SaveMenuItemToConfig(const String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODU
 	CloseHandle(hKV);
 }
 
-SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MODULE_NAME_LENGTH], bHealthBar)
+SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MODULE_NAME_LENGTH], bool:bHealthBar)
 {
 	#if defined DEBUG
 	LogMessage("[TG DEBUG] SaveGameToConfig(%s, %s)", sID, sName);
