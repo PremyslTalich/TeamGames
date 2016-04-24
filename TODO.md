@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Rework handling of games IDs and types???
+- [ ] Rework handling of games IDs and types - in progress, gonna take some while...
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
