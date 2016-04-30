@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Look at possible bug in `GetCountAllGames()`
 - [ ] Rework handling of games IDs and types - in progress, gonna take some while...
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Update API site
