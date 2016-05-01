@@ -2,7 +2,6 @@ To do list
 ==========
 
 - [ ] Add native `TG_GetCurrentGameType`
-- [ ] Look at possible bug in `GetCountAllGames()`
 - [ ] Rework handling of games IDs and types - in progress, gonna take some while...
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Update API site
@@ -11,6 +10,7 @@ To do list
 
 ---
 
+- [x] Look at possible bug in `GetCountAllGames()` - not bug
 - [x] Block message `** You just saved XY by killing XZ! **`
 - [x] Add core support for healthbars through natives
   - `TG_AttachPlayerHealthBar(iClient, iMaxHealth = 100, bool:bDestroyOnLeaveGame = true)`
