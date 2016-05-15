@@ -6,8 +6,8 @@
 /**
  * Called when player is about to be moved to TeamGames team.
  *
- * @param activator		Client index of activator (see TG_SetPlayerTeam).
  * @param client		Client index of switched player.
+ * @param activator		Client index of activator (see TG_SetPlayerTeam).
  * @param teamBefore	Team before.
  * @param teamAfter		Team after.
  * @return				Plugin_Handled to prevent player changing team.
@@ -17,8 +17,8 @@ forward Action:TG_OnPlayerTeam(client, activator, TG_Team:teamBefore, TG_Team:te
 /**
  * Called right after player was moved to TeamGames team.
  *
- * @param activator		Client index of activator (see TG_SetPlayerTeam).
  * @param client		Client index of switched player.
+ * @param activator		Client index of activator (see TG_SetPlayerTeam).
  * @param teamBefore	Team before.
  * @param teamAfter		Team after.
  * @noreturn
@@ -131,6 +131,7 @@ forward TG_OnMarkDestroyed(client, TG_Team:team, Float:position[3], Float:life, 
  * Called before game start menu is opened.
  *
  * @param id			Game ID.
+ * @param gameType		Game type.
  * @param client		Client index of game starter.
  * @param gameSettings	Game settings.
  * @param dataPack		Game datapack.
@@ -142,6 +143,7 @@ forward Action:TG_OnGameStartMenu(const String:id[], TG_GameType:gameType, clien
  * Called right before game preparation starts.
  *
  * @param id			Game ID.
+ * @param gameType		Game type.
  * @param client		Client index of game starter.
  * @param gameSettings	Game settings.
  * @param dataPack		Game datapack.
@@ -153,6 +155,7 @@ forward Action:TG_OnGamePreparePre(const String:id[], TG_GameType:gameType, clie
  * Called when game preparation started.
  *
  * @param id			Game ID.
+ * @param gameType		Game type.
  * @param client		Client index of game starter.
  * @param gameSettings	Game settings.
  * @param dataPack		Game datapack.
@@ -164,6 +167,7 @@ forward TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const 
  * Called when game started.
  *
  * @param id			Game ID.
+ * @param gameType		Game type.
  * @param client		Client index of game starter.
  * @param gameSettings	Game settings.
  * @param dataPack		Game datapack.
@@ -175,6 +179,7 @@ forward TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const St
  * Called when some error happened in TG_StartGame().
  *
  * @param id				Game ID.
+ * @param gameType			Game type.
  * @param client			Client index of game starter.
  * @param errorID			Game start error id.
  * @param errorDescription	Game start error description.
@@ -194,8 +199,9 @@ forward Action:TG_OnPlayerDamage(bool:inTeamGame, victim, &attacker, &inflictor,
  * @param victimTeam	Victim's TG team.
  * @param headshot		Was it headshot?
  * @param weapon		Killer's weapon.
- * @param gameStatus		Game status.
+ * @param gameStatus	Game status.
  * @param gameID		Game ID.
+ * @param gameType		Game type.
  * @noreturn
  */
 forward TG_OnPlayerDeath(attacker, TG_Team:attackerTeam, victim, TG_Team:victimTeam, bool:headshot, const String:weapon[], TG_GameProgress:gameStatus, const String:gameID[], TG_GameType:gameType);
@@ -204,6 +210,7 @@ forward TG_OnPlayerDeath(attacker, TG_Team:attackerTeam, victim, TG_Team:victimT
  * Called on TG_StopGame() (or one TG team is empty - depending of settings).
  *
  * @param id			Game ID.
+ * @param gameType		Game type.
  * @param team			Winner team.
  * @param winners		Array of winners (all alive players in winner team by default).
  * @param winnersCount	Number of winners.
@@ -216,8 +223,9 @@ forward TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winn
  * Called when one TG team was emptied.
  *
  * @param id			Game ID ("Core_NoGame" if there is no game running).
+ * @param gameType		Game type.
  * @param client		Client index.
- * @param team		Player's TG team.
+ * @param team			Player's TG team.
  * @param trigger		How was the team emptied.
  * @noreturn
  */
@@ -227,6 +235,7 @@ forward TG_OnTeamEmpty(const String:id[], TG_GameType:gameType, client, TG_Team:
  * Called when player leave TG game.
  *
  * @param id			Game ID.
+ * @param gameType		Game type.
  * @param client		Client index.
  * @param team			Player's TG team.
  * @param trigger		Why player left the game.
@@ -257,7 +266,7 @@ forward TG_OnMenuDisplayed(client);
  *
  * @param type 			Module type.
  * @param id			Module ID.
- * @param gametype		Game type used when selecting a game
+ * @param gameType		Game type used when selecting a game
  * @param client		Client index.
  * @return 				Plugin_Handled to block item from selecting.
  */
@@ -270,7 +279,7 @@ forward Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], TG_GameTyp
  *
  * @param type 			Module type.
  * @param id			Module ID.
- * @param gametype		Game type used when selecting a game
+ * @param gameType		Game type used when selecting a game
  * @param client		Client index.
  * @noreturn
  */

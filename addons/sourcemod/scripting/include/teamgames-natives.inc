@@ -192,12 +192,11 @@ native TG_RemoveGame(const String:id[]);
  * @param type 			Game type used when fake selecting a game
  * @noreturn
  */
-native TG_FakeSelect(client, TG_ModuleType:type, String:id[], TG_GameType:gametype = TG_None);
+native TG_FakeSelect(client, TG_ModuleType:type, String:id[], TG_GameType:gameType = TG_None);
 
 /**
  * Register (add) item to TeamGames main menu.
  *
- * @param name			Item name (showed in main menu via TG_ShowMainMenu).
  * @param id			Item ID (!!! MUST BE UNIQUE !!!).
  * @return				0 on success, otherwise on failure.
  */
@@ -226,13 +225,16 @@ native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:na
 /**
  * Start game (preparation for game and then game) with game id = @param id. And lock teams.
  *
- * @param client			Client index who start game.
- * @param id				Game ID.
- * @param CustomGameName	Custom game name to print in phrases "GAME_PREPARATION" and "GAME_STARTED".
- * @param DataPack			Datapack to pass in forwards TG_OnGamePrepare and TG_OnGameStart. If start game failed, datapack handle would be closed.
+ * @param client					Client index who start game.
+ * @param id						Game ID.
+ * @param gameType					Game type.
+ * @param gameSettings				Game settings.
+ * @param DataPack					Game datapack.
+ * @param removeDroppedWeapons		Remove weapons that prisoners dropped.
+ * @param endOnTeamEmpty			Automatically end game when one team was emptied (is that even word?).
  * @noreturn
  */
-native TG_StartGame(client, const String:id[], TG_GameType:gametype = TG_TeamGame, const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:endOnTeamEmpty = true);
+native TG_StartGame(client, const String:id[], TG_GameType:gameType = TG_TeamGame, const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:endOnTeamEmpty = true);
 
 /**
  * Retrieves current game id.
@@ -268,7 +270,8 @@ native TG_GetCurrentStarter();
 /**
  * Retrieves current game settings.
  *
- * @param id			Game ID.
+ * @param gameSettings	Buffer for current game settings.
+ * @param size			Buffer size.
  * @return				True on success, false otherwise (no settings or no running game).
  */
 native bool:TG_GetCurrentGameSettings(String:gameSettings[], size);
@@ -386,6 +389,7 @@ functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom, any:
  * @param redTeam      	Allow Red team in menu.
  * @param blueTeam      Allow Blue team in menu.
  * @param random      	Allow random player option in menu.
+ * @param data      	Pass data cell to callback.
  * @param format      	Format string for menu heading.
  * @param ...      		Format string arguments.
  * @return 				False if there are no players to be in the menu, True otherwise.
