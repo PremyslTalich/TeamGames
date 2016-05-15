@@ -20,7 +20,7 @@ public OnPluginStart()
 public OnLibraryAdded(const String:name[])
 {
 	if (StrEqual(name, "TeamGames")) {
-		TG_RegGame(GAME_ID, TG_TeamGame);
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 	}
 }
 
@@ -36,14 +36,14 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	}
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
 	if (type == TG_Game && StrEqual(id, GAME_ID)) {
 		TG_StartGame(client, GAME_ID);
 	}
 }
 
-public TG_OnGamePrepare(const String:id[], client, const String:gameSettings[], Handle:dataPack)
+public TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID))
 		return;

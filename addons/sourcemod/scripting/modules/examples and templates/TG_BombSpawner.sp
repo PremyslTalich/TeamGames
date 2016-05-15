@@ -46,7 +46,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	}
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
 	if (type == TG_MenuItem && StrEqual(id, ITEM_ID)) {
 		new Float:position[3];

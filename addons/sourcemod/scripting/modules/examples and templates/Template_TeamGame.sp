@@ -36,7 +36,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	Format(name, maxSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
 	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
@@ -44,7 +44,7 @@ public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client)
 	TG_StartGame(client, GAME_ID);
 }
 
-public TG_OnGamePrepare(const String:id[], client, const String:gameSettings[], Handle:dataPack)
+public TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID))
 		return;
@@ -52,7 +52,7 @@ public TG_OnGamePrepare(const String:id[], client, const String:gameSettings[], 
 	// code here
 }
 
-public TG_OnGameStart(const String:id[], client, const String:gameSettings[], Handle:dataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID))
 		return;
@@ -60,7 +60,7 @@ public TG_OnGameStart(const String:id[], client, const String:gameSettings[], Ha
 	// code here
 }
 
-public TG_OnGameEnd(const String:id[], TG_Team:team, winners[], winnersCount, Handle:dataPack)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID))
 		return;
