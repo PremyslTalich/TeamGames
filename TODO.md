@@ -1,13 +1,14 @@
 To do list
 ==========
 
-- [ ] Update wiki & examples according to new game types handling
+- [ ] Add missing docs and update obsolete.
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
 
 ---
 
+- [x] Update wiki & examples according to new game types handling
 - [x] Update API site
 - [x] Add native `TG_GetCurrentGameType`
 - [x] Rework handling of games IDs and types - in progress, gonna take some while...
