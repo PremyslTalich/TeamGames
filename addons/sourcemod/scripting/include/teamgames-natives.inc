@@ -370,6 +370,7 @@ native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", cons
  * @param activator 	Activator's client index (who used select menu).
  * @param client 		Client index of chosen player.
  * @param IsRandom 		True if activator chosed random player, false otherwise.
+ * @param data 			Custom data cell passed to callback.
  * @noreturn
  */
 // typedef TG_PlayerSelectMenuHandler = function void (activator, client, bool:IsRandom, any:data);
