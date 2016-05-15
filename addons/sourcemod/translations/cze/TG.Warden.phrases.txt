@@ -1,7 +1,0 @@
-"Phrases"
-{
-	"AccessDenied"
-	{
-		"cze"		"{error}TeamGames je dostupné pouze pro wardena!"
-	}
-}

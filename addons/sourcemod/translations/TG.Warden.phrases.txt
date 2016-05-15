@@ -1,7 +1,0 @@
-"Phrases"
-{
-	"AccessDenied"
-	{
-		"en"		"{error}You must be warden to use TeamGames!"
-	}
-}

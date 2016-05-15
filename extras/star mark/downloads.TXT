@@ -1,2 +1,0 @@
-materials/tg/marks/star.vmt
-materials/tg/marks/star.vtf

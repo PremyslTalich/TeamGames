@@ -1,9 +1,0 @@
-"VertexlitGeneric"
-{
-	"$basetexture" "models/player/prisoner_blue/hands"
-
-	"$phong" 			"1"
-	"$phongexponent" 		"15"
-	"$phongboost"		"2"
-	"$phongfresnelranges"	"[.05 .1 .2]"
-}

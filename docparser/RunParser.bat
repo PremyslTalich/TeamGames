@@ -1,2 +1,0 @@
-python ./parse.py
-pause
