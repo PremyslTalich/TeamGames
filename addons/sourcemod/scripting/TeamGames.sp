@@ -79,7 +79,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.15.0.12"
+#define _PLUGIN_VERSION "0.16.0.14"
 
 public Plugin:myinfo =
 {
@@ -124,6 +124,7 @@ public OnPluginStart()
 	g_hChangeTeamDelay =			CreateConVar("tg_team_changedelay",			"2.0", 						"How many seconds after team change should be player immune from changing team.", _, true, 0.0, true, 600.0);
 	g_hTeamDiff = 					CreateConVar("tg_team_diff",				"1",						"How should be teams differentiated? (0 = color, 1 = skin)");
 	g_hTeamAttack = 				CreateConVar("tg_team_attack",				"0",						"Can Ts in different teams (excluding none team) attack each other even if there is no game? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
+	g_hNoneTeamAttack = 			CreateConVar("tg_team_none_attack",			"0",						"Can Ts in none team attack each other? (requires \"mp_friendlyfire 1\") (1 = true, 0 = false)");
 	g_hNotifyPlayerTeam = 			CreateConVar("tg_team_notification",		"1",						"Location for notifications about player's team.\n\t0 = turned off\n\t1 = KeyHint text (bottom-right)\n\t2 = hsay\n\t3 = tg hud\n\t4 = screen overlay (this might break other overlays!)");
 
 	g_hAllowMark = 					CreateConVar("tg_mark_allow",				"1",						"Should be marks enabled? (1 = true, 0 = false)");
@@ -411,6 +412,10 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 	} else if (iAttackerTeam == CS_TEAM_T && iVictimTeam == CS_TEAM_T) {
 		if (g_iEngineVersion == Engine_CSS) {
 			fDamage = fDamage / FF_DMG_MODIFIER;
+		}
+
+		if (GetConVarBool(g_hNoneTeamAttack) && iAttacker != iVictim && TG_GetPlayerTeam(iAttacker) == TG_NoneTeam && TG_GetPlayerTeam(iVictim) == TG_NoneTeam) {
+			return Plugin_Changed;
 		}
 
 		if (g_Game[GameProgress] == TG_NoGame) {

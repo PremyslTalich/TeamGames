@@ -24,6 +24,7 @@ new Handle:g_hGamesTimeLock, g_iGamesTimeLock;
 new Handle:g_hChangeTeamDelay;
 new Handle:g_hTeamDiff;
 new Handle:g_hTeamAttack;
+new Handle:g_hNoneTeamAttack;
 new Handle:g_hNotifyPlayerTeam, Handle:g_hNotifyTimer;
 
 new Handle:g_hAllowMark;
