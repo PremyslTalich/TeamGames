@@ -3,12 +3,12 @@ To do list
 
 - [ ] Update wiki & examples according to new game types handling
 - [ ] Check ammo handling in games and unify somehow???
-- [ ] Update API site
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
 
 ---
 
+- [x] Update API site
 - [x] Add native `TG_GetCurrentGameType`
 - [x] Rework handling of games IDs and types - in progress, gonna take some while...
 - [x] Look at possible bug in `GetCountAllGames()` - not bug
