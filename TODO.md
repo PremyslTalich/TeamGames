@@ -1,6 +1,7 @@
 To do list
 ==========
 
+- [ ] Update wiki & examples according to new game types handling
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Update API site
 - [ ] Add fixed player skins to extras
