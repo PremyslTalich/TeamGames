@@ -39,7 +39,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
 	if (type == TG_Game && StrEqual(id, GAME_ID)) {
-		TG_StartGame(client, GAME_ID);
+		TG_StartGame(client, GAME_ID, gameType);
 	}
 }
 
