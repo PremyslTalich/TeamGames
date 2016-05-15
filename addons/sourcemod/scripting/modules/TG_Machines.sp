@@ -9,30 +9,30 @@ public Plugin:myinfo =
 	name = "[TG] Machines + 500 HP",
 	author = "Raska",
 	description = "",
-	version = "0.3",
+	version = "0.4",
 	url = ""
 };
 
-new EngineVersion:g_iEngVersion;
-new g_BeamSprite = -1;
-new Handle:g_hReffilAmmo;
-new Float:g_fDrawLaser[MAXPLAYERS + 1][3];
+new EngineVersion:g_engVersion;
+new g_beamSprite = -1;
+new Handle:g_reffilAmmo;
+new Float:g_drawLaser[MAXPLAYERS + 1][3];
 
 public OnMapStart()
 {
-	g_BeamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
+	g_beamSprite = PrecacheModel("materials/sprites/laserbeam.vmt");
 }
 
 public OnPluginStart()
 {
 	LoadTranslations("TG.Machines.phrases");
-	g_iEngVersion = GetEngineVersion();
+	g_engVersion = GetEngineVersion();
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames"))
-		TG_RegGame(GAME_ID, TG_TeamGame);
+	if (StrEqual(name, "TeamGames"))
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 }
 
 public OnPluginEnd()
@@ -40,36 +40,39 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, maxSize, "%T", "GameName", client);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if (StrEqual(id, GAME_ID) && type == TG_Game)
-		TG_StartGame(iClient, GAME_ID, _, _, true);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	TG_StartGame(client, GAME_ID, gameType, _, _, true);
 }
 
-public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID, true))
 		return;
 
 	HookEvent("bullet_impact", Event_BulletImpact);
 
-	if (g_hReffilAmmo != INVALID_HANDLE) {
-		KillTimer(g_hReffilAmmo);
+	if (g_reffilAmmo != INVALID_HANDLE) {
+		KillTimer(g_reffilAmmo);
 	}
-	g_hReffilAmmo = CreateTimer(7.0, Timer_RefillAmmo, _, TIMER_REPEAT);
+	g_reffilAmmo = CreateTimer(7.0, Timer_RefillAmmo, _, TIMER_REPEAT);
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
-		switch (g_iEngVersion) {
+		switch (g_engVersion) {
 			case Engine_CSS: {
 				GivePlayerWeaponAndAmmo(i, "weapon_m249", _, 0);
 			}
@@ -83,19 +86,19 @@ public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], H
 	}
 }
 
-public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount, Handle:DataPack)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
 	if (StrEqual(id, GAME_ID)) {
 		UnhookEvent("bullet_impact", Event_BulletImpact);
 
-		if (g_hReffilAmmo != INVALID_HANDLE) {
-			KillTimer(g_hReffilAmmo);
+		if (g_reffilAmmo != INVALID_HANDLE) {
+			KillTimer(g_reffilAmmo);
 		}
-		g_hReffilAmmo = INVALID_HANDLE;
+		g_reffilAmmo = INVALID_HANDLE;
 	}
 }
 
-public Action:Timer_RefillAmmo(Handle:hTimer)
+public Action:Timer_RefillAmmo(Handle:timer)
 {
 	if (!TG_IsCurrentGameID(GAME_ID)) {
 		return Plugin_Stop;
@@ -103,14 +106,14 @@ public Action:Timer_RefillAmmo(Handle:hTimer)
 
 	for (new i = 1; i <= MaxClients; i++) {
 		if (TG_IsPlayerRedOrBlue(i)) {
-			new String:sWeapon[64];
-			new iWeapon = Client_GetActiveWeaponName(i, sWeapon, sizeof(sWeapon));
+			new String:weaponName[64];
+			new weapon = Client_GetActiveWeaponName(i, weaponName, sizeof(weaponName));
 
-			if (iWeapon != INVALID_ENT_REFERENCE) {
-				if (g_iEngVersion == Engine_CSS && StrEqual(sWeapon, "weapon_m249")) {
-					SetPlayerWeaponAmmo(i, iWeapon, _, 100);
-				} else if (g_iEngVersion == Engine_CSGO && StrEqual(sWeapon, "weapon_negev")) {
-					SetPlayerWeaponAmmo(i, iWeapon, _, 150);
+			if (weapon != INVALID_ENT_REFERENCE) {
+				if (g_engVersion == Engine_CSS && StrEqual(weaponName, "weapon_m249")) {
+					SetPlayerWeaponAmmo(i, weapon, _, 100);
+				} else if (g_engVersion == Engine_CSGO && StrEqual(weaponName, "weapon_negev")) {
+					SetPlayerWeaponAmmo(i, weapon, _, 150);
 				}
 			}
 		}
@@ -121,33 +124,33 @@ public Action:Timer_RefillAmmo(Handle:hTimer)
 
 public Action:Event_BulletImpact(Handle:event,const String:name[],bool:dontBroadcast)
 {
-	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if ((TG_IsCurrentGameID(GAME_ID) && TG_IsPlayerRedOrBlue(iClient))) {
-		g_fDrawLaser[iClient][0] = GetEventFloat(event, "x");
-		g_fDrawLaser[iClient][1] = GetEventFloat(event, "y");
-		g_fDrawLaser[iClient][2] = GetEventFloat(event, "z");
+	if ((TG_IsCurrentGameID(GAME_ID) && TG_IsPlayerRedOrBlue(client))) {
+		g_drawLaser[client][0] = GetEventFloat(event, "x");
+		g_drawLaser[client][1] = GetEventFloat(event, "y");
+		g_drawLaser[client][2] = GetEventFloat(event, "z");
 
-		RequestFrame(Frame_DrawLaser, iClient);
+		RequestFrame(Frame_DrawLaser, client);
 	}
 
 	return Plugin_Continue;
 }
 
-public Frame_DrawLaser(any:iClient)
+public Frame_DrawLaser(any:client)
 {
-	if (g_fDrawLaser[iClient][0] == 0.0 && g_fDrawLaser[iClient][1] == 0.0 && g_fDrawLaser[iClient][2] == 0.0) {
+	if (g_drawLaser[client][0] == 0.0 && g_drawLaser[client][1] == 0.0 && g_drawLaser[client][2] == 0.0) {
 		return;
 	}
 
-	new Float:fClientPos[3];
-	GetClientEyePosition(iClient, fClientPos);
-	fClientPos[2] -= 4;
+	new Float:clientPos[3];
+	GetClientEyePosition(client, clientPos);
+	clientPos[2] -= 4;
 
-	TE_SetupBeamPoints(fClientPos, g_fDrawLaser[iClient], g_BeamSprite, g_BeamSprite, 0, 0, 0.125, 1.0, 1.0, 1024, 0.0, (TG_GetPlayerTeam(iClient) == TG_RedTeam) ? {220, 20, 60, 255} : {30, 144, 255, 255}, 10);
+	TE_SetupBeamPoints(clientPos, g_drawLaser[client], g_beamSprite, g_beamSprite, 0, 0, 0.125, 1.0, 1.0, 1024, 0.0, (TG_GetPlayerTeam(client) == TG_RedTeam) ? {220, 20, 60, 255} : {30, 144, 255, 255}, 10);
 	TE_SendToAll();
 
-	g_fDrawLaser[iClient][0] = 0.0;
-	g_fDrawLaser[iClient][1] = 0.0;
-	g_fDrawLaser[iClient][2] = 0.0;
+	g_drawLaser[client][0] = 0.0;
+	g_drawLaser[client][1] = 0.0;
+	g_drawLaser[client][2] = 0.0;
 }

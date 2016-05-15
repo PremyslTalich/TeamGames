@@ -56,7 +56,7 @@ bool:IsModuleDisabled(TG_ModuleType:iType, const String:sID[])
 ClearGameStatusInfo()
 {
 	g_Game[GameProgress] = TG_NoGame;
-	g_Game[GameType] = TG_TeamGame;
+	g_Game[GameType] = TG_None;
 	g_Game[HealthBarVisibility] = true;
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, "Core_NoGame");

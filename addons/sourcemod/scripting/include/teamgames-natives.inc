@@ -189,9 +189,10 @@ native TG_RemoveGame(const String:id[]);
  * @param client 		Client index
  * @param type 			Module type
  * @param id 			Module ID
+ * @param type 			Game type used when fake selecting a game
  * @noreturn
  */
-native TG_FakeSelect(client, TG_ModuleType:type, String:id[]);
+native TG_FakeSelect(client, TG_ModuleType:type, String:id[], TG_GameType:gametype = TG_None);
 
 /**
  * Register (add) item to TeamGames main menu.
@@ -231,7 +232,7 @@ native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:na
  * @param DataPack			Datapack to pass in forwards TG_OnGamePrepare and TG_OnGameStart. If start game failed, datapack handle would be closed.
  * @noreturn
  */
-native TG_StartGame(client, const String:id[], const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:checkTeams = true, bool:endOnTeamEmpty = true);
+native TG_StartGame(client, const String:id[], TG_GameType:gametype = TG_TeamGame, const String:gameSettings[] = "", Handle:dataPack = INVALID_HANDLE, bool:removeDroppedWeapons = false, bool:endOnTeamEmpty = true);
 
 /**
  * Retrieves current game id.
@@ -240,7 +241,7 @@ native TG_StartGame(client, const String:id[], const String:gameSettings[] = "",
  * @param size			Size of buffer.
  * @return				True on success, false on failure (buffer is smaller then TG_MODULE_ID_LENGTH).
  */
-native TG_GetCurrentGameID(String:id[], size);
+native bool:TG_GetCurrentGameID(String:id[], size);
 
 /**
  * Check if current game id is also the given game id.
@@ -271,6 +272,13 @@ native TG_GetCurrentStarter();
  * @return				True on success, false otherwise (no settings or no running game).
  */
 native bool:TG_GetCurrentGameSettings(String:gameSettings[], size);
+
+/**
+ * Retrieves current game type.
+ *
+ * @return 		Current game type or TG_None if there is not game.
+ */
+native TG_GameType:TG_GetCurrentGameType();
 
 /**
  * Retrieves game type.
@@ -364,8 +372,8 @@ native TG_LogGameMessage(const String:gameID[], const String:prefix[] = "", cons
  * @param IsRandom 		True if activator chosed random player, false otherwise.
  * @noreturn
  */
-// typedef TG_PlayerSelectMenuHandler = function void (activator, client, bool:IsRandom);
-functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
+// typedef TG_PlayerSelectMenuHandler = function void (activator, client, bool:IsRandom, any:data);
+functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom, any:data);
 
 /**
  * Opens menu for choosing player from TG team.
@@ -381,4 +389,4 @@ functag public TG_PlayerSelectMenuHandler(activator, client, bool:IsRandom);
  * @param ...      		Format string arguments.
  * @return 				False if there are no players to be in the menu, True otherwise.
  */
-native TG_ShowPlayerSelectMenu(client, TG_PlayerSelectMenuHandler:callBack, bool:redTeam = true, bool:blueTeam = true, bool:random = true, const String:format[] = "", any:...);
+native TG_ShowPlayerSelectMenu(client, TG_PlayerSelectMenuHandler:callBack, bool:redTeam = true, bool:blueTeam = true, bool:random = true, any:data = 0, const String:format[] = "", any:...);

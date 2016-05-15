@@ -1,10 +1,6 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"ru"		"Куриная охота"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"ru"		"Куриная охота"
 	}

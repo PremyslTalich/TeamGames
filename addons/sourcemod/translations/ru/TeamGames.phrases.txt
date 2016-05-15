@@ -5,13 +5,13 @@
 	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
 	{
 		"#format"	"{1:s},{2:s}"
-		
+
 		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-redteam} красных {default} !"
 	}
 	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
 	{
 		"#format"	"{1:s},{2:s}"
-		
+
 		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-blueteam} синих {default} !"
 	}
 	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
@@ -197,7 +197,7 @@
 	"MenuTeams-NoneTeamAll"
 	{
 		"ru"		"Исключить всех из команд"
-	}	
+	}
 	"MenuTeams-FiftyFiftyAll"
 	{
 		"ru"		"Поделить игроков на команды Синих и Красных"
@@ -208,10 +208,6 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Games menu
-	"MenuGames-Title"
-	{
-		"ru"		"Выбери игру:"
-	}
 	"MenuGames-Start-Title" // {1} = game name
 	{
 		"#format"	"{1:s}"
@@ -220,10 +216,6 @@
 	"MenuGames-Start"
 	{
 		"ru"		"Начать игру*"
-	}
-	"MenuGames-RedOnlyHint"
-	{
-		"ru"		"Только красные"
 	}
 //------------------------------------------------------------------------------------------------
 // Games list menu

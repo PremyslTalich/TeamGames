@@ -1,15 +1,11 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"en"		"Gun fight"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"en"		"Gun fight"
 	}
 	"ChooseWeapon"
 	{
-		"en"		"choose weapon"
+		"en"		"Choose weapon"
 	}
 }

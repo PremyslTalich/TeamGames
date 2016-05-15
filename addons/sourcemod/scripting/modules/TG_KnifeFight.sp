@@ -3,15 +3,14 @@
 #include <teamgames>
 #include <menu-stocks>
 
-#define GAME_ID_TEAMGAME	"KnifeFight-TeamGame"
-#define GAME_ID_REDONLY		"KnifeFight-RedOnly"
+#define GAME_ID	"KnifeFight"
 
 public Plugin:myinfo =
 {
 	name = "[TG] KnifeFight",
 	author = "Raska",
 	description = "",
-	version = "0.6",
+	version = "0.7",
 	url = ""
 }
 
@@ -20,48 +19,42 @@ public OnPluginStart()
 	LoadTranslations("TG.KnifeFight.phrases");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
-		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
+	if (StrEqual(name, "TeamGames")) {
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_TEAMGAME);
-	TG_RemoveGame(GAME_ID_REDONLY);
+	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type != TG_Game) {
-		return;
-	}
-
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		Format(name, maxSize, "%T", "GameName-TeamGame", client);
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, maxSize, "%T", "GameName-RedOnly", client);
-	}
-}
-public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
-{
-	if ((StrEqual(sID, GAME_ID_TEAMGAME) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
-		SetHPMenu(iClient, sID);
-}
-
-public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:DataPack)
-{
-	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
 
-	ResetPack(DataPack);
-	new hp = ReadPackCell(DataPack);
+	Format(name, nameSize, "%T", "GameName", client);
+}
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
+{
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	SetHPMenu(client, gameType);
+}
+
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
+{
+	if (!StrEqual(id, GAME_ID))
+		return;
+
+	ResetPack(dataPack);
+	new hp = ReadPackCell(dataPack);
+
+	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
@@ -72,39 +65,32 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 	}
 }
 
-SetHPMenu(iClient, const String:sID[])
+SetHPMenu(client, TG_GameType:gameType)
 {
-	new Handle:hMenu = CreateMenu(SetHPMenu_Handler);
+	new Handle:menu = CreateMenu(SetHPMenu_Handler);
 
-	SetMenuTitle(hMenu, "%T", "ChooseHP", iClient);
-	AddMenuItem(hMenu, "35", "35 HP");
-	AddMenuItem(hMenu, "100", "100 HP");
-	AddMenuItem(hMenu, "300", "300 HP");
+	SetMenuTitle(menu, "%T", "ChooseHP", client);
+	AddMenuItem(menu, "35", "35 HP");
+	AddMenuItem(menu, "100", "100 HP");
+	AddMenuItem(menu, "300", "300 HP");
 
-	PushMenuString(hMenu, "_GAME_ID_", sID);
+	PushMenuCell(menu, "_GAME_TYPE_", _:gameType);
 
-	SetMenuExitBackButton(hMenu, true);
-	DisplayMenu(hMenu, iClient, 30);
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, 30);
 }
 
-public SetHPMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+public SetHPMenu_Handler(Handle:menu, MenuAction:action, client, key)
 {
-	if (iAction == MenuAction_Select)
-	{
-		new String:info[64], String:sSettings[64], String:sID[TG_MODULE_ID_LENGTH];
-		GetMenuItem(hMenu, iKey, info, sizeof(info), _, sSettings, 64);
+	if (action == MenuAction_Select) {
+		new String:info[64], String:settings[TG_GAME_SETTINGS_LENGTH];
+		GetMenuItem(menu, key, info, sizeof(info), _, settings, sizeof(settings));
 
-		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
-			return;
-		}
+		new TG_GameType:gameType = TG_GameType:GetMenuCell(menu, "_GAME_TYPE_");
 
-		new Handle:hDataPack = CreateDataPack();
-		WritePackCell(hDataPack, StringToInt(info));
+		new Handle:dataPack = CreateDataPack();
+		WritePackCell(dataPack, StringToInt(info));
 
-		if (StrEqual(sID, GAME_ID_TEAMGAME)) {
-			TG_StartGame(iClient, GAME_ID_TEAMGAME, sSettings, hDataPack);
-		} else {
-			TG_StartGame(iClient, GAME_ID_REDONLY, sSettings, hDataPack);
-		}
+		TG_StartGame(client, GAME_ID, gameType, settings, dataPack);
 	}
 }

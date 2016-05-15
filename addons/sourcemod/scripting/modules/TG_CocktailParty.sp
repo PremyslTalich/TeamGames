@@ -2,21 +2,21 @@
 #include <smlib>
 #include <teamgames>
 
-#define GAME_ID				"CocktailParty"
+#define GAME_ID "CocktailParty"
 
 public Plugin:myinfo =
 {
 	name = "[TG] CocktailParty",
 	author = "Raska",
 	description = "",
-	version = "0.3",
+	version = "0.4",
 	url = ""
 }
 
-public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMax)
+public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	if (GetEngineVersion() != Engine_CSGO) {
-		Format(sError, iErrMax, "Not supported engine version detected! This tg game is only for CS:GO.");
+		Format(error, err_max, "Not supported engine version detected! This tg game is only for CS:GO.");
 		return APLRes_Failure;
 	}
 	return APLRes_Success;
@@ -27,10 +27,10 @@ public OnPluginStart()
 	LoadTranslations("TG.CocktailParty.phrases");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames"))
-		TG_RegGame(GAME_ID, TG_TeamGame);
+	if (StrEqual(name, "TeamGames"))
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 }
 
 public OnPluginEnd()
@@ -38,27 +38,30 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, maxSize, "%T", "GameName", client);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if (StrEqual(sID, GAME_ID) && type == TG_Game)
-		TG_StartGame(iClient, GAME_ID);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	TG_StartGame(client, GAME_ID, gameType);
 }
 
-public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:hDataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
-	if (!StrEqual(sID, GAME_ID, true))
+	if (!StrEqual(id, GAME_ID, true))
 		return;
 
 	HookEvent("molotov_detonate", Event_MolotovDetonate);
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
@@ -67,27 +70,27 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 	}
 }
 
-public Action:Event_MolotovDetonate(Handle:hEvent, const String:sName[], bool:bDontBroadcast)
+public Action:Event_MolotovDetonate(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	if (!TG_IsCurrentGameID(GAME_ID))
 		return Plugin_Continue;
 
-	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if (TG_IsPlayerRedOrBlue(iClient)) {
-
-		new iMolotov = GivePlayerItem(iClient, "weapon_molotov");
-		if (iMolotov != INVALID_ENT_REFERENCE) {
-			Client_SetActiveWeapon(iClient, iMolotov);
+	if (TG_IsPlayerRedOrBlue(client)) {
+		new molotov = GivePlayerItem(client, "weapon_molotov");
+		if (molotov != INVALID_ENT_REFERENCE) {
+			Client_SetActiveWeapon(client, molotov);
 		}
 	}
 
 	return Plugin_Continue;
 }
 
-public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount, Handle:DataPack)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
-	if (StrEqual(id, GAME_ID)) {
-		UnhookEvent("molotov_detonate", Event_MolotovDetonate);
-	}
+	if (!StrEqual(id, GAME_ID))
+		return;
+
+	UnhookEvent("molotov_detonate", Event_MolotovDetonate);
 }

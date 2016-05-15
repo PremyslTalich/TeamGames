@@ -9,7 +9,7 @@ public Plugin:myinfo =
 	name = "[TG] HEGrenades",
 	author = "Raska",
 	description = "",
-	version = "0.7",
+	version = "0.8",
 	url = ""
 }
 
@@ -18,10 +18,10 @@ public OnPluginStart()
 	LoadTranslations("TG.HEGrenades.phrases");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames"))
-		TG_RegGame(GAME_ID, TG_TeamGame);
+	if (StrEqual(name, "TeamGames"))
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 }
 
 public OnPluginEnd()
@@ -29,28 +29,31 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, maxSize, "%T", "GameName", client);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if (StrEqual(sID, GAME_ID) && type == TG_Game)
-		TG_StartGame(iClient, GAME_ID);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	TG_StartGame(client, GAME_ID, gameType);
 }
 
 
-public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:hDataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
-	if (!StrEqual(sID, GAME_ID, true))
+	if (!StrEqual(id, GAME_ID, true))
 		return;
 
 	HookEvent("hegrenade_detonate", Event_HEGrenadeDetonate);
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (new i = 1; i <= MaxClients; i++) {
 		if (TG_IsPlayerRedOrBlue(i)) {
 			GiveGrenade(i);
 			TG_AttachPlayerHealthBar(i);
@@ -58,37 +61,38 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 	}
 }
 
-public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, iWinners[], iWinnersCount, Handle:DataPack)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
-	if (StrEqual(sID, GAME_ID)) {
-		UnhookEvent("hegrenade_detonate", Event_HEGrenadeDetonate);
-	}
+	if (!StrEqual(id, GAME_ID))
+		return;
+
+	UnhookEvent("hegrenade_detonate", Event_HEGrenadeDetonate);
 }
 
-public Action:Event_HEGrenadeDetonate(Handle:hEvent, const String:sName[], bool:bDontBroadcast)
+public Action:Event_HEGrenadeDetonate(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	if (!TG_IsCurrentGameID(GAME_ID))
 		return Plugin_Continue;
 
-	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if (TG_IsPlayerRedOrBlue(iClient)) {
-		GiveGrenade(iClient);
+	if (TG_IsPlayerRedOrBlue(client)) {
+		GiveGrenade(client);
 	}
 
 	return Plugin_Continue;
 }
 
-GiveGrenade(iClient)
+GiveGrenade(client)
 {
-	new iGrenade = GivePlayerItem(iClient, "weapon_hegrenade");
+	new grenade = GivePlayerItem(client, "weapon_hegrenade");
 
-	SetEntProp(iGrenade, Prop_Send, "m_iClip1", 1);
+	SetEntProp(grenade, Prop_Send, "m_iClip1", 1);
 
-	new iOffset = FindDataMapOffs(iClient, "m_iAmmo") + (GetEntProp(iGrenade, Prop_Data, "m_iPrimaryAmmoType") * 4);
-	SetEntData(iClient, iOffset, 1, 4, true);
+	new offset = FindDataMapOffs(client, "m_iAmmo") + (GetEntProp(grenade, Prop_Data, "m_iPrimaryAmmoType") * 4);
+	SetEntData(client, offset, 1, 4, true);
 
 	if (GetEngineVersion() == Engine_CSGO) {
-		SetEntProp(iGrenade, Prop_Send, "m_iPrimaryReserveAmmoCount", 1);
+		SetEntProp(grenade, Prop_Send, "m_iPrimaryReserveAmmoCount", 1);
 	}
 }

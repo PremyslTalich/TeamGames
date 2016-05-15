@@ -1,10 +1,6 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"cze"		"Divoký západ"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"cze"		"Divoký západ"
 	}

@@ -3,24 +3,23 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID_TEAMGAME		"WildWest-TeamGame"
-#define GAME_ID_REDONLY			"WildWest-RedOnly"
+#define GAME_ID "WildWest"
 
-new g_iPlayerRevolver[MAXPLAYERS + 1];
+new g_playerRevolver[MAXPLAYERS + 1];
 
 public Plugin:myinfo =
 {
 	name = "[TG] WildWest",
 	author = "Raska",
 	description = "",
-	version = "0.3",
+	version = "0.4",
 	url = ""
 }
 
-public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMax)
+public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	if (GetEngineVersion() != Engine_CSGO) {
-		Format(sError, iErrMax, "Not supported engine version detected! This tg game is only for CS:GO.");
+		Format(error, err_max, "Not supported engine version detected! This tg game is only for CS:GO.");
 		return APLRes_Failure;
 	}
 	return APLRes_Success;
@@ -31,78 +30,65 @@ public OnPluginStart()
 	LoadTranslations("TG.WildWest.phrases");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
-		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
+	if (StrEqual(name, "TeamGames")) {
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_TEAMGAME);
-	TG_RemoveGame(GAME_ID_REDONLY);
+	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type != TG_Game) {
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
-	}
 
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		Format(name, maxSize, "%T", "GameName-TeamGame", client);
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, maxSize, "%T", "GameName-RedOnly", client);
-	}
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if (type != TG_Game) {
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
-	}
 
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		TG_StartGame(iClient, GAME_ID_TEAMGAME, _, _, true);
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		TG_StartGame(iClient, GAME_ID_REDONLY, _, _, true);
-	}
+	TG_StartGame(client, GAME_ID, gameType, _, _, true);
 }
 
-public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
-	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(id, GAME_ID))
 		return;
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (new i = 1; i <= MaxClients; i++) {
 		if (TG_IsPlayerRedOrBlue(i)) {
-			new iRevolver = GivePlayerWeaponAndAmmo(i, "weapon_revolver");
+			new revolver = GivePlayerWeaponAndAmmo(i, "weapon_revolver");
 
 			TG_AttachPlayerHealthBar(i);
 
-			g_iPlayerRevolver[i] = iRevolver;
+			g_playerRevolver[i] = revolver;
 			RequestFrame(Frame_BlockAttack2, i);
 		} else {
-			g_iPlayerRevolver[i] = -1;
+			g_playerRevolver[i] = -1;
 		}
 	}
 }
 
-public TG_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+public TG_OnPlayerLeaveGame(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger)
 {
-	g_iPlayerRevolver[iClient] = -1;
+	g_playerRevolver[client] = -1;
 }
 
-public Frame_BlockAttack2(any:iClient)
+public Frame_BlockAttack2(any:client)
 {
-	if (IsValidEntity(g_iPlayerRevolver[iClient]) && TG_IsPlayerRedOrBlue(iClient)) {
-		SetEntPropFloat(g_iPlayerRevolver[iClient], Prop_Send, "m_flNextSecondaryAttack", GetGameTime() + 1.0);
-		SetPlayerWeaponAmmo(iClient, g_iPlayerRevolver[iClient], _, 8);
-		RequestFrame(Frame_BlockAttack2, iClient);
+	if (IsValidEntity(g_playerRevolver[client]) && TG_IsPlayerRedOrBlue(client)) {
+		SetEntPropFloat(g_playerRevolver[client], Prop_Send, "m_flNextSecondaryAttack", GetGameTime() + 1.0);
+		SetPlayerWeaponAmmo(client, g_playerRevolver[client], _, 8);
+		RequestFrame(Frame_BlockAttack2, client);
 	} else {
-		g_iPlayerRevolver[iClient] = -1;
+		g_playerRevolver[client] = -1;
 	}
 }

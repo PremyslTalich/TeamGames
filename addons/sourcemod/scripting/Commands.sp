@@ -74,10 +74,10 @@ public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
 			SpawnMark(iClient, iTeam, fPos[0], fPos[1], fPos[2], _, _, _, false);
 		}
 	} else {
-		if (Call_OnMenuSelect(TG_MenuItem, sAction, iClient) != Plugin_Continue)
+		if (Call_OnMenuSelect(TG_MenuItem, sAction, TG_None, iClient) != Plugin_Continue)
 			return Plugin_Continue;
 
-		Call_OnMenuSelected(TG_MenuItem, sAction, iClient);
+		Call_OnMenuSelected(TG_MenuItem, sAction, TG_None, iClient);
 
 		if (StrContains(sAction, "Core_", false) == 0) {
 			CoreMenuItemsActions(iClient, sAction);
@@ -227,7 +227,7 @@ public VisibleSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 			new TG_ModuleType:iType = TG_ModuleType:GetMenuCell(hMenu, "Core_-TYPE-", -1);
 			GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, sDisplay, sizeof(sDisplay));
 
-			if (StrContains(sDisplay, "[]") == 0)
+			if (StrContains(sDisplay, "[ ]") == 0)
 				TG_SetModuleVisibility(iType, sKey, true);
 			else if (StrContains(sDisplay, "[X]") == 0)
 				TG_SetModuleVisibility(iType, sKey, false);
@@ -588,10 +588,10 @@ public MainMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				return;
 			}
 
-			if (Call_OnMenuSelect(TG_MenuItem, sKey, iClient) != Plugin_Continue)
+			if (Call_OnMenuSelect(TG_MenuItem, sKey, TG_None, iClient) != Plugin_Continue)
 				return;
 
-			Call_OnMenuSelected(TG_MenuItem, sKey, iClient);
+			Call_OnMenuSelected(TG_MenuItem, sKey, TG_None, iClient);
 
 			CoreMenuItemsActions(iClient, sKey);
 		}

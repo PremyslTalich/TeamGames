@@ -4,137 +4,120 @@
 #include <menu-stocks>
 #include <teamgames>
 
-#define GAME_ID_TEAMGAME	"HeadShotOnly-TeamGame"
-#define GAME_ID_REDONLY		"HeadShotOnly-RedOnly"
+#define GAME_ID	"HeadShotOnly"
 
 public Plugin:myinfo =
 {
 	name = "[TG] HeadShotOnly",
 	author = "Raska",
 	description = "",
-	version = "0.5",
+	version = "0.6",
 	url = ""
 }
 
-new EngineVersion:g_iEngVersion;
+new EngineVersion:g_engVersion;
 
 public OnPluginStart()
 {
 	LoadTranslations("TG.HeadShotOnly.phrases");
-	g_iEngVersion = GetEngineVersion();
+	g_engVersion = GetEngineVersion();
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
-		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
+	if (StrEqual(name, "TeamGames")) {
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_TEAMGAME);
-	TG_RemoveGame(GAME_ID_REDONLY);
+	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type != TG_Game) {
-		return;
-	}
-
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		Format(name, maxSize, "%T", "GameName-TeamGame", client);
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, maxSize, "%T", "GameName-RedOnly", client);
-	}
-}
-
-public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
-{
-	if ((StrEqual(sID, GAME_ID_TEAMGAME) || StrEqual(sID, GAME_ID_REDONLY)) && type == TG_Game)
-		SetWeaponMenu(iClient, sID);
-}
-
-public TG_OnGameStart(const String:sID[], iClient, const String:sGameSettings[], Handle:hDataPack)
-{
-	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
 
-	decl String:sWeapon[64];
+	Format(name, nameSize, "%T", "GameName", client);
+}
 
-	ResetPack(hDataPack);
-	ReadPackString(hDataPack, sWeapon, sizeof(sWeapon));
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
+{
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	SetWeaponMenu(client, gameType);
+}
+
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
+{
+	if (!StrEqual(id, GAME_ID))
+		return;
+
+	decl String:weapon[64];
+
+	ResetPack(dataPack);
+	ReadPackString(dataPack, weapon, sizeof(weapon));
+
+	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
-		GivePlayerWeaponAndAmmo(i, sWeapon, -1, 500);
+		GivePlayerWeaponAndAmmo(i, weapon, -1, 500);
 		TG_AttachPlayerHealthBar(i);
 	}
 }
 
 public Action:TG_OnTraceAttack(bool:ingame, victim, &attacker, &inflictor, &Float:damage, &damagetype, &ammotype, hitbox, hitgroup)
 {
-	if (ingame && hitgroup != 1) {
-		if ((TG_IsCurrentGameID(GAME_ID_TEAMGAME) && TG_InOppositeTeams(attacker, victim)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(attacker) == TG_GetPlayerTeam(victim))) {
-			return Plugin_Handled;
-		}
+	if (ingame && hitgroup != 1 && TG_IsCurrentGameID(GAME_ID)) {
+		return Plugin_Handled;
 	}
 
 	return Plugin_Continue;
 }
 
-SetWeaponMenu(iClient, const String:sID[])
+SetWeaponMenu(client, TG_GameType:gameType)
 {
-	new Handle:hMenu = CreateMenu(SetWeaponMenu_Handler);
+	new Handle:menu = CreateMenu(SetWeaponMenu_Handler);
+	SetMenuTitle(menu, "%T", "ChooseWeapon", client);
+	PushMenuCell(menu, "_GAME_TYPE_", _:gameType);
 
-	SetMenuTitle(hMenu, "%T", "ChooseWeapon", iClient);
-
-	PushMenuString(hMenu, "_GAME_ID_", sID);
-
-	switch (g_iEngVersion) {
+	switch (g_engVersion) {
 		case Engine_CSS: {
-			AddMenuItem(hMenu, "weapon_deagle", "Deagle");
-			AddMenuItem(hMenu, "weapon_usp", 	"USP");
-			AddMenuItem(hMenu, "weapon_glock", 	"Glock-18");
-			AddMenuItem(hMenu, "weapon_ak47", 	"AK-47");
-			AddMenuItem(hMenu, "weapon_m4a1", 	"M4A1");
+			AddMenuItem(menu, "weapon_deagle", 	"Deagle");
+			AddMenuItem(menu, "weapon_usp", 	"USP");
+			AddMenuItem(menu, "weapon_glock", 	"Glock-18");
+			AddMenuItem(menu, "weapon_ak47", 	"AK-47");
+			AddMenuItem(menu, "weapon_m4a1", 	"M4A1");
 		}
 		case Engine_CSGO: {
-			AddMenuItem(hMenu, "weapon_deagle", 		"Deagle");
-			AddMenuItem(hMenu, "weapon_usp_silencer", 	"USP-S");
-			AddMenuItem(hMenu, "weapon_glock", 			"Glock-18");
-			AddMenuItem(hMenu, "weapon_ak47", 			"AK-47");
-			AddMenuItem(hMenu, "weapon_m4a1", 			"M4A4");
+			AddMenuItem(menu, "weapon_deagle", 			"Deagle");
+			AddMenuItem(menu, "weapon_usp_silencer", 	"USP-S");
+			AddMenuItem(menu, "weapon_glock", 			"Glock-18");
+			AddMenuItem(menu, "weapon_ak47", 			"AK-47");
+			AddMenuItem(menu, "weapon_m4a1", 			"M4A4");
 		}
 	}
 
-	SetMenuExitBackButton(hMenu, true);
-	DisplayMenu(hMenu, iClient, 30);
+	SetMenuExitBackButton(menu, true);
+	DisplayMenu(menu, client, 30);
 }
 
-public SetWeaponMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
+public SetWeaponMenu_Handler(Handle:menu, MenuAction:action, client, key)
 {
-	if (iAction == MenuAction_Select)
-	{
-		new String:sKey[64], String:sWeaponName[64], String:sID[TG_MODULE_ID_LENGTH];
-		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey), _, sWeaponName, 64);
+	if (action == MenuAction_Select) {
+		new String:info[64], String:weapon[TG_GAME_SETTINGS_LENGTH];
+		GetMenuItem(menu, key, info, sizeof(info), _, weapon, sizeof(weapon));
 
-		if (!GetMenuString(hMenu, "_GAME_ID_", sID, sizeof(sID))) {
-			return;
-		}
 
-		new Handle:hDataPack = CreateDataPack();
-		WritePackString(hDataPack, sKey);
+		new TG_GameType:gameType = TG_GameType:GetMenuCell(menu, "_GAME_TYPE_");
 
-		if (StrEqual(sID, GAME_ID_TEAMGAME)) {
-			TG_StartGame(iClient, GAME_ID_TEAMGAME, sWeaponName, hDataPack, true);
-		} else {
-			TG_StartGame(iClient, GAME_ID_REDONLY, sWeaponName, hDataPack, true);
-		}
+		new Handle:dataPack = CreateDataPack();
+		WritePackString(dataPack, info);
+
+		TG_StartGame(client, GAME_ID, gameType, weapon, dataPack, true);
 	}
 }

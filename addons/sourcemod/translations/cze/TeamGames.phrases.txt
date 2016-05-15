@@ -208,10 +208,6 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Games menu
-	"MenuGames-Title"
-	{
-		"cze"		"Vyberte hru:"
-	}
 	"MenuGames-Start-Title" // {1} = game name
 	{
 		"cze"		"{1}"
@@ -219,10 +215,6 @@
 	"MenuGames-Start"
 	{
 		"cze"		"Začít hru*"
-	}
-	"MenuGames-RedOnlyHint"
-	{
-		"cze"		"Pouze červení"
 	}
 //------------------------------------------------------------------------------------------------
 // Games list menu

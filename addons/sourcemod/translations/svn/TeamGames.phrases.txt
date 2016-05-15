@@ -180,10 +180,6 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Games menu
-	"MenuGames-Title"
-	{
-		"svn"		"Izberi igro:"
-	}
 	"MenuGames-Start-Title" // {1} = game name
 	{
 		"svn"		"{1}"
@@ -191,10 +187,6 @@
 	"MenuGames-Start"
 	{
 		"svn"		"Zacni igro"
-	}
-	"MenuGames-RedOnlyHint"
-	{
-		"svn"		"Samo rdeci"
 	}
 //------------------------------------------------------------------------------------------------
 // Games list menu

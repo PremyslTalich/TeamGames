@@ -41,6 +41,7 @@ public __pl_teamgames_SetNTVOptional()
 	MarkNativeAsOptional("TG_GetCurrentDataPack");
 	MarkNativeAsOptional("TG_GetCurrentStarter");
 	MarkNativeAsOptional("TG_GetCurrentGameSettings");
+	MarkNativeAsOptional("TG_GetCurrentGameType");
 	MarkNativeAsOptional("TG_GetGameType");
 	MarkNativeAsOptional("TG_StopGame");
 	MarkNativeAsOptional("TG_SetModuleVisibility");
@@ -55,9 +56,9 @@ public __pl_teamgames_SetNTVOptional()
 
 //------------------------------------------------------------------------------------------------
 // Defines
-#define TG_MODULE_ID_LENGTH 	64
-#define TG_MODULE_NAME_LENGTH 	64
-#define TG_GAME_SETTINGS_LENGTH 64
+#define TG_MODULE_ID_LENGTH 	64 // Max module ID length
+#define TG_MODULE_NAME_LENGTH 	64 // Max module name length
+#define TG_GAME_SETTINGS_LENGTH 64 // Max game settings length
 
 //------------------------------------------------------------------------------------------------
 // Enums
@@ -88,9 +89,9 @@ enum TG_GameProgress
  */
 enum TG_GameType
 {
-	TG_All_ = -1, // do not use this (Only core use this "type")
-	TG_TeamGame, // TeamGame game type: RedTeam vs. BlueTeam
-	TG_RedOnly // RedOnly game type: only red players are allowed
+	TG_None = 0,
+	TG_TeamGame = (1 << 1), // TeamGame game type: RedTeam vs. BlueTeam
+	TG_RedOnly = (1 << 2) // RedOnly game type: only red players are allowed
 };
 
 /**

@@ -1,10 +1,6 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"cze"		"HeadShot only"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"cze"		"HeadShot only"
 	}

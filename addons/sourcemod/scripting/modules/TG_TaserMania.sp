@@ -2,22 +2,21 @@
 #include <smlib>
 #include <teamgames>
 
-#define GAME_ID_TEAMGAME	"TaserMania-TeamGame"
-#define GAME_ID_REDONLY		"TaserMania-RedOnly"
+#define GAME_ID	"TaserMania"
 
 public Plugin:myinfo =
 {
 	name = "[TG] TaserMania",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
 };
 
-public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMax)
+public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	if (GetEngineVersion() != Engine_CSGO) {
-		Format(sError, iErrMax, "Not supported engine version detected! This tg game is only for CS:GO.");
+		Format(error, err_max, "Not supported engine version detected! This tg game is only for CS:GO.");
 		return APLRes_Failure;
 	}
 	return APLRes_Success;
@@ -28,49 +27,42 @@ public OnPluginStart()
 	LoadTranslations("TG.TaserMania.phrases");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
-		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
+	if (StrEqual(name, "TeamGames")) {
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_TEAMGAME);
-	TG_RemoveGame(GAME_ID_REDONLY);
+	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type != TG_Game) {
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
 		return;
-	}
 
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		Format(name, maxSize, "%T", "GameName-TeamGame", client);
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, maxSize, "%T", "GameName-RedOnly", client);
-	}
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if ((StrEqual(id, GAME_ID_TEAMGAME) || StrEqual(id, GAME_ID_REDONLY)) && type == TG_Game) {
-		TG_StartGame(iClient, id);
-	}
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	TG_StartGame(client, id, gameType);
 }
 
-public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
-	if (!StrEqual(id, GAME_ID_TEAMGAME) && !StrEqual(id, GAME_ID_REDONLY))
+	if (!StrEqual(id, GAME_ID))
 		return;
 
 	HookEvent("weapon_fire", Event_WeaponFire);
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
@@ -78,40 +70,41 @@ public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], H
 	}
 }
 
-public Action:Event_WeaponFire(Handle:hEvent, const String:sName[], bool:bDontBroadcast)
+public Action:Event_WeaponFire(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	decl String:sWeapon[64];
-	new iClient = GetClientOfUserId(GetEventInt(hEvent, "userid"));
+	new String:weapon[64];
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if ((TG_IsCurrentGameID(GAME_ID_TEAMGAME) && TG_IsPlayerRedOrBlue(iClient)) || (TG_IsCurrentGameID(GAME_ID_REDONLY) && TG_GetPlayerTeam(iClient) == TG_RedTeam)) {
-		GetEventString(hEvent, "weapon", sWeapon, sizeof(sWeapon));
+	if (TG_IsCurrentGameID(GAME_ID) && TG_IsPlayerRedOrBlue(client)) {
+		GetEventString(event, "weapon", weapon, sizeof(weapon));
 
-		if (StrEqual(sWeapon, "weapon_taser")) {
-			SetPlayerWeaponAmmo(iClient, Client_GetActiveWeapon(iClient), _, 2);
+		if (StrEqual(weapon, "weapon_taser")) {
+			SetPlayerWeaponAmmo(client, Client_GetActiveWeapon(client), _, 2);
 		}
 	}
 
 	return Plugin_Continue;
 }
 
-public TG_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger){
-	if (StrEqual(sID, GAME_ID_REDONLY) && iTeam == TG_RedTeam && TG_GetTeamCount(TG_RedTeam) == 1) {
-		new Handle:hWinners = CreateArray();
+public TG_OnPlayerLeaveGame(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger){
+	if (gameType == TG_RedOnly && team == TG_RedTeam && TG_GetTeamCount(TG_RedTeam) == 1) {
+		new Handle:winners = CreateArray();
 
 		for (new i = 1; i <= MaxClients; i++) {
 			if (TG_GetPlayerTeam(i) == TG_RedTeam) {
-				PushArrayCell(hWinners, i);
+				PushArrayCell(winners, i);
 				break;
 			}
 		}
 
-		TG_StopGame(TG_RedTeam, hWinners);
+		TG_StopGame(TG_RedTeam, winners);
 	}
 }
 
-public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount, Handle:DataPack)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
-	if (StrEqual(id, GAME_ID_TEAMGAME) || StrEqual(id, GAME_ID_REDONLY)) {
-		UnhookEvent("weapon_fire", Event_WeaponFire);
-	}
+	if (!StrEqual(id, GAME_ID))
+		return;
+
+	UnhookEvent("weapon_fire", Event_WeaponFire);
 }

@@ -136,7 +136,7 @@ forward TG_OnMarkDestroyed(client, TG_Team:team, Float:position[3], Float:life, 
  * @param dataPack		Game datapack.
  * @return 				Plugin_Handled to block start menu from opening.
  */
-forward Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSettings[], Handle:dataPack);
+forward Action:TG_OnGameStartMenu(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack);
 
 /**
  * Called right before game preparation starts.
@@ -147,7 +147,7 @@ forward Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSe
  * @param dataPack		Game datapack.
  * @return 				Plugin_Handled to block game preparation from starting (and so game).
  */
-forward Action:TG_OnGamePreparePre(const String:id[], client, const String:gameSettings[], Handle:dataPack);
+forward Action:TG_OnGamePreparePre(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack);
 
 /**
  * Called when game preparation started.
@@ -158,7 +158,7 @@ forward Action:TG_OnGamePreparePre(const String:id[], client, const String:gameS
  * @param dataPack		Game datapack.
  * @noreturn
  */
-forward TG_OnGamePrepare(const String:id[], client, const String:gameSettings[], Handle:dataPack);
+forward TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack);
 
 /**
  * Called when game started.
@@ -169,7 +169,7 @@ forward TG_OnGamePrepare(const String:id[], client, const String:gameSettings[],
  * @param dataPack		Game datapack.
  * @noreturn
  */
-forward TG_OnGameStart(const String:id[], client, const String:gameSettings[], Handle:dataPack);
+forward TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack);
 
 /**
  * Called when some error happened in TG_StartGame().
@@ -180,7 +180,7 @@ forward TG_OnGameStart(const String:id[], client, const String:gameSettings[], H
  * @param errorDescription	Game start error description.
  * @noreturn
  */
-forward TG_OnGameStartError(const String:id[], client, errorID, const String:errorDescription[]);
+forward TG_OnGameStartError(const String:id[], TG_GameType:gameType, client, errorID, const String:errorDescription[]);
 
 forward Action:TG_OnTraceAttack(bool:inTeamGame, victim, &attacker, &inflictor, &Float:damage, &damageType, &ammoType, hitBox, hitGroup);
 forward Action:TG_OnPlayerDamage(bool:inTeamGame, victim, &attacker, &inflictor, &Float:damage, &damageType);
@@ -198,7 +198,7 @@ forward Action:TG_OnPlayerDamage(bool:inTeamGame, victim, &attacker, &inflictor,
  * @param gameID		Game ID.
  * @noreturn
  */
-forward TG_OnPlayerDeath(attacker, TG_Team:attackerTeam, victim, TG_Team:victimTeam, bool:headshot, const String:weapon[], TG_GameProgress:gameStatus, const String:gameID[]);
+forward TG_OnPlayerDeath(attacker, TG_Team:attackerTeam, victim, TG_Team:victimTeam, bool:headshot, const String:weapon[], TG_GameProgress:gameStatus, const String:gameID[], TG_GameType:gameType);
 
 /**
  * Called on TG_StopGame() (or one TG team is empty - depending of settings).
@@ -210,7 +210,7 @@ forward TG_OnPlayerDeath(attacker, TG_Team:attackerTeam, victim, TG_Team:victimT
  * @param dataPack		Game datapack.
  * @noreturn
  */
-forward TG_OnGameEnd(const String:id[], TG_Team:team, winners[], winnersCount, Handle:dataPack);
+forward TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack);
 
 /**
  * Called when one TG team was emptied.
@@ -221,7 +221,7 @@ forward TG_OnGameEnd(const String:id[], TG_Team:team, winners[], winnersCount, H
  * @param trigger		How was the team emptied.
  * @noreturn
  */
-forward TG_OnTeamEmpty(const String:id[], client, TG_Team:team, TG_PlayerTrigger:trigger);
+forward TG_OnTeamEmpty(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger);
 
 /**
  * Called when player leave TG game.
@@ -232,7 +232,7 @@ forward TG_OnTeamEmpty(const String:id[], client, TG_Team:team, TG_PlayerTrigger
  * @param trigger		Why player left the game.
  * @noreturn
  */
-forward TG_OnPlayerLeaveGame(const String:id[], client, TG_Team:team, TG_PlayerTrigger:trigger);
+forward TG_OnPlayerLeaveGame(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger);
 
 /**
  * Called right before the TeamGames menu is displayed.
@@ -257,10 +257,11 @@ forward TG_OnMenuDisplayed(client);
  *
  * @param type 			Module type.
  * @param id			Module ID.
+ * @param gametype		Game type used when selecting a game
  * @param client		Client index.
  * @return 				Plugin_Handled to block item from selecting.
  */
-forward Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client);
+forward Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client);
 
 /**
  * Called after player selected an item in TeamGames menu.
@@ -269,20 +270,21 @@ forward Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client);
  *
  * @param type 			Module type.
  * @param id			Module ID.
+ * @param gametype		Game type used when selecting a game
  * @param client		Client index.
  * @noreturn
  */
-forward TG_OnMenuSelected(TG_ModuleType:type, const String:id[], client);
+forward TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client);
 
 /**
  * Core asks module for name.
  *
- * @param type 			Module type.
- * @param id			Module ID.
- * @param client		Client index (target for translation).
- * @param name			Buffer for module name.
- * @param nameSize		Max size of the buffer.
- * @param status		Menu item status (used only for main menu items - not games).
+ * @param type 			Module type
+ * @param id			Module ID
+ * @param client		Client index (target for translation)
+ * @param name			Buffer for module name
+ * @param nameSize		Max size of the buffer
+ * @param status		Menu item status
  * @noreturn.
  */
 forward TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status);

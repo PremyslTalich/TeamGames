@@ -1,10 +1,6 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"ru"		"Битва без прицела"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"ru"		"Битва без прицела"
 	}

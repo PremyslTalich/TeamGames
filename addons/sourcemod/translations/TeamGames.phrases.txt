@@ -227,10 +227,6 @@
 	}
 //------------------------------------------------------------------------------------------------
 // Games menu
-	"MenuGames-Title"
-	{
-		"en"		"Choose game:"
-	}
 	"MenuGames-Start-Title" // {1} = game name
 	{
 		"#format"	"{1:s}"
@@ -239,10 +235,6 @@
 	"MenuGames-Start"
 	{
 		"en"		"Play game*"
-	}
-	"MenuGames-RedOnlyHint"
-	{
-		"en"		"Red Only"
 	}
 //------------------------------------------------------------------------------------------------
 // Games list menu

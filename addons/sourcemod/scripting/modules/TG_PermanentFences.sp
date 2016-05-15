@@ -217,7 +217,7 @@ public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:na
 	}
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, iClient)
 {
 	if (type != TG_MenuItem) {
 		return;

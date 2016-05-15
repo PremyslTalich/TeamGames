@@ -72,7 +72,7 @@ public OnMapStart()
 	LoadConfig();
 }
 
-public TG_OnMarkSpawned(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Handle:hMark, iMarkEnt)
+public TG_OnMarkSpawned(client, TG_Team:iTeam, Float:fPos[3], Float:fLife, Handle:hMark, iMarkEnt)
 {
 	if (g_hMarkTemplate[iTeam] == INVALID_HANDLE) {
 		LogError("Missing %s mark definition in %s !", (iTeam == TG_RedTeam) ? "red" : "blue", CONFIG);
@@ -100,7 +100,7 @@ public TG_OnMarkSpawned(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Hand
 			strcopy(g_iLastMark[iTeam][LM_Mark], 16, "");
 		}
 
-		g_iLastMark[iTeam][LM_Client] = iClient;
+		g_iLastMark[iTeam][LM_Client] = client;
 		g_iLastMark[iTeam][LM_Team] = iTeam;
 		g_iLastMark[iTeam][LM_Position][0] = fPos[0];
 		g_iLastMark[iTeam][LM_Position][1] = fPos[1];
@@ -110,14 +110,14 @@ public TG_OnMarkSpawned(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Hand
 
 	hComponents = CreateArray();
 	if (g_hMarkLastTemplate[iTeam] != INVALID_HANDLE) {
-		SpawnComponents(g_hMarkLastTemplate[iTeam], hComponents, fPos, iClient);
+		SpawnComponents(g_hMarkLastTemplate[iTeam], hComponents, fPos, client);
 	} else {
-		SpawnComponents(g_hMarkTemplate[iTeam], hComponents, fPos, iClient);
+		SpawnComponents(g_hMarkTemplate[iTeam], hComponents, fPos, client);
 	}
 	SetTrieValue(g_hMarks, sMark, hComponents);
 }
 
-public TG_OnMarkDestroyed(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Handle:hMark, iMarkEnt)
+public TG_OnMarkDestroyed(client, TG_Team:iTeam, Float:fPos[3], Float:fLife, Handle:hMark, iMarkEnt)
 {
 	new String:sMark[16];
 	new Handle:hComponents;
@@ -130,7 +130,7 @@ public TG_OnMarkDestroyed(iClient, TG_Team:iTeam, Float:fPos[3], Float:fLife, Ha
 	}
 }
 
-SpawnComponents(Handle:hTemplate, Handle:hComponents, Float:fPos[3], iClient)
+SpawnComponents(Handle:hTemplate, Handle:hComponents, Float:fPos[3], client)
 {
 	if (hTemplate != INVALID_HANDLE) {
 		new iComponentsCount = GetArraySize(hTemplate);
@@ -143,7 +143,7 @@ SpawnComponents(Handle:hTemplate, Handle:hComponents, Float:fPos[3], iClient)
 			if (GetTrieValue(hComponent, "__type__", iType)) {
 				switch (iType) {
 					case MM_Model, MM_Tesla, MM_SmokeStack, MM_SpotLight, MM_Steam, MM_Sprite: {
-						new iEnt = SpawnEntityComponent(iType, hComponent, fPos, iClient);
+						new iEnt = SpawnEntityComponent(iType, hComponent, fPos, client);
 
 						if (IsValidEntity(iEnt)) {
 							PushArrayCell(hComponents, iEnt);
@@ -163,11 +163,11 @@ SpawnComponents(Handle:hTemplate, Handle:hComponents, Float:fPos[3], iClient)
 	}
 }
 
-SpawnEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3], iClient)
+SpawnEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3], client)
 {
 	switch (iType) {
 		case MM_Model: {
-			return SpawnModel(hComponent, fPos, iClient);
+			return SpawnModel(hComponent, fPos, client);
 		}
 		case MM_Tesla: {
 			return SpawnTesla(hComponent, fPos);
@@ -176,10 +176,10 @@ SpawnEntityComponent(MM_Types:iType, Handle:hComponent, Float:fPos[3], iClient)
 			return SpawnSmokeStack(hComponent, fPos);
 		}
 		case MM_Steam: {
-			return SpawnSteam(hComponent, fPos, iClient);
+			return SpawnSteam(hComponent, fPos, client);
 		}
 		case MM_SpotLight: {
-			return SpawnSpotLight(hComponent, fPos, iClient);
+			return SpawnSpotLight(hComponent, fPos, client);
 		}
 		case MM_Sprite: {
 			return SpawnSprite(hComponent, fPos);
@@ -345,7 +345,7 @@ LoadConfig()
 	CloseHandle(hKV);
 }
 
-SpawnModel(Handle:hComponent, Float:fPos[3], iClient)
+SpawnModel(Handle:hComponent, Float:fPos[3], client)
 {
 	new String:sValue[PLATFORM_MAX_PATH];
 	new Float:fOrigin[3];
@@ -372,7 +372,7 @@ SpawnModel(Handle:hComponent, Float:fPos[3], iClient)
 
 	if (ExistComponentKey(hComponent, "playerangle")) {
 		new Float:fPlayerAngles[3];
-		GetClientAbsAngles(iClient, fPlayerAngles);
+		GetClientAbsAngles(client, fPlayerAngles);
 		AddVectors(fAngles, fPlayerAngles, fAngles);
 	}
 
@@ -497,7 +497,7 @@ SpawnSmokeStack(Handle:hComponent, Float:fPos[3])
 	return iEnt;
 }
 
-SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
+SpawnSteam(Handle:hComponent, Float:fPos[3], client)
 {
 	new iEnt = CreateEntityByName("env_steam");
 
@@ -515,7 +515,7 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 
 		if (bPlayerAngle) {
 			new Float:fPlayerAngles[3];
-			GetClientAbsAngles(iClient, fPlayerAngles);
+			GetClientAbsAngles(client, fPlayerAngles);
 			AddVectors(fAngles, fPlayerAngles, fAngles);
 		}
 
@@ -545,7 +545,7 @@ SpawnSteam(Handle:hComponent, Float:fPos[3], iClient)
 	return iEnt;
 }
 
-SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
+SpawnSpotLight(Handle:hComponent, Float:fPos[3], client)
 {
 	new iEnt = CreateEntityByName("point_spotlight");
 
@@ -564,7 +564,7 @@ SpawnSpotLight(Handle:hComponent, Float:fPos[3], iClient)
 
 		if (bPlayerAngle) {
 			new Float:fPlayerAngles[3];
-			GetClientAbsAngles(iClient, fPlayerAngles);
+			GetClientAbsAngles(client, fPlayerAngles);
 			AddVectors(fAngles, fPlayerAngles, fAngles);
 		}
 
@@ -613,53 +613,53 @@ SpawnBeam(Handle:hComponent, Float:fPos[3])
 	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
 	GetVectorFromString(sValue, iColor, false);
 
-	new Handle:hDataPack;
-	new iBeam = -1 * _:CreateDataTimer(0.1, Timer_DrawBeam, hDataPack, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
-	WritePackFloat(hDataPack, fStart[0]);
-	WritePackFloat(hDataPack, fStart[1]);
-	WritePackFloat(hDataPack, fStart[2]);
-	WritePackFloat(hDataPack, fEnd[0]);
-	WritePackFloat(hDataPack, fEnd[1]);
-	WritePackFloat(hDataPack, fEnd[2]);
-	WritePackCell(hDataPack, iColor[0]);
-	WritePackCell(hDataPack, iColor[1]);
-	WritePackCell(hDataPack, iColor[2]);
-	WritePackCell(hDataPack, iColor[3]);
-	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "width-start", 1.0));
-	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "width-end", 1.0));
-	WritePackCell(hDataPack, iMaterial);
-	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "amplitude", 0.0));
+	new Handle:dataPack;
+	new iBeam = -1 * _:CreateDataTimer(0.1, Timer_DrawBeam, dataPack, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+	WritePackFloat(dataPack, fStart[0]);
+	WritePackFloat(dataPack, fStart[1]);
+	WritePackFloat(dataPack, fStart[2]);
+	WritePackFloat(dataPack, fEnd[0]);
+	WritePackFloat(dataPack, fEnd[1]);
+	WritePackFloat(dataPack, fEnd[2]);
+	WritePackCell(dataPack, iColor[0]);
+	WritePackCell(dataPack, iColor[1]);
+	WritePackCell(dataPack, iColor[2]);
+	WritePackCell(dataPack, iColor[3]);
+	WritePackFloat(dataPack, GetComponentFloat(hComponent, "width-start", 1.0));
+	WritePackFloat(dataPack, GetComponentFloat(hComponent, "width-end", 1.0));
+	WritePackCell(dataPack, iMaterial);
+	WritePackFloat(dataPack, GetComponentFloat(hComponent, "amplitude", 0.0));
 
 	return iBeam;
 }
 
-public Action:Timer_DrawBeam(Handle:hTimer, Handle:hDataPack)
+public Action:Timer_DrawBeam(Handle:timer, Handle:dataPack)
 {
-	if (FindValueInArray(g_hTempEntComponents, -1 * _:hTimer) == -1) {
+	if (FindValueInArray(g_hTempEntComponents, -1 * _:timer) == -1) {
 		return Plugin_Stop;
 	}
 
 	new Float:fStart[3], Float:fEnd[3], Float:fWidthStart, Float:fWidthEnd, Float:fAmplitude;
 	new iColor[4], iMaterial;
 
-	ResetPack(hDataPack);
-	fStart[0] = ReadPackFloat(hDataPack);
-	fStart[1] = ReadPackFloat(hDataPack);
-	fStart[2] = ReadPackFloat(hDataPack);
+	ResetPack(dataPack);
+	fStart[0] = ReadPackFloat(dataPack);
+	fStart[1] = ReadPackFloat(dataPack);
+	fStart[2] = ReadPackFloat(dataPack);
 
-	fEnd[0] = ReadPackFloat(hDataPack);
-	fEnd[1] = ReadPackFloat(hDataPack);
-	fEnd[2] = ReadPackFloat(hDataPack);
+	fEnd[0] = ReadPackFloat(dataPack);
+	fEnd[1] = ReadPackFloat(dataPack);
+	fEnd[2] = ReadPackFloat(dataPack);
 
-	iColor[0] = ReadPackCell(hDataPack);
-	iColor[1] = ReadPackCell(hDataPack);
-	iColor[2] = ReadPackCell(hDataPack);
-	iColor[3] = ReadPackCell(hDataPack);
+	iColor[0] = ReadPackCell(dataPack);
+	iColor[1] = ReadPackCell(dataPack);
+	iColor[2] = ReadPackCell(dataPack);
+	iColor[3] = ReadPackCell(dataPack);
 
-	fWidthStart = ReadPackFloat(hDataPack);
-	fWidthEnd = ReadPackFloat(hDataPack);
-	iMaterial = ReadPackCell(hDataPack);
-	fAmplitude = ReadPackFloat(hDataPack);
+	fWidthStart = ReadPackFloat(dataPack);
+	fWidthEnd = ReadPackFloat(dataPack);
+	iMaterial = ReadPackCell(dataPack);
+	fAmplitude = ReadPackFloat(dataPack);
 
 	TE_SetupBeamPoints(fStart, fEnd, iMaterial, 0, 0, 0, 0.19, fWidthStart, fWidthEnd, 0, fAmplitude, iColor, 0);
 	TE_SendToAll();
@@ -687,46 +687,46 @@ SpawnCircle(Handle:hComponent, Float:fPos[3])
 	iColor[3] = GetComponentInt(hComponent, "alpha", 255);
 	GetVectorFromString(sValue, iColor, false);
 
-	new Handle:hDataPack;
-	new iCircle = -1 * _:CreateDataTimer(0.1, Timer_DrawCircle, hDataPack, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
-	WritePackFloat(hDataPack, fOrigin[0]);
-	WritePackFloat(hDataPack, fOrigin[1]);
-	WritePackFloat(hDataPack, fOrigin[2]);
-	WritePackCell(hDataPack, iColor[0]);
-	WritePackCell(hDataPack, iColor[1]);
-	WritePackCell(hDataPack, iColor[2]);
-	WritePackCell(hDataPack, iColor[3]);
-	WritePackFloat(hDataPack, (GetComponentFloat(hComponent, "radius", 32.0) * 2));
-	WritePackCell(hDataPack, iMaterial);
-	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "width", 1.0));
-	WritePackFloat(hDataPack, GetComponentFloat(hComponent, "amplitude", 0.0));
+	new Handle:dataPack;
+	new iCircle = -1 * _:CreateDataTimer(0.1, Timer_DrawCircle, dataPack, TIMER_REPEAT | TIMER_DATA_HNDL_CLOSE);
+	WritePackFloat(dataPack, fOrigin[0]);
+	WritePackFloat(dataPack, fOrigin[1]);
+	WritePackFloat(dataPack, fOrigin[2]);
+	WritePackCell(dataPack, iColor[0]);
+	WritePackCell(dataPack, iColor[1]);
+	WritePackCell(dataPack, iColor[2]);
+	WritePackCell(dataPack, iColor[3]);
+	WritePackFloat(dataPack, (GetComponentFloat(hComponent, "radius", 32.0) * 2));
+	WritePackCell(dataPack, iMaterial);
+	WritePackFloat(dataPack, GetComponentFloat(hComponent, "width", 1.0));
+	WritePackFloat(dataPack, GetComponentFloat(hComponent, "amplitude", 0.0));
 
 	return iCircle;
 }
 
-public Action:Timer_DrawCircle(Handle:hTimer, Handle:hDataPack)
+public Action:Timer_DrawCircle(Handle:timer, Handle:dataPack)
 {
-	if (FindValueInArray(g_hTempEntComponents, -1 * _:hTimer) == -1) {
+	if (FindValueInArray(g_hTempEntComponents, -1 * _:timer) == -1) {
 		return Plugin_Stop;
 	}
 
 	new Float:fOrigin[3], Float:fRadius, Float:fWidth, Float:fAmplitude;
 	new iColor[4], iMaterial;
 
-	ResetPack(hDataPack);
-	fOrigin[0] = ReadPackFloat(hDataPack);
-	fOrigin[1] = ReadPackFloat(hDataPack);
-	fOrigin[2] = ReadPackFloat(hDataPack);
+	ResetPack(dataPack);
+	fOrigin[0] = ReadPackFloat(dataPack);
+	fOrigin[1] = ReadPackFloat(dataPack);
+	fOrigin[2] = ReadPackFloat(dataPack);
 
-	iColor[0] = ReadPackCell(hDataPack);
-	iColor[1] = ReadPackCell(hDataPack);
-	iColor[2] = ReadPackCell(hDataPack);
-	iColor[3] = ReadPackCell(hDataPack);
+	iColor[0] = ReadPackCell(dataPack);
+	iColor[1] = ReadPackCell(dataPack);
+	iColor[2] = ReadPackCell(dataPack);
+	iColor[3] = ReadPackCell(dataPack);
 
-	fRadius = ReadPackFloat(hDataPack);
-	iMaterial = ReadPackCell(hDataPack);
-	fWidth = ReadPackFloat(hDataPack);
-	fAmplitude = ReadPackFloat(hDataPack);
+	fRadius = ReadPackFloat(dataPack);
+	iMaterial = ReadPackCell(dataPack);
+	fWidth = ReadPackFloat(dataPack);
+	fAmplitude = ReadPackFloat(dataPack);
 
 	TE_SetupBeamRingPoint(fOrigin, fRadius - 0.5, fRadius, iMaterial, 0, 0, 0, 0.19, fWidth, fAmplitude, iColor, 0, 0);
 	TE_SendToAll();

@@ -1,15 +1,11 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"en"		"Pistol zoom battle"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"en"		"Pistol zoom battle"
 	}
 	"ChooseWeapon"
 	{
-		"en"		"choose weapon"
+		"en"		"Choose weapon"
 	}
 }

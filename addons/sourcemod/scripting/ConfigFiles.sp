@@ -20,7 +20,8 @@ CreateModulesConfigFileIfNotExist()
 		WriteFileLine(hFile, "	\"%s\"", MODCONF_MENUITEMS);
 		WriteFileLine(hFile, "	{");
 		WriteFileLine(hFile, "		\"Core_TeamsMenu\"{}");
-		WriteFileLine(hFile, "		\"Core_GamesMenu\"{}");
+		WriteFileLine(hFile, "		\"Core_GamesMenu-TeamGame\"{}");
+		WriteFileLine(hFile, "		\"Core_GamesMenu-RedOnly\"{}");
 		WriteFileLine(hFile, "		\"Core_FencesMenu\"{}");
 		WriteFileLine(hFile, "		\"Core_StopGame\"{\"separator\" \"prepend\"}");
 		WriteFileLine(hFile, "		\"Core_GamesRoundLimitInfo\"{\"disabled\" \"1\"}");
@@ -118,7 +119,7 @@ SaveMenuItemToConfig(const String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODU
 	CloseHandle(hKV);
 }
 
-SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MODULE_NAME_LENGTH], bool:bHealthBar)
+SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MODULE_NAME_LENGTH], TG_GameType:iType, bool:bHealthBar)
 {
 	#if defined DEBUG
 	LogMessage("[TG DEBUG] SaveGameToConfig(%s, %s)", sID, sName);
@@ -134,6 +135,16 @@ SaveGameToConfig(const String:sID[TG_MODULE_ID_LENGTH], const String:sName[TG_MO
 
 	KvJumpToKey(hKV, sID, true);
 	KvSetString(hKV, "name", sName);
+
+	new String:sGameTypes[32];
+	if (iType & TG_TeamGame) {
+		strcopy(sGameTypes, sizeof(sGameTypes), "TeamGame, ");
+	}
+	if (iType & TG_RedOnly) {
+		Format(sGameTypes, sizeof(sGameTypes), "%sRedOnly, ", sGameTypes);
+	}
+	sGameTypes[strlen(sGameTypes) - 2] = '\0';
+	KvSetString(hKV, "gametypes", sGameTypes);
 
 	if (!bHealthBar) {
 		KvSetNum(hKV, "enemyhealthbar", 0);

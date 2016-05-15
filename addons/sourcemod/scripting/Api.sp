@@ -173,7 +173,7 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 		g_iGameListEnd++;
 
 		strcopy(g_GameList[iIndex][Id], TG_MODULE_ID_LENGTH, sID);
-		SaveGameToConfig(sID, sName, bHealthBar);
+		SaveGameToConfig(sID, sName, iType, bHealthBar);
 
 		g_GameList[iIndex][Visible] = GetConVarBool(g_hModuleDefVisibility);
 		g_GameList[iIndex][HealthBarVisibility] = bHealthBar;
@@ -216,9 +216,10 @@ public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 	new bool:bRedTeam = bool:GetNativeCell(3);
 	new bool:bBlueTeam = bool:GetNativeCell(4);
 	new bool:bRandom = bool:GetNativeCell(5);
+	new iData = GetNativeCell(6);
 
 	decl String:CustomTitle[64];
-	FormatNativeString(0, 6, 7, sizeof(CustomTitle), _, CustomTitle);
+	FormatNativeString(0, 7, 8, sizeof(CustomTitle), _, CustomTitle);
 
 	if (!bRedTeam && !bBlueTeam)
 		ThrowNativeError(0, "No team to choose player from!");
@@ -252,6 +253,7 @@ public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 
 		PushMenuCell(hMenu, "--RED--", _:bRedTeam);
 		PushMenuCell(hMenu, "--BLUE--", _:bBlueTeam);
+		PushMenuCell(hMenu, "--DATA--", _:iData);
 		PushMenuCell(hMenu, "--PLUGIN--", _:hPlugin);
 		PushMenuCell(hMenu, "--FUNCTION--", _:fCallBack);
 
@@ -271,6 +273,7 @@ public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 		Call_PushCell(iClient);
 		Call_PushCell(iUser);
 		Call_PushCell(false);
+		Call_PushCell(iData);
 		Call_Finish();
 	} else {
 		return false;
@@ -286,6 +289,7 @@ public PlayerSelectMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		new bool:bRandom = false;
 		new bool:bRedTeam = bool:GetMenuCell(hMenu, "--RED--");
 		new bool:bBlueTeam = bool:GetMenuCell(hMenu, "--BLUE--");
+		new iData = GetMenuCell(hMenu, "--DATA--");
 		new Handle:hPlugin = Handle:GetMenuCell(hMenu, "--PLUGIN--");
 		new Function:fCallBack = Function:GetMenuCell(hMenu, "--FUNCTION--");
 		decl String:sUserId[32];
@@ -315,6 +319,7 @@ public PlayerSelectMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		Call_PushCell(iClient);
 		Call_PushCell(iUser);
 		Call_PushCell(bRandom);
+		Call_PushCell(iData);
 		Call_Finish();
 	}
 	// else if (iAction == MenuAction_Cancel && iKey == MenuCancel_ExitBack)
@@ -327,16 +332,17 @@ public Native_FakeSelect(Handle:hPlugin, iNumParams)
 {
 	new iClient = GetNativeCell(1);
 	new TG_ModuleType:iType = GetNativeCell(2);
+	new TG_GameType:iGameType = GetNativeCell(4);
 	decl String:sID[TG_MODULE_ID_LENGTH];
 
 	if (GetNativeString(3, sID, sizeof(sID)) != SP_ERROR_NONE) {
 		return ThrowNativeError(1, "Fake select failed! Couldn't get Arg3 (Module ID)!");
 	}
 
-	if (Call_OnMenuSelect(iType, sID, iClient) != Plugin_Continue)
+	if (Call_OnMenuSelect(iType, sID, iGameType, iClient) != Plugin_Continue)
 		return 0;
 
-	Call_OnMenuSelected(iType, sID, iClient);
+	Call_OnMenuSelected(iType, sID, iGameType, iClient);
 
 	if (iType == TG_MenuItem && StrContains(sID, "Core_", false) == 0) {
 		CoreMenuItemsActions(iClient, sID);
@@ -476,16 +482,20 @@ public Native_StartGame(Handle:hPlugin, iNumParams)
 
 	new String:sID[TG_MODULE_ID_LENGTH], String:sName[TG_MODULE_NAME_LENGTH], String:sSettings[TG_MODULE_NAME_LENGTH];
 	GetNativeString(2, sID, sizeof(sID));
-	GetNativeString(3, sSettings, sizeof(sSettings));
+	new TG_GameType:iGameType = TG_GameType:GetNativeCell(3);
+	GetNativeString(4, sSettings, sizeof(sSettings));
 	Call_AskModuleName(sID, TG_Game, iClient, sName, sizeof(sName));
 
-	hDataPack = Handle:GetNativeCell(4);
-	new bool:bRemoveDropppedWeapons = GetNativeCell(5);
-	new bool:bCheckTeams = GetNativeCell(6);
+	hDataPack = Handle:GetNativeCell(5);
+	new bool:bRemoveDropppedWeapons = GetNativeCell(6);
 	new bool:bEndOnTeamEmpty = GetNativeCell(7);
 
+	if (iGameType != TG_TeamGame && iGameType != TG_RedOnly) {
+		return ThrowNativeError(1, "GameType arg. in TG_StartGame must be equal to \"TG_TeamGame\" or \"TG_RedTeam\" !");
+	}
+
 	if (iClient == 0) {
-		TG_StartGamePreparation(iClient, sID, sSettings, hDataPack, bRemoveDropppedWeapons, bCheckTeams, bEndOnTeamEmpty);
+		TG_StartGamePreparation(iClient, sID, iGameType, sSettings, hDataPack, bRemoveDropppedWeapons, bEndOnTeamEmpty);
 		return 0;
 	}
 
@@ -494,10 +504,10 @@ public Native_StartGame(Handle:hPlugin, iNumParams)
 	AddMenuItemFormat(hMenu, "START_GAME",_ , "%T", "MenuGames-Start", iClient);
 	PushMenuCell(hMenu, "-CLIENT-", iClient);
 	PushMenuString(hMenu, "-GAMEID-", sID);
+	PushMenuCell(hMenu, "-GAMETYPE-", _:iGameType);
 	PushMenuString(hMenu, "-GAMESETTINGS-", sSettings);
 	PushMenuCell(hMenu, "-DATAPACK-", _:hDataPack);
 	PushMenuCell(hMenu, "-REMOVEDROPS-", _:bRemoveDropppedWeapons);
-	PushMenuCell(hMenu, "-CHECKTEAMS-", _:bCheckTeams);
 	PushMenuCell(hMenu, "-ENDONTEAMEMPTY-", _:bEndOnTeamEmpty);
 	SetMenuExitBackButton(hMenu, true);
 	DisplayMenu(hMenu, iClient, 30);
@@ -560,6 +570,11 @@ public Native_GetCurrentGameSettings(Handle:hPlugin, iNumParams)
 	}
 
 	return true;
+}
+
+public Native_GetCurrentGameType(Handle:hPlugin, iNumParams)
+{
+	return _:g_Game[GameType];
 }
 
 public Native_GetGameType(Handle:hPlugin, iNumParams)
@@ -708,6 +723,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 	Call_StartForward(Forward_OnGameEnd);
 	Call_PushString(g_Game[GameID]);
+	Call_PushCell(g_Game[GameType]);
 	Call_PushCell(iTeam);
 	Call_PushArray(iWinners, MAXPLAYERS + 1);
 	Call_PushCell(iWinnersCount);
@@ -716,7 +732,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 	for (new i = 1; i <= MaxClients; i++) {
 		if (TG_IsPlayerRedOrBlue(i)) {
-			Call_OnPlayerLeaveGame(g_Game[GameID], i, g_PlayerData[i][Team], TG_GameEnd);
+			Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], i, g_PlayerData[i][Team], TG_GameEnd);
 		}
 	}
 
@@ -991,6 +1007,7 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_GetCurrentDataPack", Native_GetCurrentDataPack);
 	CreateNative("TG_GetCurrentStarter", Native_GetCurrentStarter);
 	CreateNative("TG_GetCurrentGameSettings", Native_GetCurrentGameSettings);
+	CreateNative("TG_GetCurrentGameType", Native_GetCurrentGameType);
 	CreateNative("TG_GetGameType", Native_GetGameType);
 	CreateNative("TG_StopGame", Native_StopGame);
 	CreateNative("TG_GetGameStatus", Native_GetGameStatus);
@@ -1003,14 +1020,14 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	CreateNative("TG_LogRoundMessage", Native_LogRoundMessage);
 	CreateNative("TG_LogGameMessage", Native_LogGameMessage);
 
-	Forward_OnTraceAttack = 	 		CreateGlobalForward("TG_OnTraceAttack", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, 	Param_CellByRef, 	Param_Cell, Param_Cell);
-	Forward_OnPlayerDamage = 	 		CreateGlobalForward("TG_OnPlayerDamage", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, 	Param_CellByRef, 	Param_Cell, Param_Cell);
-	Forward_OnPlayerDeath = 	 		CreateGlobalForward("TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_String, 		Param_Cell, Param_String);
+	Forward_OnTraceAttack = 	 		CreateGlobalForward("TG_OnTraceAttack", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, 	Param_CellByRef, 	Param_Cell,   Param_Cell);
+	Forward_OnPlayerDamage = 	 		CreateGlobalForward("TG_OnPlayerDamage", 				ET_Hook, 	Param_Cell, 		Param_Cell, 		Param_CellByRef, 	Param_CellByRef, 	Param_FloatByRef, 	Param_CellByRef, 	Param_CellByRef, 	Param_Cell,   Param_Cell);
+	Forward_OnPlayerDeath = 	 		CreateGlobalForward("TG_OnPlayerDeath", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_String, 		Param_Cell, 		Param_String, Param_Cell);
 	Forward_OnPlayerTeam = 	 			CreateGlobalForward("TG_OnPlayerTeam", 					ET_Event, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnPlayerTeamPost = 	 		CreateGlobalForward("TG_OnPlayerTeamPost", 				ET_Ignore, 	Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnPlayerRebel = 	 		CreateGlobalForward("TG_OnPlayerRebel", 				ET_Event, 	Param_Cell, 		Param_Cell);
 	Forward_OnPlayerRebelPost = 	 	CreateGlobalForward("TG_OnPlayerRebelPost", 			ET_Ignore, 	Param_Cell, 		Param_Cell);
-	Forward_OnPlayerLeaveGame = 	 	CreateGlobalForward("TG_OnPlayerLeaveGame", 			ET_Event, 	Param_String, 		Param_Cell, 		Param_Cell, 		Param_Cell);
+	Forward_OnPlayerLeaveGame = 	 	CreateGlobalForward("TG_OnPlayerLeaveGame", 			ET_Event, 	Param_String, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
 	Forward_OnLaserFenceCreate = 		CreateGlobalForward("TG_OnLaserFenceCreate", 			ET_Event, 	Param_Cell,			Param_Array, 		Param_Array);
 	Forward_OnLaserFenceCreated = 		CreateGlobalForward("TG_OnLaserFenceCreated", 			ET_Ignore, 	Param_Cell,			Param_Array, 		Param_Array);
 	Forward_OnLaserFenceCross = 		CreateGlobalForward("TG_OnLaserFenceCross", 			ET_Event, 	Param_Cell, 		Param_FloatByRef);
@@ -1019,17 +1036,17 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnMarkSpawn = 				CreateGlobalForward("TG_OnMarkSpawn", 					ET_Event, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float);
 	Forward_OnMarkSpawned = 			CreateGlobalForward("TG_OnMarkSpawned", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float, 		Param_Cell, 		Param_Cell);
 	Forward_OnMarkDestroyed = 			CreateGlobalForward("TG_OnMarkDestroyed", 				ET_Ignore, 	Param_Cell,			Param_Cell, 		Param_Array, 		Param_Float, 		Param_Cell, 		Param_Cell, 		Param_Cell);
-	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
-	Forward_OnGamePreparePre =  		CreateGlobalForward("TG_OnGamePreparePre",				ET_Event, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
-	Forward_OnGamePrepare =  			CreateGlobalForward("TG_OnGamePrepare",					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
-	Forward_OnGameStart = 	 			CreateGlobalForward("TG_OnGameStart", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_String, 		Param_Cell);
-	Forward_OnGameStartError = 			CreateGlobalForward("TG_OnGameStartError",				ET_Ignore, 	Param_String,		Param_Cell, 		Param_Cell, 		Param_String);
-	Forward_OnTeamEmpty = 	 			CreateGlobalForward("TG_OnTeamEmpty", 					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell,			Param_Cell);
-	Forward_OnGameEnd = 	 			CreateGlobalForward("TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell);
+	Forward_OnGameStartMenu =  			CreateGlobalForward("TG_OnGameStartMenu",				ET_Event, 	Param_String,		Param_Cell,			Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGamePreparePre =  		CreateGlobalForward("TG_OnGamePreparePre",				ET_Event, 	Param_String,		Param_Cell,			Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGamePrepare =  			CreateGlobalForward("TG_OnGamePrepare",					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGameStart = 	 			CreateGlobalForward("TG_OnGameStart", 					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell, 		Param_String, 		Param_Cell);
+	Forward_OnGameStartError = 			CreateGlobalForward("TG_OnGameStartError",				ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell, 		Param_Cell, 		Param_String);
+	Forward_OnTeamEmpty = 	 			CreateGlobalForward("TG_OnTeamEmpty", 					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell,			Param_Cell,			Param_Cell);
+	Forward_OnGameEnd = 	 			CreateGlobalForward("TG_OnGameEnd", 					ET_Ignore, 	Param_String,		Param_Cell,			Param_Cell, 		Param_Array, 		Param_Cell, 		Param_Cell);
 	Forward_OnMenuDisplay =  			CreateGlobalForward("TG_OnMenuDisplay",					ET_Event, 	Param_Cell);
 	Forward_OnMenuDisplayed =  			CreateGlobalForward("TG_OnMenuDisplayed",				ET_Ignore, 	Param_Cell);
-	Forward_OnMenuSelect = 				CreateGlobalForward("TG_OnMenuSelect", 					ET_Event, 	Param_Cell, 		Param_String,		Param_Cell);
-	Forward_OnMenuSelected = 			CreateGlobalForward("TG_OnMenuSelected", 				ET_Ignore, 	Param_Cell, 		Param_String,		Param_Cell);
+	Forward_OnMenuSelect = 				CreateGlobalForward("TG_OnMenuSelect", 					ET_Event, 	Param_Cell, 		Param_String,		Param_Cell,		Param_Cell);
+	Forward_OnMenuSelected = 			CreateGlobalForward("TG_OnMenuSelected", 				ET_Ignore, 	Param_Cell, 		Param_String,		Param_Cell,		Param_Cell);
 	Forward_OnDownloadsStart =			CreateGlobalForward("TG_OnDownloadsStart", 				ET_Ignore);
 	Forward_OnDownloadFile =			CreateGlobalForward("TG_OnDownloadFile", 				ET_Ignore, 	Param_String,		Param_String,		Param_Cell, 		Param_CellByRef);
 	Forward_OnDownloadsEnd =			CreateGlobalForward("TG_OnDownloadsEnd", 				ET_Ignore);
@@ -1069,9 +1086,9 @@ public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 			decl String:sSettings[TG_GAME_SETTINGS_LENGTH];
 			decl String:sGameID[TG_MODULE_ID_LENGTH];
 			new iStarter = GetMenuCell(hMenu, "-CLIENT-");
+			new TG_GameType:iGameType = TG_GameType:GetMenuCell(hMenu, "-GAMETYPE-");
 			new Handle:hDataPack = Handle:GetMenuCell(hMenu, "-DATAPACK-");
 			new bool:bRemoveDrops = bool:GetMenuCell(hMenu, "-REMOVEDROPS-");
-			new bool:bCheckTeams = bool:GetMenuCell(hMenu, "-CHECKTEAMS-");
 			new bool:bEndOnTeamEmpty = bool:GetMenuCell(hMenu, "-ENDONTEAMEMPTY-");
 
 			GetMenuString(hMenu, "-GAMEID-", sGameID, sizeof(sGameID));
@@ -1080,6 +1097,7 @@ public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 			new Action:iResult = Plugin_Continue;
 			Call_StartForward(Forward_OnGameStartMenu);
 			Call_PushString(sGameID);
+			Call_PushCell(iGameType);
 			Call_PushCell(iStarter);
 			Call_PushString(sSettings);
 			Call_PushCell(hDataPack);
@@ -1091,16 +1109,17 @@ public GameStartMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				return;
 			}
 
-			TG_StartGamePreparation(iStarter, sGameID, sSettings, hDataPack, bRemoveDrops, bCheckTeams, bEndOnTeamEmpty);
+			TG_StartGamePreparation(iStarter, sGameID, iGameType, sSettings, hDataPack, bRemoveDrops, bEndOnTeamEmpty);
 		}
 	}
 }
 
-TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettings[TG_GAME_SETTINGS_LENGTH], Handle:hGameCustomDataPack, bool:bRemoveDropppedWeapons, bool:bCheckTeams, bool:bEndOnTeamEmpty)
+TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], TG_GameType:iGameType, String:sSettings[TG_GAME_SETTINGS_LENGTH], Handle:hGameCustomDataPack, bool:bRemoveDropppedWeapons, bool:bEndOnTeamEmpty)
 {
 	new Action:iResult = Plugin_Continue;
 	Call_StartForward(Forward_OnGamePreparePre);
 	Call_PushString(sID);
+	Call_PushCell(iGameType);
 	Call_PushCell(iClient);
 	Call_PushString(sSettings);
 	Call_PushCell(hGameCustomDataPack);
@@ -1129,13 +1148,11 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 		iErrorCode = 1;
 	}
 
-	if (g_GameList[iGameIndex][GameType] != TG_TeamGame || (g_GameList[iGameIndex][GameType] == TG_TeamGame && GetConVarBool(g_hCheckTeams))) {
-		if (bCheckTeams && !IsGameTypeAvailable(g_GameList[iGameIndex][GameType])) {
-			CPrintToChat(iClient, "%t", "StartGame-BadTeamRatio");
-			Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Bad teams ratio\")", 2, iClient, sName, sID);
+	if (!IsGameTypeAvailable(iGameType)) {
+		CPrintToChat(iClient, "%t", "StartGame-BadTeamRatio");
+		Format(sErrorDescription, sizeof(sErrorDescription), "[ERROR - TG_StartGame #%d] \"%L\" tried to start preparation for game (sName: \"%s\") (sID: \"%s\") (sError: \"Bad teams ratio\")", 2, iClient, sName, sID);
 
-			iErrorCode = 2;
-		}
+		iErrorCode = 2;
 	}
 
 	if (!IsPlayerAlive(iClient) && !CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
@@ -1150,6 +1167,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 
 		Call_StartForward(Forward_OnGameStartError);
 		Call_PushString(sID);
+		Call_PushCell(iGameType);
 		Call_PushCell(iClient);
 		Call_PushCell(iErrorCode);
 		Call_PushString(sErrorDescription);
@@ -1169,6 +1187,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 	g_Game[GameDataPack] = hGameCustomDataPack;
 	strcopy(g_Game[GameSettings], TG_GAME_SETTINGS_LENGTH, sSettings);
 	g_Game[GameStarter] = iClient;
+	g_Game[GameType] = iGameType;
 	g_Game[RemoveDrops] = bRemoveDropppedWeapons;
 	g_Game[EndOnTeamEmpty] = bEndOnTeamEmpty;
 	g_Game[HealthBarVisibility] = g_GameList[iGameIndex][HealthBarVisibility];
@@ -1177,8 +1196,6 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, sID);
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, g_GameList[iGameIndex][DefaultName]);
-
-	g_Game[GameType] = g_GameList[iGameIndex][GameType];
 
 	if (g_iRoundLimit > 0)
 		g_iRoundLimit--;
@@ -1238,6 +1255,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 
 	Call_StartForward(Forward_OnGamePrepare);
 	Call_PushString(g_Game[GameID]);
+	Call_PushCell(g_Game[GameType]);
 	Call_PushCell(g_Game[GameStarter]);
 	Call_PushString(g_Game[GameSettings]);
 	Call_PushCell(g_Game[GameDataPack]);
@@ -1252,8 +1270,8 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 
 		TG_LogRoundMessage(   "GamePrepare", "(ID: \"%s\")", g_Game[GameID]);
 		TG_LogRoundMessage(_, "{");
-		TG_LogRoundMessage(_, "\tSettings: \"%s\"", sSettings);
-		TG_LogRoundMessage(_, "\tActivator: \"%L\"", iClient);
+		TG_LogRoundMessage(_, "\tSettings: \"%s\"", g_Game[GameSettings]);
+		TG_LogRoundMessage(_, "\tActivator: \"%L\"", g_Game[GameStarter]);
 		TG_LogRoundMessage(_, "");
 		TG_LogRoundMessage(_, "\tRedTeam (%d): \"%s\"", iCount1, sTeam1);
 		TG_LogRoundMessage(_, "\tBlueTeam (%d): \"%s\"", iCount2, sTeam2);
@@ -1263,12 +1281,8 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], String:sSettin
 	if (IsSoundPrecached(g_sGamePrepare[5]))
 		EmitSoundToAllAny(g_sGamePrepare[5]);
 
-	new Handle:hDataPack = CreateDataPack();
-	WritePackString(hDataPack, sSettings);
-	WritePackCell(hDataPack, iClient);
-
 	g_iTimer_CountDownGamePrepare_counter = 4;
-	g_hTimer_CountDownGamePrepare = CreateTimer(1.0, Timer_CountDownGamePrepare, hDataPack, TIMER_REPEAT);
+	g_hTimer_CountDownGamePrepare = CreateTimer(1.0, Timer_CountDownGamePrepare, _, TIMER_REPEAT);
 
 	return 0;
 }
@@ -1285,7 +1299,7 @@ public Action:Hook_WeaponDrop(iClient, weapon)
 	return Plugin_Continue;
 }
 
-public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
+public Action:Timer_CountDownGamePrepare(Handle:hTimer)
 {
 	if (g_iTimer_CountDownGamePrepare_counter > 0) {
 		if (IsSoundPrecached(g_sGamePrepare[g_iTimer_CountDownGamePrepare_counter]))
@@ -1314,13 +1328,6 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 				SetEntityMoveType(i, MoveType:MOVETYPE_ISOMETRIC);
 		}
 
-		decl String:sSettings[TG_GAME_SETTINGS_LENGTH];
-		new iActivator = -1;
-		ResetPack(hDataPack);
-		ReadPackString(hDataPack, sSettings, sizeof(sSettings));
-		iActivator = ReadPackCell(hDataPack);
-		CloseHandle(hDataPack);
-
 		for (new iUser = 1; iUser <= MaxClients; iUser++) {
 			if (!IsClientInGame(iUser)) {
 				continue;
@@ -1330,10 +1337,10 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 			Call_AskModuleName(g_Game[GameID], TG_Game, iUser, sGameName, sizeof(sGameName));
 
 			for (new i = 0; i <= _:GetConVarBool(g_hImportantMsg); i++) {
-				if (sSettings[0] == '\0') {
+				if (g_Game[GameSettings][0] == '\0') {
 					CPrintToChat(iUser, "%T", "GameStart", iUser, sGameName);
 				} else {
-					CPrintToChat(iUser, "%T", "GameStart-Settings", iUser, sGameName, sSettings);
+					CPrintToChat(iUser, "%T", "GameStart-Settings", iUser, sGameName, g_Game[GameSettings]);
 				}
 			}
 		}
@@ -1343,8 +1350,9 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer, Handle:hDataPack)
 
 		Call_StartForward(Forward_OnGameStart);
 		Call_PushString(g_Game[GameID]);
-		Call_PushCell(iActivator);
-		Call_PushString(sSettings);
+		Call_PushCell(g_Game[GameType]);
+		Call_PushCell(g_Game[GameStarter]);
+		Call_PushString(g_Game[GameSettings]);
 		Call_PushCell(g_Game[GameDataPack]);
 		Call_Finish();
 
@@ -1389,30 +1397,33 @@ bool:Call_OnDownloadFile(String:sFile[], String:sPrefix[], Handle:hArgs, bool:bK
 	return m_bKnown;
 }
 
-Call_OnMenuSelected(TG_ModuleType:iType, const String:sID[], iClient)
+Call_OnMenuSelected(TG_ModuleType:iType, const String:sID[], TG_GameType:iGameType, iClient)
 {
 	Call_StartForward(Forward_OnMenuSelected);
 	Call_PushCell(iType);
 	Call_PushString(sID);
+	Call_PushCell(iGameType);
 	Call_PushCell(iClient);
 	Call_Finish();
 }
 
-Action:Call_OnMenuSelect(TG_ModuleType:iType, const String:sID[], iClient)
+Action:Call_OnMenuSelect(TG_ModuleType:iType, const String:sID[], TG_GameType:iGameType, iClient)
 {
 	new Action:iResult = Plugin_Continue;
 	Call_StartForward(Forward_OnMenuSelect);
 	Call_PushCell(iType);
 	Call_PushString(sID);
+	Call_PushCell(iGameType);
 	Call_PushCell(iClient);
 	Call_Finish(iResult);
 	return iResult;
 }
 
-Call_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+Call_OnPlayerLeaveGame(const String:sID[], TG_GameType:iGameType, iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
 	Call_StartForward(Forward_OnPlayerLeaveGame);
 	Call_PushString(sID);
+	Call_PushCell(iGameType);
 	Call_PushCell(iClient);
 	Call_PushCell(iTeam);
 	Call_PushCell(iTrigger);
@@ -1423,10 +1434,11 @@ Call_OnPlayerLeaveGame(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrig
 	}
 }
 
-Call_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+Call_OnTeamEmpty(const String:sID[], TG_GameType:iGameType, iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
 	Call_StartForward(Forward_OnTeamEmpty);
 	Call_PushString(sID);
+	Call_PushCell(iGameType);
 	Call_PushCell(iClient);
 	Call_PushCell(iTeam);
 	Call_PushCell(iTrigger);

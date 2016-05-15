@@ -39,7 +39,7 @@ public Action:TG_OnMenuDisplay(client)
 	return Plugin_Continue;
 }
 
-public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSettings[], Handle:dataPack)
+public Action:TG_OnGameStartMenu(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!CheckWardenAccess(client, g_hGames)) {
 		PrintClientAccessDenied(client)
@@ -49,7 +49,7 @@ public Action:TG_OnGameStartMenu(const String:id[], client, const String:gameSet
 	return Plugin_Continue;
 }
 
-public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], client)
+public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
 	if ((type == TG_Game || StrContains(id, "Core_GamesMenu", false) == 0) && !CheckWardenAccess(client, g_hGames)) {
 		PrintClientAccessDenied(client)

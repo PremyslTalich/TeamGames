@@ -79,7 +79,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.14.0.1"
+#define _PLUGIN_VERSION "0.15.0.12"
 
 public Plugin:myinfo =
 {
@@ -282,7 +282,7 @@ public OnClientDisconnect(iClient)
 	if (g_Game[GameProgress] != TG_NoGame && TG_IsPlayerRedOrBlue(iClient)) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_OnPlayerLeaveGame(g_Game[GameID], iClient, g_PlayerData[iClient][Team], TG_Disconnect);
+		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iClient, g_PlayerData[iClient][Team], TG_Disconnect);
 	}
 
 	if (TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]) && GetCountPlayersInTeam(g_PlayerData[iClient][Team]) == 0) {
@@ -292,7 +292,7 @@ public OnClientDisconnect(iClient)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_OnTeamEmpty(g_Game[GameID], iClient, g_PlayerData[iClient][Team], TG_Death);
+		Call_OnTeamEmpty(g_Game[GameID], g_Game[GameType], iClient, g_PlayerData[iClient][Team], TG_Death);
 	}
 
 	ClearPlayerData(iClient);
@@ -545,13 +545,14 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	Call_PushString(sWeapon);
 	Call_PushCell(g_Game[GameProgress]);
 	Call_PushString(g_Game[GameID]);
+	Call_PushCell(g_Game[GameType]);
 	Call_Finish();
 
 	decl String:sVictimName[64];
 	GetClientName(iVictim, sVictimName, sizeof(sVictimName));
 
 	if (g_Game[GameProgress] != TG_NoGame) {
-		Call_OnPlayerLeaveGame(g_Game[GameID], iVictim, g_PlayerData[iVictim][Team], TG_Death);
+		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 
 		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam2(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	} else {
@@ -571,7 +572,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Death\")", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_OnTeamEmpty(g_Game[GameID], iVictim, g_PlayerData[iVictim][Team], TG_Death);
+		Call_OnTeamEmpty(g_Game[GameID], g_Game[GameType], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 	}
 
 	g_PlayerData[iVictim][MenuLock] = true;

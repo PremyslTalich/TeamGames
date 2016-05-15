@@ -8,14 +8,13 @@
 #define GAME_ID				"HotPotato"
 #define DOWNLOAD_POTATO		"HotPotato"
 #define DOWNLOAD_BEAM		"HotPotato-beam"
-#define DOWNLOAD_HEALTHBAR	"HotPotato-healthbar"
 
 public Plugin:myinfo =
 {
 	name = "[TG] HotPotato",
 	author = "Raska",
 	description = "",
-	version = "0.5",
+	version = "0.6",
 	url = ""
 }
 
@@ -29,20 +28,20 @@ enum HealhBar
 	Float:Scale
 };
 
-new bool:g_bToLastMan;
-new g_iVictim, Handle:g_hVictimSpeed, Handle:g_hHeathCheck;
-new Handle:g_hDamage, Handle:g_hDamageTimer, Handle:g_hDamageInterval;
-new g_iPotato, String:g_sPotatoModel[PLATFORM_MAX_PATH];
-new g_iBeam, String:g_sBeamModel[PLATFORM_MAX_PATH], Float:g_fBeamWidth, g_iBeamColor[4];
+new bool:g_toLastMan;
+new g_victim, Handle:g_victimSpeed, Handle:g_heathCheck;
+new Handle:g_hDamage, Handle:g_damageTimer, Handle:g_damageInterval;
+new g_potato, String:g_potatoModel[PLATFORM_MAX_PATH];
+new g_beam, String:g_beamModel[PLATFORM_MAX_PATH], Float:g_beamWidth, g_beamColor[4];
 
 public OnPluginStart()
 {
 	LoadTranslations("TG.HotPotato.phrases");
 
-	g_hHeathCheck = 	CreateConVar("tgm_hotpotato_healthcheck", 	 "2", 	"0 = Nothing\n1 = Color players in shades of red according to their health level.\n2 = Show healthbar above players.");
+	g_heathCheck = 	    CreateConVar("tgm_hotpotato_healthcheck", 	 "2", 	"0 = Nothing\n1 = Color players in shades of red according to their health level.\n2 = Show healthbar above players.");
 	g_hDamage = 		CreateConVar("tgm_hotpotato_damage", 		 "2", 	"Amount of damage to deal to victim");
-	g_hDamageInterval = CreateConVar("tgm_hotpotato_damageinterval", "0.2", "Interval between dealing damage to victim", _, true, 0.1, true, 10.0);
-	g_hVictimSpeed = 	CreateConVar("tgm_hotpotato_victimspeed", 	 "1.1", "Set speed of victim (in percent)");
+	g_damageInterval =  CreateConVar("tgm_hotpotato_damageinterval", "0.2", "Interval between dealing damage to victim", _, true, 0.1, true, 10.0);
+	g_victimSpeed = 	CreateConVar("tgm_hotpotato_victimspeed", 	 "1.1", "Set speed of victim (in percent)");
 
 	HookEvent("bomb_pickup",  Event_BombPickUp, EventHookMode_Post);
 
@@ -51,9 +50,9 @@ public OnPluginStart()
 	AutoExecConfig(_, _, "sourcemod/teamgames");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames"))
+	if (StrEqual(name, "TeamGames"))
 		TG_RegGame(GAME_ID, TG_RedOnly);
 }
 
@@ -62,81 +61,84 @@ public OnPluginEnd()
 	TG_RemoveGame(GAME_ID);
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type == TG_Game && StrEqual(id, GAME_ID))
-		Format(name, maxSize, "%T", "GameName", client);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bool:bKnown)
+public TG_OnDownloadFile(String:file[], String:prefixName[], Handle:args, &bool:known)
 {
-	if (StrEqual(sPrefixName, DOWNLOAD_POTATO, false)) {
-		PrecacheModel(sFile);
-		strcopy(g_sPotatoModel, sizeof(g_sPotatoModel), sFile);
+	if (StrEqual(prefixName, DOWNLOAD_POTATO, false)) {
+		PrecacheModel(file);
+		strcopy(g_potatoModel, sizeof(g_potatoModel), file);
 
-		bKnown = true;
-	} else if (StrEqual(sPrefixName, DOWNLOAD_BEAM, false)) {
-		PrecacheModel(sFile);
-		strcopy(g_sBeamModel, sizeof(g_sBeamModel), sFile);
+		known = true;
+	} else if (StrEqual(prefixName, DOWNLOAD_BEAM, false)) {
+		PrecacheModel(file);
+		strcopy(g_beamModel, sizeof(g_beamModel), file);
 
-		g_fBeamWidth = DTC_GetArgFloat(hArgs, 1, 1.0);
-		g_iBeamColor[0] = DTC_GetArgNum(hArgs, 2, 255);
-		g_iBeamColor[1] = DTC_GetArgNum(hArgs, 3, 255);
-		g_iBeamColor[2] = DTC_GetArgNum(hArgs, 4, 255);
-		g_iBeamColor[3] = DTC_GetArgNum(hArgs, 5, 255);
+		g_beamWidth = DTC_GetArgFloat(args, 1, 1.0);
+		g_beamColor[0] = DTC_GetArgNum(args, 2, 255);
+		g_beamColor[1] = DTC_GetArgNum(args, 3, 255);
+		g_beamColor[2] = DTC_GetArgNum(args, 4, 255);
+		g_beamColor[3] = DTC_GetArgNum(args, 5, 255);
 
-		bKnown = true;
+		known = true;
 	}
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if (StrEqual(id, GAME_ID) && type == TG_Game)
-		ModuleSetTypeGameMenu(iClient);
+	if (type != TG_Game || !StrEqual(id, GAME_ID))
+		return;
+
+	ModuleSetTypeGameMenu(client, gameType);
 }
 
-public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID, true))
 		return;
 
-	ResetPack(DataPack);
-	new iUser = ReadPackCell(DataPack);
+	ResetPack(dataPack);
+	new user = ReadPackCell(dataPack);
 
-	if (Client_IsIngame(iUser)) {
-		for (new i = 1; i <= MaxClients; i++)
-		{
+	if (Client_IsIngame(user)) {
+		for (new i = 1; i <= MaxClients; i++) {
 			if (!TG_IsPlayerRedOrBlue(i) || !Client_IsIngame(i))
 				continue;
 
 			SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
 
-			if (GetConVarInt(g_hHeathCheck) == 2) {
+			if (GetConVarInt(g_heathCheck) == 2) {
 				TG_AttachPlayerHealthBar(i);
 			}
 		}
-		MakeClientVictim(iUser, true);
+		MakeClientVictim(user, true);
 	} else {
 		TG_StopGame(TG_NoneTeam);
 	}
 }
 
-public TG_OnGameStart(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID, true))
 		return;
 
-	if (!Client_IsIngame(g_iVictim))
+	if (!Client_IsIngame(g_victim))
 		TG_StopGame(TG_NoneTeam);
 
-	g_hDamageTimer = CreateTimer(GetConVarFloat(g_hDamageInterval), Timer_SlapClient, _, TIMER_REPEAT);
+	g_damageTimer = CreateTimer(GetConVarFloat(g_damageInterval), Timer_SlapClient, _, TIMER_REPEAT);
 
 	return;
 }
 
-public Action:Hook_WeaponDrop(iClient, iWeapon)
+public Action:Hook_WeaponDrop(client, weapon)
 {
-	if (TG_IsCurrentGameID(GAME_ID) && iClient == g_iVictim && iWeapon == g_iPotato) {
+	if (TG_IsCurrentGameID(GAME_ID) && client == g_victim && weapon == g_potato) {
 		if (TG_GetGameStatus() == TG_InPreparation) {
 			return Plugin_Handled;
 		} else {
@@ -149,46 +151,45 @@ public Action:Hook_WeaponDrop(iClient, iWeapon)
 
 public Frame_DropedPotato(any:data)
 {
-	if (IsValidEntity(g_iPotato)) {
+	if (IsValidEntity(g_potato)) {
 
 		if (ExistBeam()) {
-			DispatchKeyValue(g_iPotato, "targetname", "TG_HotPotato-Bomb");
-			ActivateEntity(g_iBeam);
-			AcceptEntityInput(g_iBeam, "TurnOn");
+			DispatchKeyValue(g_potato, "targetname", "TG_HotPotato-Bomb");
+			ActivateEntity(g_beam);
+			AcceptEntityInput(g_beam, "TurnOn");
 		}
 	}
 }
 
-public Action:Timer_SlapClient(Handle:hTimer)
+public Action:Timer_SlapClient(Handle:timer)
 {
-	if (!Client_IsIngame(g_iVictim))
+	if (!Client_IsIngame(g_victim))
 		return Plugin_Continue;
 
-	new iClient = g_iVictim;
+	new client = g_victim;
 
-	if (g_hDamageTimer == INVALID_HANDLE)
+	if (g_damageTimer == INVALID_HANDLE)
 		return Plugin_Stop;
 
-	new iOldHealth = GetClientHealth(iClient);
-	new iNewHealth = iOldHealth - GetConVarInt(g_hDamage);
+	new newHealth = GetClientHealth(client) - GetConVarInt(g_hDamage);
 
-	if (iNewHealth <= 0) {
-		Client_RemoveAllWeapons(iClient);
-		ForcePlayerSuicide(iClient);
+	if (newHealth <= 0) {
+		Client_RemoveAllWeapons(client);
+		ForcePlayerSuicide(client);
 	} else {
-		SetEntityHealth(iClient, iNewHealth);
+		SetEntityHealth(client, newHealth);
 
-		if (GetConVarInt(g_hHeathCheck) == 1) {
-			if (iNewHealth > 90) {
-				SetEntityRenderColor(iClient, 255, 255, 255, 255);
-			} else if (iNewHealth > 10) {
-				new iColor = RoundToNearest((iNewHealth - 10) * 3.1875);
-				SetEntityRenderColor(iClient, 255, iColor, iColor, 255);
+		if (GetConVarInt(g_heathCheck) == 1) {
+			if (newHealth > 90) {
+				SetEntityRenderColor(client, 255, 255, 255, 255);
+			} else if (newHealth > 10) {
+				new iColor = RoundToNearest((newHealth - 10) * 3.1875);
+				SetEntityRenderColor(client, 255, iColor, iColor, 255);
 			} else {
-				SetEntityRenderColor(iClient, 255, 0, 0, 255);
+				SetEntityRenderColor(client, 255, 0, 0, 255);
 			}
-		} else if (GetConVarInt(g_hHeathCheck) == 2) {
-			TG_UpdatePlayerHealthBar(iClient);
+		} else if (GetConVarInt(g_heathCheck) == 2) {
+			TG_UpdatePlayerHealthBar(client);
 		}
 	}
 
@@ -197,52 +198,52 @@ public Action:Timer_SlapClient(Handle:hTimer)
 
 public Action:Event_BombPickUp(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 
-	if (TG_IsCurrentGameID(GAME_ID) && TG_GetPlayerTeam(iClient) == TG_RedTeam) {
-		if (iClient == g_iVictim) {
+	if (TG_IsCurrentGameID(GAME_ID) && TG_GetPlayerTeam(client) == TG_RedTeam) {
+		if (client == g_victim) {
 			if (ExistBeam())
-				AcceptEntityInput(g_iBeam, "TurnOff");
+				AcceptEntityInput(g_beam, "TurnOff");
 		} else {
-			MakeClientVictim(iClient, false);
-			SetEntPropEnt(iClient, Prop_Data, "m_hActiveWeapon", g_iPotato);
+			MakeClientVictim(client, false);
+			SetEntPropEnt(client, Prop_Data, "m_hActiveWeapon", g_potato);
 		}
 	}
 
 	return Plugin_Continue;
 }
 
-public Action:TG_OnLaserFenceCross(iClient, Float:FreezeTime)
+public Action:TG_OnLaserFenceCross(client, Float:FreezeTime)
 {
-	if (g_iVictim == iClient)
+	if (g_victim == client)
 		return Plugin_Handled;
 
 	return Plugin_Continue;
 }
 
-public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+public TG_OnPlayerLeaveGame(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger)
 {
 	if (!StrEqual(id, GAME_ID, true))
 		return;
 
-	if (Client_IsIngame(iClient)) {
-		SetEntPropFloat(iClient, Prop_Data, "m_flLaggedMovementValue", 1.0);
-		SetEntityRenderColor(iClient, 255, 255, 255, 255);
+	if (Client_IsIngame(client)) {
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
+		SetEntityRenderColor(client, 255, 255, 255, 255);
 	}
 
-	SDKUnhook(iClient, SDKHook_WeaponDrop, 		 Hook_WeaponDrop);
+	SDKUnhook(client, SDKHook_WeaponDrop, Hook_WeaponDrop);
 
-	if (iClient != g_iVictim)
+	if (client != g_victim)
 		return;
 
-	if (IsValidEntity(g_iPotato)) {
-		RemoveEdict(g_iPotato);
-		g_iPotato = -1;
+	if (IsValidEntity(g_potato)) {
+		RemoveEdict(g_potato);
+		g_potato = -1;
 	}
 
 	RemoveClientVictim();
 
-	if (g_bToLastMan && TG_GetTeamCount(TG_RedTeam) > 1) {
+	if (g_toLastMan && TG_GetTeamCount(TG_RedTeam) > 1) {
 		new user = TG_GetRandomClient(TG_RedTeam);
 
 		if (Client_IsIngame(user)) {
@@ -251,20 +252,20 @@ public TG_OnPlayerLeaveGame(const String:id[], iClient, TG_Team:iTeam, TG_Player
 			TG_StopGame(TG_NoneTeam);
 		}
 	} else {
-		g_hDamageTimer = INVALID_HANDLE;
+		g_damageTimer = INVALID_HANDLE;
 
-		new Handle:hWinners = CreateArray();
+		new Handle:winners = CreateArray();
 		for (new i = 1; i <= MaxClients; i++) {
 			if (TG_GetPlayerTeam(i) == TG_RedTeam) {
-				PushArrayCell(hWinners, i);
+				PushArrayCell(winners, i);
 			}
 		}
 
-		TG_StopGame(TG_RedTeam, hWinners);
+		TG_StopGame(TG_RedTeam, winners);
 	}
 }
 
-public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
 	if (!StrEqual(id, GAME_ID, true))
 		return;
@@ -274,151 +275,154 @@ public TG_OnGameEnd(const String:id[], TG_Team:iTeam, winners[], winnersCount)
 	return;
 }
 
-ModuleSetTypeGameMenu(iClient)
+ModuleSetTypeGameMenu(client, TG_GameType:gameType)
 {
 	new Handle:menu = CreateMenu(ModuleSetTypeGameMenu_Handler);
 
-	SetMenuTitle(menu, "%T - %T", "GameName", iClient, "Menu-Title", iClient);
-	AddMenuItemFormat(menu, "Menu-OneDeath", _, "%T", "Menu-OneDeath", iClient);
-	AddMenuItemFormat(menu, "Menu-LastManStanding", _, "%T", "Menu-LastManStanding", iClient);
+	SetMenuTitle(menu, "%T - %T", "GameName", client, "Menu-Title", client);
+	AddMenuItemFormat(menu, "Menu-OneDeath", _, "%T", "Menu-OneDeath", client);
+	AddMenuItemFormat(menu, "Menu-LastManStanding", _, "%T", "Menu-LastManStanding", client);
+
+	PushMenuCell(menu, "__GAME_TYPE__", _:gameType);
+
 	SetMenuExitBackButton(menu, true);
-	DisplayMenu(menu, iClient, 30);
+	DisplayMenu(menu, client, 30);
 }
 
-public ModuleSetTypeGameMenu_Handler(Handle:menu, MenuAction:iAction, iClient, iKey)
+public ModuleSetTypeGameMenu_Handler(Handle:menu, MenuAction:action, client, key)
 {
-	if (iAction == MenuAction_Select) {
-		decl String:info[TG_MODULE_ID_LENGTH], String:GameSettings[TG_GAME_SETTINGS_LENGTH];
+	if (action == MenuAction_Select) {
+		new String:info[TG_MODULE_ID_LENGTH];
+		GetMenuItem(menu, key, info, sizeof(info));
 
-		GetMenuItem(menu, iKey, info, sizeof(info));
-		Format(GameSettings, sizeof(GameSettings), "%t", info);
+		new TG_GameType:gameType = TG_GameType:GetMenuCell(menu, "__GAME_TYPE__");
 
 		if (StrEqual(info, "Menu-OneDeath")) {
-			g_bToLastMan = false;
+			g_toLastMan = false;
 		} else {
-			g_bToLastMan = true;
+			g_toLastMan = true;
 		}
 
-		TG_ShowPlayerSelectMenu(iClient, SelectPlayerHandeler, true, false, true, "%T", "Menu-ChooseFirstPotato", iClient);
+		TG_ShowPlayerSelectMenu(client, SelectPlayerHandeler, true, false, true, gameType, "%T", "Menu-ChooseFirstPotato", client);
 	}
 }
 
-public SelectPlayerHandeler(activator, iClient, bool:IsRandom)
+public SelectPlayerHandeler(activator, client, bool:IsRandom, any:data)
 {
-	if (Client_IsIngame(iClient)) {
-		new String:sSettings[48];
-		new Handle:hDataPack = CreateDataPack();
+	if (Client_IsIngame(client)) {
+		new String:settings[48];
+		new Handle:dataPack = CreateDataPack();
 
-		Format(sSettings, sizeof(sSettings), "%t", (g_bToLastMan) ? "Menu-LastManStanding" : "Menu-OneDeath");
-		WritePackCell(hDataPack, iClient);
+		Format(settings, sizeof(settings), "%t", (g_toLastMan) ? "Menu-LastManStanding" : "Menu-OneDeath");
+		WritePackCell(dataPack, client);
 
-		TG_StartGame(activator, GAME_ID, sSettings, hDataPack, _, _, false);
+		TG_StartGame(activator, GAME_ID, TG_GameType:data, settings, dataPack);
 	}
 }
 
-MakeClientVictim(iClient, bool:bGiveBomb)
+MakeClientVictim(client, bool:giveBomb)
 {
-	if (g_iVictim == iClient)
+	if (g_victim == client)
 		return;
 
 	RemoveClientVictim();
 
-	g_iVictim = iClient;
-	SetEntPropFloat(g_iVictim, Prop_Data, "m_flLaggedMovementValue", GetConVarFloat(g_hVictimSpeed));
+	g_victim = client;
+	SetEntPropFloat(g_victim, Prop_Data, "m_flLaggedMovementValue", GetConVarFloat(g_victimSpeed));
 
-	if (bGiveBomb) {
-		if (Client_IsIngame(g_iVictim)) {
-			Client_RemoveAllWeapons(g_iVictim);
+	if (giveBomb) {
+		if (Client_IsIngame(g_victim)) {
+			Client_RemoveAllWeapons(g_victim);
 		}
 
-		g_iPotato = CreateEntityByName("weapon_c4");
-		DispatchKeyValue(g_iPotato, "targetname", "TG_HotPotato-Bomb");
-		DispatchSpawn(g_iPotato);
+		g_potato = CreateEntityByName("weapon_c4");
+		DispatchKeyValue(g_potato, "targetname", "TG_HotPotato-Bomb");
+		DispatchSpawn(g_potato);
 		CreateTimer(0.1, Timer_Bomb);
 
-		if (IsModelPrecached(g_sPotatoModel))
-			SDKHook(g_iPotato, SDKHook_Think, Hook_BombThink);
+		if (IsModelPrecached(g_potatoModel))
+			SDKHook(g_potato, SDKHook_Think, Hook_BombThink);
 	}
 
 	CreateBeam();
 
-	TG_LogGameMessage(GAME_ID, _, "Player %N has the hot potato.", iClient);
+	TG_LogGameMessage(GAME_ID, _, "Player %N has the hot potato.", client);
 }
 
 
-public Action:Timer_Bomb(Handle:hTimer)
+public Action:Timer_Bomb(Handle:timer)
 {
-	SetEntPropEnt(g_iPotato, Prop_Data, "m_hOwner", g_iVictim);
-	EquipPlayerWeapon(g_iVictim, g_iPotato);
+	SetEntPropEnt(g_potato, Prop_Data, "m_hOwner", g_victim);
+	EquipPlayerWeapon(g_victim, g_potato);
 }
 
 CreateBeam()
 {
-	if (IsModelPrecached(g_sBeamModel)) {
-		if (IsValidEntity(g_iBeam) && g_iBeam != 0) {
-			RemoveEdict(g_iBeam);
+	if (IsModelPrecached(g_beamModel)) {
+		if (IsValidEntity(g_beam) && g_beam != 0) {
+			RemoveEdict(g_beam);
 		}
 
-		g_iBeam = CreateEntityByName("env_beam");
+		g_beam = CreateEntityByName("env_beam");
 
-		if (IsValidEntity(g_iBeam)) {
-			DispatchKeyValue(g_iBeam, "targetname", "TG_HotPotato-Beam");
+		if (IsValidEntity(g_beam)) {
+			DispatchKeyValue(g_beam, "targetname", "TG_HotPotato-Beam");
 
-			DispatchKeyValue(g_iBeam, "texture", g_sBeamModel);
-			DispatchKeyValueFormat(g_iBeam, "BoltWidth", "%f", g_fBeamWidth);
-			DispatchKeyValue(g_iBeam, "life", "0");
-			DispatchKeyValueFormat(g_iBeam, "rendercolor", "%d %d %d", g_iBeamColor[0], g_iBeamColor[1], g_iBeamColor[2]);
-			DispatchKeyValueFormat(g_iBeam, "renderamt", "%d", g_iBeamColor[3]);
-			DispatchKeyValue(g_iBeam, "TextureScroll", "0");
-			DispatchKeyValue(g_iBeam, "LightningStart", "TG_HotPotato-Beam");
-			DispatchKeyValue(g_iBeam, "LightningEnd", "TG_HotPotato-Bomb");
+			DispatchKeyValue(g_beam, "texture", g_beamModel);
+			DispatchKeyValueFormat(g_beam, "BoltWidth", "%f", g_beamWidth);
+			DispatchKeyValue(g_beam, "life", "0");
+			DispatchKeyValueFormat(g_beam, "rendercolor", "%d %d %d", g_beamColor[0], g_beamColor[1], g_beamColor[2]);
+			DispatchKeyValueFormat(g_beam, "renderamt", "%d", g_beamColor[3]);
+			DispatchKeyValue(g_beam, "TextureScroll", "0");
+			DispatchKeyValue(g_beam, "LightningStart", "TG_HotPotato-Beam");
+			DispatchKeyValue(g_beam, "LightningEnd", "TG_HotPotato-Bomb");
 
-			DispatchSpawn(g_iBeam);
-			ActivateEntity(g_iBeam);
-			AcceptEntityInput(g_iBeam, "TurnOff");
+			DispatchSpawn(g_beam);
+			ActivateEntity(g_beam);
+			AcceptEntityInput(g_beam, "TurnOff");
 
-			new Float:fVictimPos[3];
-			GetClientAbsOrigin(g_iVictim, fVictimPos);
-			fVictimPos[2] += 48.0;
+			new Float:victimPos[3];
+			GetClientAbsOrigin(g_victim, victimPos);
+			victimPos[2] += 48.0;
 
-			TeleportEntity(g_iBeam, fVictimPos, NULL_VECTOR, NULL_VECTOR);
+			TeleportEntity(g_beam, victimPos, NULL_VECTOR, NULL_VECTOR);
 
 			SetVariantString("!activator");
-			AcceptEntityInput(g_iBeam, "SetParent", g_iVictim);
+			AcceptEntityInput(g_beam, "SetParent", g_victim);
 		}
 	}
 }
 
 bool:ExistBeam()
 {
-	return (IsModelPrecached(g_sBeamModel) && IsValidEntity(g_iBeam) && g_iBeam != 0);
+	return (IsModelPrecached(g_beamModel) && IsValidEntity(g_beam) && g_beam != 0);
 }
 
 public Hook_BombThink(iEntity)
 {
-	SetEntityModel(g_iPotato, g_sPotatoModel);
+	SetEntityModel(g_potato, g_potatoModel);
 }
 
 RemoveClientVictim()
 {
-	if (Client_IsIngame(g_iVictim))
-		SetEntPropFloat(g_iVictim, Prop_Data, "m_flLaggedMovementValue", 1.0);
+	if (Client_IsIngame(g_victim))
+		SetEntPropFloat(g_victim, Prop_Data, "m_flLaggedMovementValue", 1.0);
 
-	g_iVictim = 0;
+	g_victim = 0;
 }
 
 ResetGame()
 {
-	if (IsValidEntity(g_iPotato))
-		RemoveEdict(g_iPotato);
+	if (IsValidEntity(g_potato))
+		RemoveEdict(g_potato);
 
 	if (ExistBeam()) {
-		RemoveEdict(g_iBeam);
-		g_iBeam = 0;
+		RemoveEdict(g_beam);
+		g_beam = 0;
 	}
 
-	g_iPotato = -1;
-	g_iVictim = -1;
-	g_bToLastMan = false;
-	g_hDamageTimer = INVALID_HANDLE;
+	g_potato = -1;
+	g_victim = -1;
+	g_toLastMan = false;
+	g_damageTimer = INVALID_HANDLE;
 }

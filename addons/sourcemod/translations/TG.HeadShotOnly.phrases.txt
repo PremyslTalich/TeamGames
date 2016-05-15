@@ -1,15 +1,11 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"en"		"HeadShot only battle"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"en"		"HeadShot only battle"
 	}
 	"ChooseWeapon"
 	{
-		"en"		"choose weapon"
+		"en"		"Choose weapon"
 	}
 }

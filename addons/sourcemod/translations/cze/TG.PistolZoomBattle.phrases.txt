@@ -1,10 +1,6 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"cze"		"Pistol zoom battle"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"cze"		"Pistol zoom battle"
 	}

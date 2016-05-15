@@ -5,32 +5,31 @@
 #include <emitsoundany>
 #include <colorvariables>
 
-#define GAME_ID_TEAMGAME 	"ChickenHunt-TeamGame"
-#define GAME_ID_REDONLY 	"ChickenHunt-RedOnly"
-#define WAVE_COUNT 			5
+#define GAME_ID 	"ChickenHunt"
+#define WAVE_COUNT 	5
 
 public Plugin:myinfo =
 {
 	name = "[TG] ChickenHunt",
 	author = "Raska",
 	description = "",
-	version = "0.2",
+	version = "0.3",
 	url = ""
 }
 
-new g_iTeamScore[3];
-new g_iPlayerScore[MAXPLAYERS + 1];
-new g_iWaveCount;
-new bool:g_bTeamGame;
-new Handle:g_hChickens;
-new Handle:g_hCollisionTimer;
-new Handle:g_hPrintScoreTimer;
-new String:g_sChickenSpawnSound[PLATFORM_MAX_PATH];
+new g_teamScore[3];
+new g_playerScore[MAXPLAYERS + 1];
+new g_waveCount;
+new TG_GameType:g_gametype;
+new Handle:g_chickens;
+new Handle:g_collisionTimer;
+new Handle:g_printScoreTimer;
+new String:g_chickenSpawnSound[PLATFORM_MAX_PATH];
 
-public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMax)
+public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	if (GetEngineVersion() != Engine_CSGO) {
-		Format(sError, iErrMax, "Not supported engine version detected! This tg game is only for CS:GO.");
+		Format(error, err_max, "Not supported engine version detected! This tg game is only for CS:GO.");
 		return APLRes_Failure;
 	}
 	return APLRes_Success;
@@ -42,97 +41,83 @@ public OnPluginStart()
 	CLoadPluginConfig("TeamGames");
 }
 
-public OnLibraryAdded(const String:sName[])
+public OnLibraryAdded(const String:name[])
 {
-	if (StrEqual(sName, "TeamGames")) {
-		TG_RegGame(GAME_ID_TEAMGAME, TG_TeamGame);
-		TG_RegGame(GAME_ID_REDONLY, TG_RedOnly);
+	if (StrEqual(name, "TeamGames")) {
+		TG_RegGame(GAME_ID, TG_TeamGame | TG_RedOnly);
 	}
 }
 
 public OnPluginEnd()
 {
-	TG_RemoveGame(GAME_ID_TEAMGAME);
-	TG_RemoveGame(GAME_ID_REDONLY);
+	TG_RemoveGame(GAME_ID);
 }
 
-public TG_OnDownloadFile(String:sFile[], String:sPrefixName[], Handle:hArgs, &bool:known)
+public TG_OnDownloadFile(String:file[], String:prefixName[], Handle:args, &bool:known)
 {
-	if (StrEqual(sPrefixName, "ChickenHunt-SpawnSound")) {
-		ReplaceStringEx(sFile, PLATFORM_MAX_PATH, "sound/", "");
-		PrecacheSoundAny(sFile, true);
-		strcopy(g_sChickenSpawnSound, sizeof(g_sChickenSpawnSound), sFile);
+	if (StrEqual(prefixName, "ChickenHunt-SpawnSound")) {
+		ReplaceStringEx(file, PLATFORM_MAX_PATH, "sound/", "");
+		PrecacheSoundAny(file, true);
+		strcopy(g_chickenSpawnSound, sizeof(g_chickenSpawnSound), file);
 		known = true;
 	}
 }
 
-public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], maxSize, &TG_MenuItemStatus:status)
+public TG_AskModuleName(TG_ModuleType:type, const String:id[], client, String:name[], nameSize, &TG_MenuItemStatus:status)
 {
-	if (type != TG_Game) {
+	if (type != TG_Game || !StrEqual(id, GAME_ID)) {
 		return;
 	}
 
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		Format(name, maxSize, "%T", "GameName-TeamGame", client);
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		Format(name, maxSize, "%T", "GameName-RedOnly", client);
-	}
+	Format(name, nameSize, "%T", "GameName", client);
 }
 
-public TG_OnMenuSelected(TG_ModuleType:type, const String:sID[], iClient)
+public TG_OnMenuSelected(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
-	if (type != TG_Game) {
+	if (type != TG_Game || !StrEqual(id, GAME_ID)) {
 		return;
 	}
 
-	if (StrEqual(sID, GAME_ID_TEAMGAME)) {
-		TG_StartGame(iClient, GAME_ID_TEAMGAME, _, _, _, _, false);
-	} else if (StrEqual(sID, GAME_ID_REDONLY)) {
-		TG_StartGame(iClient, GAME_ID_REDONLY, _, _, _, _, false);
-	}
+	g_gametype = gameType;
+	TG_StartGame(client, GAME_ID, gameType);
 }
 
-public TG_OnGamePrepare(const String:id[], iClient, const String:GameSettings[], Handle:DataPack)
+public TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
-	if (StrEqual(id, GAME_ID_TEAMGAME)) {
-		g_bTeamGame = true;
-	} else if (StrEqual(id, GAME_ID_REDONLY)) {
-		g_bTeamGame = false;
-	} else {
+	if (!StrEqual(id, GAME_ID)) {
 		return;
 	}
 
-	if (g_bTeamGame) {
-		g_iTeamScore[TG_RedTeam] = 0;
-		g_iTeamScore[TG_BlueTeam] = 0;
-	} else {
+	if (g_gametype == TG_TeamGame) {
+		g_teamScore[TG_RedTeam] = 0;
+		g_teamScore[TG_BlueTeam] = 0;
+	} else if (g_gametype == TG_RedOnly) {
 		for (new i = 1; i <= MaxClients; i++) {
-			g_iPlayerScore[i] = 0;
+			g_playerScore[i] = 0;
 		}
 	}
 
-	g_iWaveCount = WAVE_COUNT;
+	g_waveCount = WAVE_COUNT;
 	SpawnChickenWave();
 
-	if (g_hPrintScoreTimer != INVALID_HANDLE) {
-		KillTimer(g_hPrintScoreTimer);
+	if (g_printScoreTimer != INVALID_HANDLE) {
+		KillTimer(g_printScoreTimer);
 	}
 
-	g_hPrintScoreTimer = CreateTimer(0.1, Timer_PrintScore, _, TIMER_REPEAT);
+	g_printScoreTimer = CreateTimer(0.1, Timer_PrintScore, _, TIMER_REPEAT);
 }
 
-public Action:Timer_PrintScore(Handle:hTimer)
+public Action:Timer_PrintScore(Handle:timer)
 {
 	PrintScore();
 }
 
-public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], Handle:hDataPack)
+public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
-	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(id, GAME_ID))
 		return;
 
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (new i = 1; i <= MaxClients; i++) {
 		if (!TG_IsPlayerRedOrBlue(i))
 			continue;
 
@@ -140,14 +125,17 @@ public TG_OnGameStart(const String:sID[], iClient, const String:GameSettings[], 
 	}
 }
 
-public TG_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
+public TG_OnTeamEmpty(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger)
 {
-	if (StrEqual(sID, GAME_ID_TEAMGAME)) {
-		TG_StopGame(TG_GetOppositeTeam(iTeam));
-	} else if (StrEqual(sID, GAME_ID_REDONLY) && iTeam == TG_RedTeam) {
-		new iWinner = Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1);
+	if (!StrEqual(id, GAME_ID))
+		return;
 
-		if (g_iPlayerScore[iWinner] > 0) {
+	if (g_gametype == TG_TeamGame) {
+		TG_StopGame(TG_GetOppositeTeam(team));
+	} else if (g_gametype == TG_RedOnly && team == TG_RedTeam) {
+		new iWinner = Array_FindHighestValue(g_playerScore, MAXPLAYERS + 1);
+
+		if (g_playerScore[iWinner] > 0) {
 			new Handle:hWinner = CreateArray();
 			PushArrayCell(hWinner, iWinner);
 			TG_StopGame(TG_RedTeam, hWinner);
@@ -157,21 +145,21 @@ public TG_OnTeamEmpty(const String:sID[], iClient, TG_Team:iTeam, TG_PlayerTrigg
 	}
 }
 
-public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, winners[], winnersCount)
+public TG_OnGameEnd(const String:id[], TG_GameType:gameType, TG_Team:team, winners[], winnersCount, Handle:dataPack)
 {
-	if (!StrEqual(sID, GAME_ID_TEAMGAME) && !StrEqual(sID, GAME_ID_REDONLY))
+	if (!StrEqual(id, GAME_ID))
 		return;
 
 	KillChickens();
 
-	if (g_hCollisionTimer != INVALID_HANDLE) {
-		KillTimer(g_hCollisionTimer);
-		g_hCollisionTimer = INVALID_HANDLE;
+	if (g_collisionTimer != INVALID_HANDLE) {
+		KillTimer(g_collisionTimer);
+		g_collisionTimer = INVALID_HANDLE;
 	}
 
-	if (g_hPrintScoreTimer != INVALID_HANDLE) {
-		KillTimer(g_hPrintScoreTimer);
-		g_hPrintScoreTimer = INVALID_HANDLE;
+	if (g_printScoreTimer != INVALID_HANDLE) {
+		KillTimer(g_printScoreTimer);
+		g_printScoreTimer = INVALID_HANDLE;
 	}
 
 	return;
@@ -179,7 +167,7 @@ public TG_OnGameEnd(const String:sID[], TG_Team:iTeam, winners[], winnersCount)
 
 public Action:TG_OnTraceAttack(bool:ingame, victim, &attacker, &inflictor, &Float:damage, &damagetype, &ammotype, hitbox, hitgroup)
 {
-	if (!TG_IsCurrentGameID(GAME_ID_TEAMGAME) && !TG_IsCurrentGameID(GAME_ID_REDONLY))
+	if (!TG_IsCurrentGameID(GAME_ID))
 		return Plugin_Continue;
 
 	if (TG_IsPlayerRedOrBlue(victim) && TG_IsPlayerRedOrBlue(attacker)) {
@@ -193,33 +181,33 @@ bool:SpawnChickenWave()
 {
 	KillChickens();
 
-	if (g_iWaveCount < 1) {
+	if (g_waveCount < 1) {
 		return false;
 	}
-	g_iWaveCount--;
+	g_waveCount--;
 
-	new Float:fClientPos[3];
-	g_hChickens = CreateArray();
+	new Float:clientPos[3];
+	g_chickens = CreateArray();
 
 	for (new i = 1; i <= MaxClients; i++) {
-		if ((g_bTeamGame && !TG_IsPlayerRedOrBlue(i)) || (!g_bTeamGame && TG_GetPlayerTeam(i) != TG_RedTeam)) {
+		if ((g_gametype == TG_TeamGame && !TG_IsPlayerRedOrBlue(i)) || (g_gametype == TG_RedOnly && TG_GetPlayerTeam(i) != TG_RedTeam)) {
 			continue;
 		}
 
-		GetClientAbsOrigin(i, fClientPos);
-		fClientPos[2] += 8.0;
+		GetClientAbsOrigin(i, clientPos);
+		clientPos[2] += 8.0;
 
 		// for (new n = 0; n < 2; n++) {
 		for (new n = 0; n < GetRandomInt(1, 2); n++) {
-			SpawnChicken(fClientPos);
+			SpawnChicken(clientPos);
 		}
 
 		EventWeaponFire(i);
-		SpawnParticles(fClientPos);
+		SpawnParticles(clientPos);
 	}
 
-	if (g_sChickenSpawnSound[0] != '\0' && g_iWaveCount != WAVE_COUNT - 1) {
-		EmitSoundToAllAny(g_sChickenSpawnSound);
+	if (g_chickenSpawnSound[0] != '\0' && g_waveCount != WAVE_COUNT - 1) {
+		EmitSoundToAllAny(g_chickenSpawnSound);
 	}
 
 	return true;
@@ -227,43 +215,41 @@ bool:SpawnChickenWave()
 
 KillChickens()
 {
-	if (g_hChickens != INVALID_HANDLE) {
-		new iChicken;
+	if (g_chickens != INVALID_HANDLE) {
+		for (new i = 0; i < GetArraySize(g_chickens); i++) {
+			new chicken = GetArrayCell(g_chickens, i);
 
-		for (new i = 0; i < GetArraySize(g_hChickens); i++) {
-			iChicken = GetArrayCell(g_hChickens, i);
-
-			if (IsValidEntity(iChicken)) {
-				AcceptEntityInput(iChicken, "kill");
+			if (IsValidEntity(chicken)) {
+				AcceptEntityInput(chicken, "kill");
 			}
 		}
 
-		CloseHandle(g_hChickens);
+		CloseHandle(g_chickens);
 	}
 
-	g_hChickens = INVALID_HANDLE;
+	g_chickens = INVALID_HANDLE;
 }
 
-public Hook_ChickenDeath(const String: sOutput[], iChicken, iClient, Float: fDelay)
+public Hook_ChickenDeath(const String: output[], chicken, client, Float: delay)
 {
-	new iChickenIndex = FindValueInArray(g_hChickens, iChicken);
-	if (iChickenIndex != -1) {
+	new chickenIndex = FindValueInArray(g_chickens, chicken);
+	if (chickenIndex != -1) {
 
-		if (TG_IsPlayerRedOrBlue(iClient)) {
-			AddScore(iClient);
+		if (TG_IsPlayerRedOrBlue(client)) {
+			AddScore(client);
 		}
 
-		RemoveFromArray(g_hChickens, iChickenIndex);
+		RemoveFromArray(g_chickens, chickenIndex);
 
-		if (GetArraySize(g_hChickens) == 0) {
+		if (GetArraySize(g_chickens) == 0) {
 
 			if (!SpawnChickenWave()) {
-				if (g_bTeamGame) {
-					TG_StopGame((g_iTeamScore[TG_RedTeam] == g_iTeamScore[TG_BlueTeam]) ? TG_NoneTeam : (g_iTeamScore[TG_RedTeam] > g_iTeamScore[TG_BlueTeam]) ? TG_RedTeam : TG_BlueTeam);
-				} else {
-					new iWinner = Array_FindHighestValue(g_iPlayerScore, MAXPLAYERS + 1);
+				if (g_gametype == TG_TeamGame) {
+					TG_StopGame((g_teamScore[TG_RedTeam] == g_teamScore[TG_BlueTeam]) ? TG_NoneTeam : (g_teamScore[TG_RedTeam] > g_teamScore[TG_BlueTeam]) ? TG_RedTeam : TG_BlueTeam);
+				} else if (g_gametype == TG_RedOnly) {
+					new iWinner = Array_FindHighestValue(g_playerScore, MAXPLAYERS + 1);
 
-					if (g_iPlayerScore[iWinner] > 0) {
+					if (g_playerScore[iWinner] > 0) {
 						new Handle:hWinner = CreateArray();
 						PushArrayCell(hWinner, iWinner);
 						TG_StopGame(TG_RedTeam, hWinner);
@@ -276,58 +262,56 @@ public Hook_ChickenDeath(const String: sOutput[], iChicken, iClient, Float: fDel
 	}
 }
 
-SpawnChicken(const Float:fPos[3])
+SpawnChicken(const Float:pos[3])
 {
-	new iChicken = CreateEntityByName("chicken");
+	new chicken = CreateEntityByName("chicken");
 
-	if (iChicken != -1) {
-		DispatchKeyValue(iChicken, "glowenabled", "1");
-		DispatchKeyValue(iChicken, "glowcolor", "255 255 255");
-		DispatchKeyValue(iChicken, "rendercolor", "255 255 255");
-		DispatchKeyValue(iChicken, "modelscale", "1");
-		DispatchKeyValue(iChicken, "skin", (GetRandomInt(0,1) == 0) ? "0" : "1");
-		DispatchSpawn(iChicken);
+	if (chicken != -1) {
+		DispatchKeyValue(chicken, "glowenabled", "1");
+		DispatchKeyValue(chicken, "glowcolor", "255 255 255");
+		DispatchKeyValue(chicken, "rendercolor", "255 255 255");
+		DispatchKeyValue(chicken, "modelscale", "1");
+		DispatchKeyValue(chicken, "skin", (GetRandomInt(0,1) == 0) ? "0" : "1");
+		DispatchSpawn(chicken);
 
-		SetEntProp(iChicken, Prop_Send, "m_bShouldGlow", true);
-		SetEntProp(iChicken, Prop_Send, "m_nGlowStyle", 0);
-		SetEntPropFloat(iChicken, Prop_Send, "m_flGlowMaxDist", 10000000.0);
-		SetEntProp(iChicken, Prop_Data, "m_takedamage", 0, 1);
+		SetEntProp(chicken, Prop_Send, "m_bShouldGlow", true);
+		SetEntProp(chicken, Prop_Send, "m_nGlowStyle", 0);
+		SetEntPropFloat(chicken, Prop_Send, "m_flGlowMaxDist", 10000000.0);
+		SetEntProp(chicken, Prop_Data, "m_takedamage", 0, 1);
 
-		TeleportEntity(iChicken, fPos, NULL_VECTOR, NULL_VECTOR);
+		TeleportEntity(chicken, pos, NULL_VECTOR, NULL_VECTOR);
 
-		if (g_hCollisionTimer != INVALID_HANDLE) {
-			KillTimer(g_hCollisionTimer);
-			g_hCollisionTimer = INVALID_HANDLE;
+		if (g_collisionTimer != INVALID_HANDLE) {
+			KillTimer(g_collisionTimer);
+			g_collisionTimer = INVALID_HANDLE;
 		}
 
-		PushArrayCell(g_hChickens, iChicken);
-		HookSingleEntityOutput(iChicken, "OnBreak", Hook_ChickenDeath);
+		PushArrayCell(g_chickens, chicken);
+		HookSingleEntityOutput(chicken, "OnBreak", Hook_ChickenDeath);
 
-		SDKHook(iChicken, SDKHook_ShouldCollide, Hook_ChickenCollide);
-		g_hCollisionTimer = CreateTimer(3.0, Timer_SetChickenTakeDamage);
+		SDKHook(chicken, SDKHook_ShouldCollide, Hook_ChickenCollide);
+		g_collisionTimer = CreateTimer(3.0, Timer_SetChickenTakeDamage);
 	}
 
-	return iChicken;
+	return chicken;
 }
 
-public Action:Timer_SetChickenTakeDamage(Handle:hTimer)
+public Action:Timer_SetChickenTakeDamage(Handle:timer)
 {
-	if (g_hChickens != INVALID_HANDLE) {
-		new iChicken;
+	if (g_chickens != INVALID_HANDLE) {
+		for (new i = 0; i < GetArraySize(g_chickens); i++) {
+			new chicken = GetArrayCell(g_chickens, i);
 
-		for (new i = 0; i < GetArraySize(g_hChickens); i++) {
-			iChicken = GetArrayCell(g_hChickens, i);
-
-			if (IsValidEntity(iChicken)) {
-				SetEntProp(iChicken, Prop_Data, "m_takedamage", 2, 1);
-				SetEntProp(iChicken, Prop_Send, "m_clrGlow", ((0 & 0xFF) << 16) | ((0 & 0xFF) << 8) | ((255 & 0xFF) << 0));
+			if (IsValidEntity(chicken)) {
+				SetEntProp(chicken, Prop_Data, "m_takedamage", 2, 1);
+				SetEntProp(chicken, Prop_Send, "m_clrGlow", ((0 & 0xFF) << 16) | ((0 & 0xFF) << 8) | ((255 & 0xFF) << 0));
 			} else {
-				RemoveFromArray(g_hChickens, i);
+				RemoveFromArray(g_chickens, i);
 			}
 		}
 	}
 
-	g_hCollisionTimer = INVALID_HANDLE;
+	g_collisionTimer = INVALID_HANDLE;
 	return Plugin_Stop;
 }
 
@@ -336,12 +320,12 @@ public bool:Hook_ChickenCollide(entity, collisiongroup, contentsmask, bool:origi
 	return (contentsmask == 33570827 || contentsmask == 1174421515 || contentsmask == 1107320971 || contentsmask == 1174421507);
 }
 
-AddScore(iClient)
+AddScore(client)
 {
-	if (g_bTeamGame) {
-		g_iTeamScore[TG_GetPlayerTeam(iClient)]++;
-	} else {
-		g_iPlayerScore[iClient]++;
+	if (g_gametype == TG_TeamGame) {
+		g_teamScore[TG_GetPlayerTeam(client)]++;
+	} else if (g_gametype == TG_RedOnly) {
+		g_playerScore[client]++;
 	}
 
 	PrintScore();
@@ -349,64 +333,64 @@ AddScore(iClient)
 
 PrintScore()
 {
-	if (g_bTeamGame) {
-		PrintHintTextToAll("%t", "ScoreBoard-TeamGame", g_iWaveCount, g_iTeamScore[TG_RedTeam], g_iTeamScore[TG_BlueTeam]);
-	} else {
-		new iHighest[2], iLowest[2];
-		decl String:sHighest[64], String:sLowest[64];
+	if (g_gametype == TG_TeamGame) {
+		PrintHintTextToAll("%t", "ScoreBoard-TeamGame", g_waveCount, g_teamScore[TG_RedTeam], g_teamScore[TG_BlueTeam]);
+	} else if (g_gametype == TG_RedOnly) {
+		new highest[2], lowest[2];
+		decl String:highestMsg[64], String:lowestMsg[64];
 
 		for (new i = 1; i <= MaxClients; i++)
 		{
 			if (TG_GetPlayerTeam(i) != TG_RedTeam)
 				continue;
 
-			if (g_iPlayerScore[i] >= iHighest[1]) {
-				iHighest[0] = i;
-				iHighest[1] = g_iPlayerScore[i];
+			if (g_playerScore[i] >= highest[1]) {
+				highest[0] = i;
+				highest[1] = g_playerScore[i];
 			}
 
-			if (g_iPlayerScore[i] <= iLowest[1]) {
-				iLowest[0] = i;
-				iLowest[1] = g_iPlayerScore[i];
+			if (g_playerScore[i] <= lowest[1]) {
+				lowest[0] = i;
+				lowest[1] = g_playerScore[i];
 			}
 		}
 
-		FormatEx(sHighest, sizeof(sHighest), "%N", iHighest[0]);
-		FormatEx(sLowest, sizeof(sLowest), "%N", iLowest[0]);
+		FormatEx(highestMsg, sizeof(highestMsg), "%N", highest[0]);
+		FormatEx(lowestMsg, sizeof(lowestMsg), "%N", lowest[0]);
 
-		PrintHintTextToAll("%t", "ScoreBoard-RedOnly", g_iWaveCount, sHighest, iHighest[1], sLowest, iLowest[1]);
+		PrintHintTextToAll("%t", "ScoreBoard-RedOnly", g_waveCount, highestMsg, highest[1], lowestMsg, lowest[1]);
 	}
 }
 
-EventWeaponFire(iClient)
+EventWeaponFire(client)
 {
-	new Handle:hEvent = CreateEvent("weapon_fire");
-	if (hEvent != INVALID_HANDLE) {
-		SetEventInt(hEvent, "userid", GetClientUserId(iClient));
-		SetEventString(hEvent, "weapon", "awp");
-		SetEventBool(hEvent, "silenced", false);
-		FireEvent(hEvent);
+	new Handle:event = CreateEvent("weapon_fire");
+	if (event != INVALID_HANDLE) {
+		SetEventInt(event, "userid", GetClientUserId(client));
+		SetEventString(event, "weapon", "awp");
+		SetEventBool(event, "silenced", false);
+		FireEvent(event);
 	}
 }
 
-SpawnParticles(Float:fPos[3])
+SpawnParticles(Float:pos[3])
 {
-	new iParticles = CreateEntityByName("info_particle_system");
-	if (IsValidEntity(iParticles)) {
-		DispatchKeyValue(iParticles, "effect_name", "chicken_gone_feathers");
-		DispatchKeyValue(iParticles, "angles", "-90 0 0");
-		DispatchSpawn(iParticles);
+	new particles = CreateEntityByName("info_particle_system");
+	if (IsValidEntity(particles)) {
+		DispatchKeyValue(particles, "effect_name", "chicken_gone_feathers");
+		DispatchKeyValue(particles, "angles", "-90 0 0");
+		DispatchSpawn(particles);
 
-		TeleportEntity(iParticles, fPos, NULL_VECTOR, NULL_VECTOR);
+		TeleportEntity(particles, pos, NULL_VECTOR, NULL_VECTOR);
 
-		ActivateEntity(iParticles);
-		AcceptEntityInput(iParticles, "Start");
+		ActivateEntity(particles);
+		AcceptEntityInput(particles, "Start");
 
-		CreateTimer(5.0, Timer_KillEntity, iParticles);
+		CreateTimer(5.0, Timer_KillEntity, particles);
 	}
 }
 
-public Action:Timer_KillEntity(Handle:hTimer, any:iEntity)
+public Action:Timer_KillEntity(Handle:timer, any:entity)
 {
-	AcceptEntityInput(iEntity, "kill");
+	AcceptEntityInput(entity, "kill");
 }

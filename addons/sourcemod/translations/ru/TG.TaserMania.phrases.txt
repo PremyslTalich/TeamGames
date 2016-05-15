@@ -1,10 +1,6 @@
 "Phrases"
 {
-	"GameName-TeamGame"
-	{
-		"ru"		"Taser мания"
-	}
-	"GameName-RedOnly"
+	"GameName"
 	{
 		"ru"		"Taser мания"
 	}
