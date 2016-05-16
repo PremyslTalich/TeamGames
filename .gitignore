@@ -1,0 +1,7 @@
+*.smx
+*.lnk
+
+addons/sourcemod/scripting/modules/dodelat/
+addons/sourcemod/scripting/modules/opravit/
+addons/sourcemod/scripting/modules/zaloha/
+addons/sourcemod/scripting/modules/zruseno/
