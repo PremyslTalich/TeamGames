@@ -229,7 +229,7 @@ native TG_GetModuleName(TG_ModuleType:type, const String:id[], client, String:na
  * @param id						Game ID.
  * @param gameType					Game type.
  * @param gameSettings				Game settings.
- * @param DataPack					Game datapack.
+ * @param dataPack					Game datapack.
  * @param removeDroppedWeapons		Remove weapons that prisoners dropped.
  * @param endOnTeamEmpty			Automatically end game when one team was emptied (is that even word?).
  * @noreturn
