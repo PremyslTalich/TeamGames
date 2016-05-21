@@ -656,6 +656,10 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 					break;
 				}
 
+				if (!IsPlayerAlive(g_Game[RedTeam][i])) {
+					continue;
+				}
+
 				iWinners[i] = GetClientOfUserId(g_Game[RedTeam][i]);
 				iWinnersCount++;
 			}

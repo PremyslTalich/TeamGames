@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"cze"		"Kuřecí ruleta"
+	}
+}
