@@ -25,6 +25,7 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 ## Games
 
 - Chicken hunt *(CS:GO only)*
+- Chicken roulette *(CS:GO only)*
 - Gun fight
 - HeadShot only
 - Knife fight
