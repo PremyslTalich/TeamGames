@@ -7,6 +7,52 @@
 #include <sdktools>
 
 /**
+ * Returns wheter players are enemies within given game type.
+ * If there is not game type passed, game type of current game is taken.
+ *
+ * @param client1		First player
+ * @param client2		Second player
+ * @return				True if given players are enemies
+ */
+stock bool:TG_AreEnemies(client1, client2, TG_GameType:gameType = TG_None)
+{
+	new TG_Team:team1 = TG_GetPlayerTeam(client1);
+	new TG_Team:team2 = TG_GetPlayerTeam(client2);
+
+	return TG_AreTeamsEnemies(team1, team2, gameType);
+}
+
+/**
+ * Returns wheter teams are enemies within given game type.
+ * If there is not game type passed, game type of current game is taken.
+ *
+ * @param team1			First team
+ * @param team2			Second team
+ * @return				True if given team are enemies
+ */
+stock bool:TG_AreTeamsEnemies(TG_Team:team1, TG_Team:team2, TG_GameType:gameType = TG_None)
+{
+	if (gameType == TG_None)
+		gameType = TG_GetCurrentGameType();
+
+	if (gameType == TG_None)
+		ThrowError("Function must be called while game is running or with set game type argument!");
+
+	if (gameType == TG_TeamGame) {
+		new TG_Team:opTeam1 = TG_GetOppositeTeam(team1);
+		new TG_Team:opopTeam1 = TG_GetOppositeTeam(opTeam1);
+
+		if (opTeam1 == team2 && opopTeam1 == team1)
+			return true;
+	}
+
+	if (gameType == TG_RedOnly && team1 == TG_RedTeam && team1 == team2)
+		return true;
+
+	return false;
+}
+
+/**
  * Is player in TG team (Red or Blue)?
  *
  * @param client	Client index.
