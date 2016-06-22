@@ -1,5 +1,6 @@
 *.smx
 *.lnk
+*.pyc
 
 addons/sourcemod/scripting/modules/dodelat/
 addons/sourcemod/scripting/modules/opravit/
