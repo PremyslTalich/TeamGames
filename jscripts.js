@@ -275,6 +275,7 @@ function buildTypedefHeader(objName, obj)
 
 	return header;
 }
+
 function loadEnumDetails(name, obj)
 {
 	var details = '';
@@ -356,6 +357,9 @@ function loadMainPage()
 	details += '<h4>Looking for more information?</h4>';
 	details += '<p>For more information, see the <a href="https://github.com/KissLick/TeamGames/wiki">TeamGames Wiki</a>, which contains some examples and explanations.</p>';
 	details += '</div>';
+	details += '<div style="margin-top: 100px;">';
+	details += loadSummary();
+	details += '</div>';
 	details += '</div>';
 
 	$('#objectDetail').html(details);
@@ -370,6 +374,93 @@ function loadMainPage()
 	}
 
 	$(document).prop('title', 'TeamGames Scripting API Reference');
+}
+
+function loadSummary()
+{
+	var types = '';
+	var typesCount = 0;
+
+	var constants = '';
+	var constantsCount = 0;
+
+	var forwards = '';
+	var forwardsCount = 0;
+
+	var functions = '';
+	var functionsCount = 0;
+
+	var complete = '';
+
+	for (object in objects) {
+		var target = undefined;
+
+		if (objects[object].objType == 'functions') {
+			if (objects[object].kind == 'forward') {
+				forwards += getSummarySingle(object);
+				forwardsCount += 1;
+			} else {
+				functions += getSummarySingle(object);
+				functionsCount += 1;
+			}
+		} else if (objects[object].objType == 'typedefs') {
+			types += getSummarySingle(object);
+			typesCount += 1;
+		} else if (objects[object].objType == 'enums') {
+			types += getSummarySingle(object);
+			typesCount += 1;
+		} else if (objects[object].objType == 'constants') {
+			constants += getSummarySingle(object);
+			constantsCount += 1;
+		}
+	}
+
+	complete += getSummarySection('Type', types, typesCount);
+	complete += getSummarySection('Constant', constants, constantsCount);
+	complete += getSummarySection('Forward', forwards, forwardsCount);
+	complete += getSummarySection('Function', functions, functionsCount);
+
+	return complete;
+}
+
+function getSummarySection(type, tbody, count)
+{
+	var out = '<h3 class="sub-header2">' + type + 's <span class="badge">' + count + '</span></h3>';
+
+	out += '<div class="table-responsive">';
+	out += '<table class="table table-bordered table-hover">';
+	out += '<thead><tr>';
+	out += '<th>' + type + '</th>';
+	out += '<th>Description</th>';
+	out += '</tr></thead>';
+
+	out += '<tbody>';
+	out += tbody;
+	out += '</tbody>';
+
+	out += '</table>';
+	out += '</div>';
+
+	return out;
+}
+
+function getSummarySingle(object)
+{
+	var single = '';
+
+	single += '<tr>';
+		single += '<td class="col-md-3 mono name">';
+			single += '<a href="#" onclick="loadObjectDetails(\'' + object + '\'); return false;">' + object + '</a>';
+		single += '</td>';
+
+		if (objects[object].docText != undefined) {
+			single += '<td>' + objects[object].docText + '</td>';
+		} else {
+			single += '<td><i class="text-muted">No description.</i></td>';
+		}
+	single += '</tr>';
+
+	return single;
 }
 
 function getTypeName(type)
@@ -403,16 +494,35 @@ function search(name)
 	});
 }
 
+// function updateBreadCrumbs(newCrumb)
+// {
+	// $('#breadcrumb').html('');
+	// crumbs.push(newCrumb);
+
+	// if (crumbs.length > 7) {
+		// crumbs.shift();
+	// }
+
+	// var breads = '';
+	// for (crumb in crumbs) {
+		// breads += '<li><a href="#" onclick="loadObjectDetails(\'' + crumbs[crumb] + '\'); return false;">' + crumbs[crumb] + '</a></li>';
+	// }
+
+	// $('#breadcrumb').html(breads);
+
+	// $('#breadcrumb').css('visibility', 'visible');
+// }
+
 function updateBreadCrumbs(newCrumb)
 {
 	$('#breadcrumb').html('');
-	crumbs.push(newCrumb);
+	crumbs.unshift(newCrumb);
 
 	if (crumbs.length > 7) {
-		crumbs.shift();
+		crumbs.pop();
 	}
 
-	var breads = '';
+	var breads = '<strong style="border-right-width: 1px; border-right-style: solid; padding-right: 10px;">History</strong>&nbsp;&nbsp;';
 	for (crumb in crumbs) {
 		breads += '<li><a href="#" onclick="loadObjectDetails(\'' + crumbs[crumb] + '\'); return false;">' + crumbs[crumb] + '</a></li>';
 	}

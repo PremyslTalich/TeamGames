@@ -10,17 +10,38 @@
 	color: #777;
 }
 
-.breadcrumb a:hover {
-	color: #337ab7;
+.breadcrumb li a:hover {
+	color: #337ab7 !important;
 }
 
-.breadcrumb li:last-child a {
-	color: black;
+.breadcrumb li:nth-child(2) a {
+	color: #3f3f3f;
+}
+
+.breadcrumb li:nth-child(3) a {
+	color: #696969;
+}
+
+.breadcrumb li:nth-child(4) a {
+	color: #939393;
+}
+
+.breadcrumb li:nth-child(5) a {
+	color: #bdbdbd;
+}
+
+.breadcrumb li a {
+	color: #cccccc;
 }
 
 .breadcrumb > li + li::before {
-	content: "\25B6" !important;
-	color: #cccccc !important;
+	/*content: "\25B6" !important;*/
+	/*content: "\25C0" !important;*/
+	content: "-" !important;
+	margin-left: 5px;
+	margin-right: 5px;
+	/*color: #cccccc !important;*/
+	color: #3f3f3f !important;
 }
 
 .kind {
@@ -297,12 +318,12 @@ a.type:hover {
 	body {
 		margin-left: 300px;
 	}
-	
+
 	.container-fluid {
 		padding-right: 40px;
 		padding-left: 40px;
 	}
-	
+
 	.sidebar.collapse {
 		display: block !important;
 		height: auto !important;
@@ -335,7 +356,7 @@ a.type:hover {
 	height: 100%;
 	box-shadow: 0 0 10px #29d, 0 0 5px #29d;
 	opacity: 1.0;
-	
+
 	-webkit-transform: rotate(3deg) translate(0px, -4px);
 	  -ms-transform: rotate(3deg) translate(0px, -4px);
 	      transform: rotate(3deg) translate(0px, -4px);
