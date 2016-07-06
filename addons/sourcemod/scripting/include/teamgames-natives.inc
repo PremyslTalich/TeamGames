@@ -59,7 +59,7 @@ native TG_UpdatePlayerHealthBar(client);
  * @param client				Client index.
  * @noreturn
  */
-native TG_DestoryPlayerHealthBar(client);
+native TG_DestroyPlayerHealthBar(client);
 
 
 /**
