@@ -1,13 +1,17 @@
 To do list
 ==========
 
-- [ ] Add missing docs and update obsolete.
+- [ ] Add option `@hidden` to docs & docparser for excluding functions them from API site
+- [ ] Finish the game *One in the chamber*
+- [ ] Make the game *Magic dodgeball*
+- [ ] Make the game *Dodge the prop*
 - [ ] Check ammo handling in games and unify somehow???
 - [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
 
 ---
 
+- [x] Add missing docs and update obsolete.
 - [x] Update wiki & examples according to new game types handling
 - [x] Update API site
 - [x] Add native `TG_GetCurrentGameType`
