@@ -153,6 +153,9 @@ def ProcessIncludeFileData(includeText, includeJson):
 			if obj['name'].endswith('SetNTVOptional'):
 				continue
 			
+			if not obj['name'].startswith('TG_'):
+				continue
+			
 			objData = dict(obj)
 			objData['objType'] = type
 			del objData['name']
