@@ -146,21 +146,21 @@ def ProcessIncludeFileData(includeText, includeJson):
     outData = {}
     
     for type in includeJson:
-		for obj in includeJson[type]:
-			if obj['name'] in outData:
-				continue
-			
-			if obj['name'].endswith('SetNTVOptional'):
-				continue
-			
-			if not obj['name'].startswith('TG_'):
-				continue
-			
-			objData = dict(obj)
-			objData['objType'] = type
-			del objData['name']
-			
-			outData[obj['name']] = objData
+        for obj in includeJson[type]:
+            if obj['name'] in outData:
+                continue
+            
+            if obj['name'].endswith('SetNTVOptional'):
+                continue
+            
+            if not obj['name'].startswith('TG_'):
+                continue
+            
+            objData = dict(obj)
+            objData['objType'] = type
+            del objData['name']
+            
+            outData[obj['name']] = objData
     
     return outData
     

@@ -257,16 +257,16 @@ stock CreateDirectoryPath(const String:dirPath[], mode, bool:containsFile = fals
 	}
 }
 
-stock RequestFrame2(RequestFrameCallback:function, framesAhead = 1, any:data = 0)
+stock RequestFrame2(RequestFrameCallback:func, framesAhead = 1, any:data = 0)
 {
 	if (framesAhead < 1)
 		return;
 
 	if (framesAhead == 1) {
-		RequestFrame(function, data);
+		RequestFrame(func, data);
 	} else {
 		new Handle:pack = CreateDataPack();
-		WritePackCell(pack, function);
+		WritePackCell(pack, func);
 		WritePackCell(pack, framesAhead);
 		WritePackCell(pack, data);
 
@@ -277,12 +277,12 @@ stock RequestFrame2(RequestFrameCallback:function, framesAhead = 1, any:data = 0
 public RequestFrame2_CallBack(any:pack)
 {
 	ResetPack(Handle:pack);
-	new RequestFrameCallback:function = RequestFrameCallback:ReadPackCell(Handle:pack);
+	new RequestFrameCallback:func = RequestFrameCallback:ReadPackCell(Handle:pack);
 	new framesAhead = ReadPackCell(Handle:pack) - 1;
 	new data = ReadPackCell(Handle:pack);
 	CloseHandle(Handle:pack);
 
-	RequestFrame2(function, framesAhead, data);
+	RequestFrame2(func, framesAhead, data);
 }
 
 //------------------------------------------------------------------------------------------------
