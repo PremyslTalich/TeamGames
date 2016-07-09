@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Add option `@hidden` to docs & docparser for excluding functions them from API site
+- [x] ~~Add option `@hidden`~~ to docs & docparser for excluding functions from API site *- Done by excluding objects not starting with `TG_`*
 - [ ] Finish the game *One in the chamber*
 - [ ] Make the game *Magic dodgeball*
 - [ ] Make the game *Dodge the prop*
