@@ -10,7 +10,7 @@ public Plugin:myinfo =
 	name = "[TG] Warden",
 	author = "Raska",
 	description = "",
-	version = "0.4",
+	version = "0.5",
 	url = ""
 }
 
@@ -71,6 +71,10 @@ public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], TG_GameType
 
 public Action:TG_OnPlayerTeam(client, activator, TG_Team:teamBefore, TG_Team:teamAfter)
 {
+	if (activator < 1 || activator > MaxClients || !IsClientInGame(activator)) {
+		return Plugin_Continue;
+	}
+
 	if (!CheckWardenAccess(activator, g_hTeams)) {
 		return Plugin_Handled;
 	}
