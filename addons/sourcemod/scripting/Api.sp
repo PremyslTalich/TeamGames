@@ -1032,6 +1032,8 @@ public APLRes:AskPluginLoad2(Handle:hMySelf, bool:bLate, String:sError[], iErrMa
 	Forward_OnPlayerRebel = 	 		CreateGlobalForward("TG_OnPlayerRebel", 				ET_Event, 	Param_Cell, 		Param_Cell);
 	Forward_OnPlayerRebelPost = 	 	CreateGlobalForward("TG_OnPlayerRebelPost", 			ET_Ignore, 	Param_Cell, 		Param_Cell);
 	Forward_OnPlayerLeaveGame = 	 	CreateGlobalForward("TG_OnPlayerLeaveGame", 			ET_Event, 	Param_String, 		Param_Cell, 		Param_Cell, 		Param_Cell, 		Param_Cell);
+	Forward_OnPlayerStopGame = 	 		CreateGlobalForward("TG_OnPlayerStopGame", 				ET_Event, 	Param_Cell, 		Param_String);
+	Forward_OnPlayerStopGamePost = 	 	CreateGlobalForward("TG_OnPlayerStopGamePost", 			ET_Ignore, 	Param_Cell, 		Param_String);
 	Forward_OnLaserFenceCreate = 		CreateGlobalForward("TG_OnLaserFenceCreate", 			ET_Event, 	Param_Cell,			Param_Array, 		Param_Array);
 	Forward_OnLaserFenceCreated = 		CreateGlobalForward("TG_OnLaserFenceCreated", 			ET_Ignore, 	Param_Cell,			Param_Array, 		Param_Array);
 	Forward_OnLaserFenceCross = 		CreateGlobalForward("TG_OnLaserFenceCross", 			ET_Event, 	Param_Cell, 		Param_FloatByRef);
@@ -1209,6 +1211,10 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], TG_GameType:iG
 			continue;
 		}
 
+		if (GetClientTeam(iUser) == CS_TEAM_CT) {
+			CPrintToChat(iUser, "%T", "StopGameInfo", iUser, "Menu-StopGame");
+		}
+		
 		new String:sGameName[TG_MODULE_NAME_LENGTH];
 		Call_AskModuleName(sID, TG_Game, iUser, sGameName, sizeof(sGameName));
 

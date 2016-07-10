@@ -85,6 +85,11 @@
 		"#format"	"{1:s},{2:s}"
 		"en"		"Game {tg-module}{1}{default} - {tg-settings}{2}{default} started !!!"
 	}
+	"StopGameInfo" // msg for CTs players about how they can stop the game
+	{
+		"#format"	"{1:t}"
+		"en"		"You can stop current game with {command}!stoptg{default} or {command}TG menu{default} -> {command}{1}{default} !"
+	}
 	"GameStop" // msg for all players when someone stop the game ({1} = player name)
 	{
 		"#format"	"{1:s}"

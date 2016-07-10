@@ -38,6 +38,8 @@ new Handle:Forward_OnPlayerTeamPost;
 new Handle:Forward_OnPlayerRebel;
 new Handle:Forward_OnPlayerRebelPost;
 new Handle:Forward_OnPlayerLeaveGame;
+new Handle:Forward_OnPlayerStopGame;
+new Handle:Forward_OnPlayerStopGamePost;
 new Handle:Forward_OnLaserFenceCreate;
 new Handle:Forward_OnLaserFenceCreated;
 new Handle:Forward_OnLaserFenceCross;
@@ -79,7 +81,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.16.1.1"
+#define _PLUGIN_VERSION "0.17.0.4"
 
 public Plugin:myinfo =
 {
@@ -155,9 +157,9 @@ public OnPluginStart()
 	RegConsoleCmd("sm_games", 		Command_GamesList,	"List of all loaded games.");
 	RegConsoleCmd("sm_rebel", 		Command_Rebel,		"Become a rebel.");
 	RegConsoleCmd("sm_r", 			Command_Rebel,		"Become a rebel.");
+	RegConsoleCmd("sm_stoptg", 		Command_StopTG,		"Stop current TG game.");
 
 	RegAdminCmd("sm_teamgames", 	Command_MainMenu, 			ADMFLAG_GENERIC,	"TeamGames main menu");
-	RegAdminCmd("sm_stoptg", 		Command_StopTG,				ADMFLAG_GENERIC, 	"Stop current TG game.");
 	RegAdminCmd("sm_tgteam", 		Command_SetTeam,	 	 	ADMFLAG_GENERIC, 	"Set player team (0 = NoneTeam, 1 = RedTeam, 2 = BlueTeam).");
 	RegAdminCmd("sm_tglist",  		Command_ModulesList, 		ADMFLAG_GENERIC,	"List of all games and custom (modules) menu items.");
 	RegAdminCmd("sm_tgvisible", 	Command_Visible, 		 	ADMFLAG_GENERIC, 	"Set modules visibility (allow/disallow them to appear in tg menu).");

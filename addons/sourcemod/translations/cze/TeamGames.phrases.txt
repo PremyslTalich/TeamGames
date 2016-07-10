@@ -76,6 +76,10 @@
 	{
 		"cze"		"Začala hra {tg-module}{1}{default} - {tg-settings}{2}{default} !!!"
 	}
+	"StopGameInfo" // msg for CTs players about how they can stop the game
+	{
+		"cze"		"Probíhající hru můžeš zastavit pomocí {command}!stoptg{default} nebo {command}TG menu{default} -> {command}{1}{default} !"
+	}
 	"GameStop" // msg for all players when someone stop the game ({1} = player name)
 	{
 		"cze"		"Hráč {player}{1}{default} zastavil hru !!!"

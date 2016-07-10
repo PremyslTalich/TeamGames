@@ -10,7 +10,7 @@ public Plugin:myinfo =
 	name = "[TG] Warden",
 	author = "Raska",
 	description = "",
-	version = "0.5",
+	version = "0.6",
 	url = ""
 }
 
@@ -40,6 +40,16 @@ public Action:TG_OnMenuDisplay(client)
 }
 
 public Action:TG_OnGameStartMenu(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
+{
+	if (!CheckWardenAccess(client, g_hGames)) {
+		PrintClientAccessDenied(client)
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
+}
+
+public Action:TG_OnPlayerStopGame(client, const String:id[])
 {
 	if (!CheckWardenAccess(client, g_hGames)) {
 		PrintClientAccessDenied(client)

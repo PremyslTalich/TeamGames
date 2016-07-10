@@ -244,6 +244,24 @@ forward TG_OnTeamEmpty(const String:id[], TG_GameType:gameType, client, TG_Team:
 forward TG_OnPlayerLeaveGame(const String:id[], TG_GameType:gameType, client, TG_Team:team, TG_PlayerTrigger:trigger);
 
 /**
+ * Called when player is about to stop (interrupt) a game.
+ *
+ * @param client		Client index.
+ * @param id			Game ID.
+ * @return 				Plugin_Handled to prevent player from stopping a game.
+ */
+forward Action:TG_OnPlayerStopGame(client, const String:id[]);
+
+/**
+ * Called when player is stopping (interrupting) a game (the game is not stopped yet).
+ *
+ * @param client		Client index.
+ * @param id			Game ID.
+ * @noreturn
+ */
+forward TG_OnPlayerStopGamePost(client, const String:id[]);
+
+/**
  * Called right before the TeamGames menu is displayed.
  *
  * @param client		Client index.

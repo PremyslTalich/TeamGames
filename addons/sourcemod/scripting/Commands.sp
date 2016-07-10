@@ -365,12 +365,17 @@ public GamesListSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 public Action:Command_StopTG(iClient, iArgs)
 {
-	TG_StopGame(TG_NoneTeam);
+	if (GetClientTeam(iClient) != CS_TEAM_CT && !CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
+		CPrintToChat(iClient, "%t", "Menu-CTOnly");
+		return Plugin_Handled;
+	}
 
-	TG_LogRoundMessage("StopGame", "Admin %L stopped game (sID: \"%s\") !", iClient, g_Game[GameID]);
-	decl String:sClientName[64];
-	GetClientName(iClient, sClientName, sizeof(sClientName));
-	CPrintToChatAll("%t", "GameStop", sClientName);
+	if (!IsPlayerAlive(iClient) && !CheckCommandAccess(iClient, "sm_teamgames", ADMFLAG_GENERIC)) {
+		CPrintToChat(iClient, "%t", "Menu-AliveOnly");
+		return Plugin_Handled;
+	}
+
+	StopGame(iClient);
 
 	return Plugin_Handled;
 }
@@ -618,12 +623,30 @@ CoreMenuItemsActions(iClient, String:sKey[])
 	} else if (StrEqual(sKey, "Core_FencesMenu")) {
 		FencesMenu(iClient);
 	} else if (StrEqual(sKey, "Core_StopGame")) {
-		TG_LogRoundMessage("StopGame", "Player %L stopped game (sID: \"%s\") !", iClient, g_Game[GameID]);
-
-		decl String:sClientName[64];
-		GetClientName(iClient, sClientName, sizeof(sClientName));
-		CPrintToChatAll("%t", "GameStop", sClientName);
-
-		TG_StopGame(TG_NoneTeam, _, false, true);
+		StopGame(iClient);
 	}
+}
+
+StopGame(iClient)
+{
+	new Action:iResult = Plugin_Continue;
+	Call_StartForward(Forward_OnPlayerStopGame);
+	Call_PushCell(iClient);
+	Call_PushString(g_Game[GameID]);
+	Call_Finish(iResult);
+	if (iResult != Plugin_Continue) {
+		return;
+	}
+
+	Call_StartForward(Forward_OnPlayerStopGamePost);
+	Call_PushCell(iClient);
+	Call_PushString(g_Game[GameID]);
+	Call_Finish();
+
+	TG_StopGame(TG_NoneTeam);
+
+	TG_LogRoundMessage("StopGame", "Player %L stopped the game (sID: \"%s\") !", iClient, g_Game[GameID]);
+	decl String:sClientName[64];
+	GetClientName(iClient, sClientName, sizeof(sClientName));
+	CPrintToChatAll("%t", "GameStop", sClientName);
 }
