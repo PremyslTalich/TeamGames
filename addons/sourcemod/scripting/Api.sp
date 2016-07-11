@@ -642,12 +642,19 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 					break;
 				}
 
+				new iUser;
+
 				if (iTeam == TG_RedTeam) {
-					iWinners[i] = GetClientOfUserId(g_Game[RedTeam][i]);
+					iUser = GetClientOfUserId(g_Game[RedTeam][i]);
 				} else if (iTeam == TG_BlueTeam) {
-					iWinners[i] = GetClientOfUserId(g_Game[BlueTeam][i]);
+					iUser = GetClientOfUserId(g_Game[BlueTeam][i]);
 				}
 
+				if (iUser == 0) {
+					continue;
+				}
+
+				iWinners[i] = iUser;
 				iWinnersCount++;
 			}
 		} else if (g_Game[GameType] == TG_RedOnly && (iTeam == TG_RedTeam || iTeam == TG_BlueTeam)) {
@@ -656,11 +663,13 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 					break;
 				}
 
-				if (!IsPlayerAlive(g_Game[RedTeam][i])) {
+				new iUser = GetClientOfUserId(g_Game[RedTeam][i]);
+
+				if (iUser == 0 || !IsPlayerAlive(iUser)) {
 					continue;
 				}
 
-				iWinners[i] = GetClientOfUserId(g_Game[RedTeam][i]);
+				iWinners[i] = iUser;
 				iWinnersCount++;
 			}
 		}
@@ -1214,7 +1223,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], TG_GameType:iG
 		if (GetClientTeam(iUser) == CS_TEAM_CT) {
 			CPrintToChat(iUser, "%T", "StopGameInfo", iUser, "Menu-StopGame");
 		}
-		
+
 		new String:sGameName[TG_MODULE_NAME_LENGTH];
 		Call_AskModuleName(sID, TG_Game, iUser, sGameName, sizeof(sGameName));
 

@@ -81,7 +81,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.17.0.7"
+#define _PLUGIN_VERSION "0.17.2.11"
 
 public Plugin:myinfo =
 {
@@ -288,7 +288,7 @@ public OnClientDisconnect(iClient)
 		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iClient, g_PlayerData[iClient][Team], TG_Disconnect);
 	}
 
-	if (TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]) && GetCountPlayersInTeam(g_PlayerData[iClient][Team]) == 0) {
+	if (TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]) && GetCountPlayersInTeam(g_PlayerData[iClient][Team]) - 1 == 0) {
 		if (g_Game[GameProgress] != TG_NoGame) {
 			TG_LogGameMessage(g_Game[GameID], "OnTeamEmpty", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		} else {
