@@ -63,8 +63,8 @@ UpdateHealthBar(iClient, bool:bCheckExistence = true)
 
 AttachHealthBar(iClient, iTemplate)
 {
-	new iSprite;
-	if ((iSprite = CreateEntityByName("env_sprite_oriented")) != INVALID_ENT_REFERENCE) {
+	new iSprite = CreateEntityByName("env_sprite_oriented");
+	if (iSprite != INVALID_ENT_REFERENCE) {
 		new Float:fPos[3];
 		GetClientAbsOrigin(iClient, fPos);
 		fPos[2] += 73.0 + g_iHPBarTemplate[iTemplate][Offset];
@@ -92,7 +92,7 @@ AttachHealthBar(iClient, iTemplate)
 
 RemoveHealthBar(iClient)
 {
-	if (g_iPlayerHPBar[iClient][Entity] != INVALID_ENT_REFERENCE && g_iPlayerHPBar[iClient][Entity] != 0) {
+	if (g_iPlayerHPBar[iClient][Entity] != INVALID_ENT_REFERENCE && g_iPlayerHPBar[iClient][Entity] != 0 && IsValidEdict(g_iPlayerHPBar[iClient][Entity])) {
 		RemoveEdict(g_iPlayerHPBar[iClient][Entity]);
 	}
 
