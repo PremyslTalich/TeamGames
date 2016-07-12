@@ -38,7 +38,7 @@ public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
 			SwitchToTeam(iClient, iTarget, iTeam);
 		}
 	} else if (StrEqual(sAction, "Core_SwitchAllToNoneTeam", false)) {
-		ClearTeams();
+		ClearTeams(iClient);
 	} else if (StrContains(sAction, "Core_SwitchAllToRedTeam", false) == 0) {
 		SwitchAllToRedTeam(iClient);
 

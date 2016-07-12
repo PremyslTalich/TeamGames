@@ -4,11 +4,11 @@
 // Player moved to team
 	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
 	{
-		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
+		"cze"		"{1} přesunul vězně{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
 	}
 	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
 	{
-		"cze"		"{1} přesunul hráče{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
+		"cze"		"{1} přesunul vězně{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
 	}
 	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
 	{
@@ -16,11 +16,23 @@
 	}
 	"PlayerMove-RedTeam-Game"
 	{
-		"cze"		"Hra {highlight}{1}{default} přesunula hráče{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
+		"cze"		"Hra {highlight}{1}{default} přesunula vězně{highlight} {2}{default} do teamu{tg-redteam} červených {default}!"
 	}
-	"PlayerMove-BlueTeam-Gamee"
+	"PlayerMove-BlueTeam-Game"
 	{
-		"cze"		"Hra {highlight}{1}{default} přesunula hráče{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
+		"cze"		"Hra {highlight}{1}{default} přesunula vězně{highlight} {2}{default} do teamu{tg-blueteam} modrých {default}!"
+	}
+	"PlayerMove-RedTeamAll"
+	{
+		"cze"		"{1}{default} přesunul všechny vězně do teamu{tg-redteam} červených {default}!"
+	}
+	"PlayerMove-FiftyFiftyAll"
+	{
+		"cze"		"{1} rozdělil vězně do{tg-redteam} červeného{default} a{tg-blueteam} modrého{default} teamu!"
+	}
+	"PlayerMove-NoneTeamAll"
+	{
+		"cze"		"{1} vyprázdnil oba teamy!"
 	}
 //------------------------------------------------------------------------------------------------
 // Player team hints

@@ -81,7 +81,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "0.17.2.11"
+#define _PLUGIN_VERSION "0.18.0.5"
 
 public Plugin:myinfo =
 {
@@ -100,7 +100,7 @@ public OnPluginStart()
 	CreateConVar("tg_version", _PLUGIN_VERSION, "TeamGames core version (not changeable)", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_DONTRECORD);
 
 	g_hAutoUpdate = 				CreateConVar("tg_autoupdate", 				"1", 						"Should TeamGames use plugin Updater? (https://forums.alliedmods.net/showthread.php?t=169095) (1 = true, 0 = false)");
-	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 					"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are hold forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
+	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 					"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are held forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
 
 	g_hModuleDefVisibility = 		CreateConVar("tg_module_defvisibility",		"1", 						"Default visibility of new modules (might not work properly). (1 = visible, 0 = invisible)");
 
@@ -116,8 +116,8 @@ public OnPluginStart()
 
 	g_hRoundLimit = 				CreateConVar("tg_game_roundlimit", 			"-1", 						"How many games can be played in one round? (-1 = no limit)");
 	g_hCheckTeams = 				CreateConVar("tg_game_checkteams", 			"0", 						"Check if the teams are equal before starting TeamGame game.");
-	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",						"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide)");
-	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",						"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide)");
+	g_hMoveSurvivors = 				CreateConVar("tg_game_movesurvivors",		"0",						"Should be survivors (after game end) moved to \"NoneTeam\"?\n\t0 = don't move them\n\t1 = move them\n\t2 = let the game decide");
+	g_hSaveWeapons = 				CreateConVar("tg_game_saveweapons",			"2",						"Should survivors recieve striped weapons, health and armor in Game preparation?\n\t0 = no\n\t1 = yes\n\t2 = let the game decide");
 	g_hRebelAttack = 				CreateConVar("tg_game_rebelattack",			"1",						"Action taken when red/blue T attack CT during game\n\t0 = no dmg & no rebel\n\t1 = no dmg & make rebel");
 	g_hKillFrags = 					CreateConVar("tg_game_killfrags",			"1",						"Frags added when prisoner killed in TG game.");
 	g_hKillScore = 					CreateConVar("tg_game_killscore",			"1",						"Score added when prisoner killed in TG game. (Only for CS:GO)");

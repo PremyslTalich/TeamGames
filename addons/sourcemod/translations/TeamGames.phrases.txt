@@ -2,17 +2,17 @@
 {
 //------------------------------------------------------------------------------------------------
 // Player moved to team
-	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
+	"PlayerMove-RedTeam" // msg for all players when prisoner {1} moved {2} to team red
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
+		"en"		"{1} moved prisoner{highlight} {2}{default} to{tg-redteam} red{default} team!"
 	}
-	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
+	"PlayerMove-BlueTeam" // msg for all players when prisoner {1} moved {2} to team blue
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"{1} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
+		"en"		"{1} moved prisoner{highlight} {2}{default} to{tg-blueteam} blue{default} team!"
 	}
-	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
+	"PlayerMove-NoneTeam" // msg for all players when prisoner {1} was moved out of any team
 	{
 		"#format"	"{1:s}"
 		"en"		"{1} is not in a team anymore!"
@@ -20,12 +20,27 @@
 	"PlayerMove-RedTeam-Game"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
+		"en"		"Game {highlight}{1}{default} moved prisoner{highlight} {2}{default} to{tg-redteam} red{default} team!"
 	}
-	"PlayerMove-BlueTeam-Gamee"
+	"PlayerMove-BlueTeam-Game"
 	{
 		"#format"	"{1:s},{2:s}"
-		"en"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
+		"en"		"Game {highlight}{1}{default} moved prisoner{highlight} {2}{default} to{tg-blueteam} blue{default} team!"
+	}
+	"PlayerMove-RedTeamAll"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1}{default} moved all the prisoners to{tg-redteam} red{default} team!"
+	}
+	"PlayerMove-FiftyFiftyAll"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} split the prisoners into {tg-redteam} red{default} and{tg-blueteam} blue{default} team!"
+	}
+	"PlayerMove-NoneTeamAll"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} cleared both teams!"
 	}
 //------------------------------------------------------------------------------------------------
 // Player team hints

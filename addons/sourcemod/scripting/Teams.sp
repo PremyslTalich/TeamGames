@@ -63,7 +63,7 @@ public TeamsMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		GetMenuItem(hMenu, iKey, sKey, sizeof(sKey));
 
 		if (StrEqual(sKey, "AllNone")) {
-			ClearTeams();
+			ClearTeams(iClient);
 		} else if (StrEqual(sKey, "AllRed")) {
 			SwitchAllToRedTeam(iClient);
 
@@ -104,8 +104,15 @@ SwitchAllToRedTeam(iClient)
 	for (new iUser = 1; iUser <= MaxClients; iUser++) {
 		iTeam = TG_GetPlayerTeam(iUser);
 		if (iTeam == TG_NoneTeam || iTeam == TG_BlueTeam) {
-			SwitchToTeam(iClient, iUser, TG_RedTeam);
+			SwitchToTeam(iClient, iUser, TG_RedTeam, false);
 		}
+	}
+
+	if (iClient > 0 && iClient <= MaxClients && IsClientInGame(iClient)) {
+		new String:sClientName[64];
+		GetClientName(iClient, sClientName, sizeof(sClientName));
+
+		CPrintToChatAll("%t", "PlayerMove-RedTeamAll", sClientName);
 	}
 }
 
@@ -124,16 +131,23 @@ SwitchAllFiftyFifty(iClient)
 
 	if ((iUsersCount & 1) == 1) {
 		iUsersCount--;
-		SwitchToTeam(iClient, iUsers[iUsersCount], TG_NoneTeam);
+		SwitchToTeam(iClient, iUsers[iUsersCount], TG_NoneTeam, false);
 	}
 
 	for (new i = 0; i < iUsersCount; i++) {
-		SwitchToTeam(iClient, iUsers[i], iTeam);
+		SwitchToTeam(iClient, iUsers[i], iTeam, false);
 		iTeam = TG_GetOppositeTeam(iTeam);
+	}
+
+	if (iClient > 0 && iClient <= MaxClients && IsClientInGame(iClient)) {
+		new String:sClientName[64];
+		GetClientName(iClient, sClientName, sizeof(sClientName));
+
+		CPrintToChatAll("%t", "PlayerMove-FiftyFiftyAll", sClientName);
 	}
 }
 
-SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
+SwitchToTeam(iActivator, iClient, TG_Team:iTeam, bool:bPrintChatMessages = true)
 {
 	if (iTeam == TG_ErrorTeam)
 		return 5;
@@ -193,18 +207,20 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam)
 	Call_PushCell(iTeam);
 	Call_Finish();
 
-	if (Client_IsIngame(iActivator)) {
-		if (iTeam == TG_NoneTeam)
-			CPrintToChatAll("%t", "PlayerMove-NoneTeam", sClientName);
-		else if (iTeam == TG_RedTeam)
-			CPrintToChatAll("%t", "PlayerMove-RedTeam", sActivatorName, sClientName);
-		else if (iTeam == TG_BlueTeam)
-			CPrintToChatAll("%t", "PlayerMove-BlueTeam", sActivatorName, sClientName);
-	} else if (iActivator == -1 && g_Game[GameProgress] != TG_NoGame) {
-		if (iTeam == TG_RedTeam)
-			CPrintToChatAll("%t", "PlayerMove-RedTeam-Game", g_GameList[GetGameIndex(g_Game[GameID])][DefaultName], sClientName);
-		else if (iTeam == TG_BlueTeam)
-			CPrintToChatAll("%t", "PlayerMove-BlueTeam-Game", g_GameList[GetGameIndex(g_Game[GameID])][DefaultName], sClientName);
+	if (bPrintChatMessages) {
+		if (Client_IsIngame(iActivator)) {
+			if (iTeam == TG_NoneTeam)
+				CPrintToChatAll("%t", "PlayerMove-NoneTeam", sClientName);
+			else if (iTeam == TG_RedTeam)
+				CPrintToChatAll("%t", "PlayerMove-RedTeam", sActivatorName, sClientName);
+			else if (iTeam == TG_BlueTeam)
+				CPrintToChatAll("%t", "PlayerMove-BlueTeam", sActivatorName, sClientName);
+		} else if (iActivator == -1 && g_Game[GameProgress] != TG_NoGame) {
+			if (iTeam == TG_RedTeam)
+				CPrintToChatAll("%t", "PlayerMove-RedTeam-Game", g_GameList[GetGameIndex(g_Game[GameID])][DefaultName], sClientName);
+			else if (iTeam == TG_BlueTeam)
+				CPrintToChatAll("%t", "PlayerMove-BlueTeam-Game", g_GameList[GetGameIndex(g_Game[GameID])][DefaultName], sClientName);
+		}
 	}
 
 	if (g_bLogCvar) {
@@ -359,14 +375,21 @@ ClearTeam(TG_Team:iTeam)
 			continue;
 
 		if (g_PlayerData[i][Team] == iTeam)
-			SwitchToTeam(-1, i, TG_NoneTeam);
+			SwitchToTeam(-1, i, TG_NoneTeam, false);
 	}
 
 	return 0;
 }
 
-ClearTeams()
+ClearTeams(iClient = 0)
 {
+	if (iClient > 0 && iClient <= MaxClients && IsClientInGame(iClient)) {
+		new String:sClientName[64];
+		GetClientName(iClient, sClientName, sizeof(sClientName));
+
+		CPrintToChatAll("%t", "PlayerMove-NoneTeamAll", sClientName);
+	}
+
 	ClearTeam(TG_RedTeam);
 	ClearTeam(TG_BlueTeam);
 }

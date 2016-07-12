@@ -18,7 +18,7 @@
 	{
 		"svn"		"Igra {highlight}{1}{default} je premaknila{highlight} {2}{default} v{tg-redteam} rdec {default} team!"
 	}
-	"PlayerMove-BlueTeam-Gamee"
+	"PlayerMove-BlueTeam-Game"
 	{
 		"svn"		"Igra {highlight}{1}{default} je premaknila{highlight} {2}{default} v{tg-blueteam} moder {default} team!"
 	}

@@ -24,7 +24,7 @@
 		"#format"	"{1:s},{2:s}"
 		"ru"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
 	}
-	"PlayerMove-BlueTeam-Gamee"
+	"PlayerMove-BlueTeam-Game"
 	{
 		"#format"	"{1:s},{2:s}"
 		"ru"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
