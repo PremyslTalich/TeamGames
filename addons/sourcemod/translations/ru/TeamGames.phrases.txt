@@ -4,30 +4,35 @@
 // Player moved to team
 	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
 	{
-		"#format"	"{1:s},{2:s}"
-
 		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-redteam} красных {default} !"
 	}
 	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
 	{
-		"#format"	"{1:s},{2:s}"
-
 		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-blueteam} синих {default} !"
 	}
 	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
 	{
-		"#format"	"{1:s}"
 		"ru"		"{1} Больше не в команде!"
 	}
 	"PlayerMove-RedTeam-Game"
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-redteam} red {default} team!"
 	}
 	"PlayerMove-BlueTeam-Game"
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Game {highlight}{1}{default} moved player{highlight} {2}{default} to{tg-blueteam} blue {default} team!"
+	}
+	"PlayerMove-RedTeamAll"
+	{
+		"en"		"{1} переместил всех в команду {tg-redteam} красных!"
+	}
+	"PlayerMove-FiftyFiftyAll"
+	{
+		"en"		"{1} поделил всех на 2 команды!"
+	}
+	"PlayerMove-NoneTeamAll"
+	{
+		"en"		"Всех игроков исключили из команды!"
 	}
 //------------------------------------------------------------------------------------------------
 // Player team hints
@@ -43,6 +48,18 @@
 	{
 		"ru"		"Вы не состоите ни в какой команде!"
 	}
+	"TeamHud-CSGO-RedTeam" // CSGO hint msg for player in team red
+	{
+		"ru"		"Вы в <font color='#ff0000'>команде красных</font>!"
+	}
+	"TeamHud-CSGO-BlueTeam" // CSGO hint msg for player in team blue
+	{
+		"ru"		"Вы в <font color='#0000ff'>команде синих</font>!"
+	}
+	"TeamHud-CSGO-NoneTeam" // CSGO hint msg for player moved out of team
+	{
+		"ru"		"Вы не в команде!"
+	}
 //------------------------------------------------------------------------------------------------
 // Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
 	"TeamPrefix-RedTeam" // player prefix in chat (team red)
@@ -57,42 +74,38 @@
 // Game progress
 	"GamePreparation" // msg for all players when started preparation for game ({1} = game name)
 	{
-		"#format"	"{1:s}"
 		"ru"		"Подготовка к игре {tg-module}{1}{default} !!!"
 	}
 	"GamePreparation-Settings" // msg for all players when started preparation for game ({1} = game name, {2} = game settings)
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Подготовка к игре {tg-module}{1}{default} - {tg-settings}{2}{default} !!!"
 	}
 	"GameStart" // msg for all players when GameStart ({1} = game name)
 	{
-		"#format"	"{1:s}"
 		"ru"		"Игра {tg-module}{1}{default} начата !!!"
 	}
 	"GameStart-Settings" // msg for all players when GameStart ({1} = game name, {2} = game settings)
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Игра {tg-module}{1}{default} - {tg-settings}{2}{default} начата !!!"
+	}
+	"StopGameInfo" // msg for CTs players about how they can stop the game
+	{
+		"ru"		"Ты можешь остановить игру командой {command}!stoptg{default} или в меню {command}TG menu{default} -> {command}{1}{default} !"
 	}
 	"GameStop" // msg for all players when someone stop the game ({1} = player name)
 	{
-		"#format"	"{1:s}"
 		"ru"		"Игрок {player}{1}{default} завершил игру !!!"
 	}
 	"GameEnd"
 	{
-		"#format"	"{1:s}"
 		"ru"		"Игра {tg-module}{1}{default} завершена !!!"
 	}
 	"PlayerDeath-RedTeam" // msg for all players that player from team red died ({1} = red player name)
 	{
-		"#format"	"{1:s}"
 		"ru"		"Умер {1} из команды{tg-redteam} красных {default}!"
 	}
 	"PlayerDeath-BlueTeam" // msg for all players that player from team blue died ({1} = blue player name)
 	{
-		"#format"	"{1:s}"
 		"ru"		"Умер {1} из команды{tg-blueteam} синих{default} !"
 	}
 	"TeamWins-RedTeam" // msg for all players that team red wins
@@ -109,16 +122,18 @@
 	}
 	"TeamWins-Winner" // msg for all players that teams tied
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Игрок {tg-redteam}{1} {default}победил в игре {tg-module}{2}!"
 	}
 	"TeamWins-Winners" // msg for all players that teams tied
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Игроки {tg-redteam}{1} {default}победили в игре {tg-module}{2}!"
 	}
 //------------------------------------------------------------------------------------------------
 // Main menu - lock/unlock
+	"Menu-TimeLock" // msg for CTs trying gto use tg menu over time lock
+	{
+		"ru"		"Мемю мини-игр будет разблокировано через {highlight}{1}{default} секунд!"
+	}
 	"Menu-AliveOnly" // msg for dead CT player trying open main menu
 	{
 		"ru"		"Только живые игроки могут проводить игры !"
@@ -129,7 +144,6 @@
 	}
 	"Menu-Locked" // msg for all players if somebody (must be CT and alive) try to open main menu and main menu is locked
 	{
-		"#format"	"{1:d},{2:d}"
 		"ru"		"{highlight}{1}/{2}{default} требуется {highlight} !tg{default} для разблокировки."
 	}
 	"Menu-Unlocked" // msg for all players when main menu is unlocked
@@ -144,7 +158,6 @@
 	}
 	"Menu-Teams"
 	{
-		"en"		"Distribute to teams"
 		"ru"		"Распределить по командам"
 	}
 	"Menu-Games"
@@ -169,12 +182,15 @@
 	}
 	"Menu-CountGamesInfo"
 	{
-		"#format"	"{1:d}"
 		"ru"		"Вы можете сыграть {1} игр за этот раунд."
 	}
 	"Menu-NoMoreGames"
 	{
 		"ru"		"Пока что вы не можете играть в какую-либо игру."
+	}
+	"Menu-Games-TimeLock"
+	{
+		"en"		"Мини-игры будут доступны через {1} секунд!"
 	}
 //------------------------------------------------------------------------------------------------
 // Teams menu
@@ -210,7 +226,6 @@
 // Games menu
 	"MenuGames-Start-Title" // {1} = game name
 	{
-		"#format"	"{1:s}"
 		"ru"		"{1}"
 	}
 	"MenuGames-Start"
@@ -241,12 +256,10 @@
 	}
 	"MenuGamesList-Chosen-TeamGame"
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Игрок {1} выбрал игру {tg-module}{2}"
 	}
 	"MenuGamesList-Chosen-RedOnly"
 	{
-		"#format"	"{1:s},{2:s}"
 		"ru"		"Игрок {1}выбрал игру {tg-module}{2} {tg-redteam}(RedOnly)"
 	}
 //------------------------------------------------------------------------------------------------
@@ -257,7 +270,6 @@
 	}
 	"Fences-PlayerCross"
 	{
-		"#format"	"{1:s}"
 		"ru"		"Игрок {1} коснулся каната!"
 	}
 //------------------------------------------------------------------------------------------------
@@ -322,7 +334,6 @@
 	}
 	"Rebel-Become"
 	{
-		"#format"	"{1:s}"
 		"ru"	"Игрок {highlight}{1}{default} стал бунтовщиком!"
 	}
 }
