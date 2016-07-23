@@ -31,7 +31,7 @@ $(document).ready(function()
 		}
 
 		lst += '<li id="' + object + '" data-container="body" data-trigger="hover" data-title="' + object + '" data-content="' + doc + '">';
-			lst += '<a href="#" onclick="loadObjectDetails(\'' + object + '\'); return false;">';
+			lst += '<a href="?' + object + '" onclick="loadObjectDetails(\'' + object + '\'); return false;">';
 				lst += object;
 			lst += '</a>';
 		lst += '</li>';
@@ -450,7 +450,7 @@ function getSummarySingle(object)
 
 	single += '<tr>';
 		single += '<td class="col-md-3 mono name">';
-			single += '<a href="#" onclick="loadObjectDetails(\'' + object + '\'); return false;">' + object + '</a>';
+			single += '<a href="?' + object + '" onclick="loadObjectDetails(\'' + object + '\'); return false;">' + object + '</a>';
 		single += '</td>';
 
 		if (objects[object].docText != undefined) {
@@ -466,7 +466,7 @@ function getSummarySingle(object)
 function getTypeName(type)
 {
 	if (type in objects) {
-		return '<a class="type" href="#" onclick="loadObjectDetails(\'' + type + '\'); return false;">' + type + '</a>';
+		return '<a class="type" href="?' + type + '" onclick="loadObjectDetails(\'' + type + '\'); return false;">' + type + '</a>';
 	} else {
 		return type;
 	}
@@ -494,25 +494,6 @@ function search(name)
 	});
 }
 
-// function updateBreadCrumbs(newCrumb)
-// {
-	// $('#breadcrumb').html('');
-	// crumbs.push(newCrumb);
-
-	// if (crumbs.length > 7) {
-		// crumbs.shift();
-	// }
-
-	// var breads = '';
-	// for (crumb in crumbs) {
-		// breads += '<li><a href="#" onclick="loadObjectDetails(\'' + crumbs[crumb] + '\'); return false;">' + crumbs[crumb] + '</a></li>';
-	// }
-
-	// $('#breadcrumb').html(breads);
-
-	// $('#breadcrumb').css('visibility', 'visible');
-// }
-
 function updateBreadCrumbs(newCrumb)
 {
 	$('#breadcrumb').html('');
@@ -524,7 +505,7 @@ function updateBreadCrumbs(newCrumb)
 
 	var breads = '<strong style="border-right-width: 1px; border-right-style: solid; padding-right: 10px;">History</strong>&nbsp;&nbsp;';
 	for (crumb in crumbs) {
-		breads += '<li><a href="#" onclick="loadObjectDetails(\'' + crumbs[crumb] + '\'); return false;">' + crumbs[crumb] + '</a></li>';
+		breads += '<li><a href="?' + object + '" onclick="loadObjectDetails(\'' + crumbs[crumb] + '\'); return false;">' + crumbs[crumb] + '</a></li>';
 	}
 
 	$('#breadcrumb').html(breads);
