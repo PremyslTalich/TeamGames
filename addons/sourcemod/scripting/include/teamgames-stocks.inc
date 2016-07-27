@@ -266,7 +266,11 @@ stock RequestFrame2(RequestFrameCallback:func, framesAhead = 1, any:data = 0)
 		RequestFrame(func, data);
 	} else {
 		new Handle:pack = CreateDataPack();
+#if SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 7
+		WritePackFunction(pack, func);
+#else
 		WritePackCell(pack, func);
+#endif
 		WritePackCell(pack, framesAhead);
 		WritePackCell(pack, data);
 
@@ -277,7 +281,11 @@ stock RequestFrame2(RequestFrameCallback:func, framesAhead = 1, any:data = 0)
 public RequestFrame2_CallBack(any:pack)
 {
 	ResetPack(Handle:pack);
+#if SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 7
+	new RequestFrameCallback:func = RequestFrameCallback:ReadPackFunction(Handle:pack);
+#else
 	new RequestFrameCallback:func = RequestFrameCallback:ReadPackCell(Handle:pack);
+#endif
 	new framesAhead = ReadPackCell(Handle:pack) - 1;
 	new data = ReadPackCell(Handle:pack);
 	CloseHandle(Handle:pack);
@@ -297,7 +305,7 @@ stock GivePlayerWeaponAndAmmo(client, String:weapon[], clip = -1, ammo = -1)
 			SetEntProp(weaponEnt, Prop_Send, "m_iClip1", clip);
 
 		if (ammo != -1) {
-			new iOffset = FindDataMapOffs(client, "m_iAmmo") + (GetEntProp(weaponEnt, Prop_Data, "m_iPrimaryAmmoType") * 4);
+			new iOffset = FindDataMapInfo(client, "m_iAmmo") + (GetEntProp(weaponEnt, Prop_Data, "m_iPrimaryAmmoType") * 4);
 			SetEntData(client, iOffset, ammo, 4, true);
 
 			if (GetEngineVersion() == Engine_CSGO) {

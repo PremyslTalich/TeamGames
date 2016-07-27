@@ -89,7 +89,7 @@ GiveGrenade(client)
 
 	SetEntProp(grenade, Prop_Send, "m_iClip1", 1);
 
-	new offset = FindDataMapOffs(client, "m_iAmmo") + (GetEntProp(grenade, Prop_Data, "m_iPrimaryAmmoType") * 4);
+	new offset = FindDataMapInfo(client, "m_iAmmo") + (GetEntProp(grenade, Prop_Data, "m_iPrimaryAmmoType") * 4);
 	SetEntData(client, offset, 1, 4, true);
 
 	if (GetEngineVersion() == Engine_CSGO) {

@@ -97,7 +97,7 @@ public OnPluginStart()
 	LoadTranslations("common.phrases");
 	LoadTranslations("TeamGames.phrases");
 
-	CreateConVar("tg_version", _PLUGIN_VERSION, "TeamGames core version (not changeable)", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_DONTRECORD);
+	CreateConVar("tg_version", _PLUGIN_VERSION, "TeamGames core version (not changeable)", FCVAR_NOTIFY|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_DONTRECORD);
 
 	g_hAutoUpdate = 				CreateConVar("tg_autoupdate", 				"1", 						"Should TeamGames use plugin Updater? (https://forums.alliedmods.net/showthread.php?t=169095) (1 = true, 0 = false)");
 	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 					"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are held forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);

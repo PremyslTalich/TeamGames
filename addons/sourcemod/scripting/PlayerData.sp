@@ -176,7 +176,7 @@ SavePlayerEquipment(iClient, bool:bSaveHP = true, bool:bSaveArmor = true)
 		if (g_iEngineVersion == Engine_CSGO) {
 			iPrimaryAmmo = GetEntProp(iTaser, Prop_Send, "m_iPrimaryReserveAmmoCount");
 		} else {
-			iPrimaryAmmo = GetEntData(iClient, FindDataMapOffs(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iTaser) * 4));
+			iPrimaryAmmo = GetEntData(iClient, FindDataMapInfo(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iTaser) * 4));
 		}
 	}
 
@@ -190,7 +190,7 @@ SavePlayerEquipment(iClient, bool:bSaveHP = true, bool:bSaveArmor = true)
 		if (g_iEngineVersion == Engine_CSGO) {
 			iPrimaryAmmo = GetEntProp(iWeaponEntity, Prop_Send, "m_iPrimaryReserveAmmoCount");
 		} else {
-			iPrimaryAmmo = GetEntData(iClient, FindDataMapOffs(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iWeaponEntity) * 4));
+			iPrimaryAmmo = GetEntData(iClient, FindDataMapInfo(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iWeaponEntity) * 4));
 		}
 	}
 
@@ -204,7 +204,7 @@ SavePlayerEquipment(iClient, bool:bSaveHP = true, bool:bSaveArmor = true)
 		if (g_iEngineVersion == Engine_CSGO) {
 			iSecondaryAmmo = GetEntProp(iWeaponEntity, Prop_Send, "m_iPrimaryReserveAmmoCount");
 		} else {
-			iSecondaryAmmo = GetEntData(iClient, FindDataMapOffs(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iWeaponEntity) * 4));
+			iSecondaryAmmo = GetEntData(iClient, FindDataMapInfo(iClient, "m_iAmmo") + (Weapon_GetPrimaryAmmoType(iWeaponEntity) * 4));
 		}
 	}
 
