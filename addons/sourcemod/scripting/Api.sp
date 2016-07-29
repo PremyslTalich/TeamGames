@@ -212,7 +212,11 @@ public Native_RemoveGame(Handle:hPlugin, iNumParams)
 public Native_ShowPlayerSelectMenu(Handle:hPlugin, iNumParams)
 {
 	new iClient = GetNativeCell(1);
+#if SOURCEMOD_V_MAJOR >= 1 && SOURCEMOD_V_MINOR >= 7
+	new Function:fCallBack = GetNativeFunction(2);
+#else
 	new Function:fCallBack = Function:GetNativeCell(2);
+#endif
 	new bool:bRedTeam = bool:GetNativeCell(3);
 	new bool:bBlueTeam = bool:GetNativeCell(4);
 	new bool:bRandom = bool:GetNativeCell(5);
