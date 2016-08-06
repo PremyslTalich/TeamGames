@@ -18,6 +18,8 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 
 ***Not sure how to install TeamGames?*** *Check [installation guide](https://github.com/KissLick/TeamGames/wiki/Installation-guide)!*
 
+Now also on AlliedModders [forum](https://forums.alliedmods.net/showthread.php?t=286045)!
+
 ### Special thanks to:
 - [SHAREN](https://github.com/SHAREN) - Bug reports, ideas and Russian translation (not completed)
 - [Arhar](http://steamcommunity.com/profiles/76561198015855520/) - Slovenian translation  (not completed)
