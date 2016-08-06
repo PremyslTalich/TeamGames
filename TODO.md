@@ -1,15 +1,15 @@
 To do list
 ==========
 
-- [ ] Finish the game *One in the chamber* - test properly
 - [ ] Make the game *Magic dodgeball*
 - [ ] Make the game *Dodge the prop*
 - [ ] Check ammo handling in games and unify somehow???
-- [ ] Add fixed player skins to extras
 - [ ] Create first release and publish on SM forum
 
 ---
 
+- [x] Add fixed player skins to extras
+- [x] Finish the game *One in the chamber* - test properly
 - [x] ~~Add option `@hidden`~~ to docs & docparser for excluding functions from API site *- Done by excluding objects not starting with `TG_`*
 - [x] Add missing docs and update obsolete.
 - [x] Update wiki & examples according to new game types handling
