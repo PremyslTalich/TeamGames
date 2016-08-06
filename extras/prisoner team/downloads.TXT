@@ -2,8 +2,6 @@ models/player/prisoner/prisoner_new_red.mdl
 models/player/prisoner/prisoner_new_red.dx90.vtx
 models/player/prisoner/prisoner_new_red.phy
 models/player/prisoner/prisoner_new_red.vvd
-materials/models/player/prisoner_red/hands.vmt
-materials/models/player/prisoner_red/hands.vtf
 materials/models/player/prisoner_red/prisoner.vmt
 materials/models/player/prisoner_red/prisoner.vtf
 materials/models/player/prisoner_red/prisoner_n.vtf
@@ -12,8 +10,6 @@ models/player/prisoner/prisoner_new_blue.mdl
 models/player/prisoner/prisoner_new_blue.dx90.vtx
 models/player/prisoner/prisoner_new_blue.phy
 models/player/prisoner/prisoner_new_blue.vvd
-materials/models/player/prisoner_blue/hands.vmt
-materials/models/player/prisoner_blue/hands.vtf
 materials/models/player/prisoner_blue/prisoner.vmt
 materials/models/player/prisoner_blue/prisoner.vtf
 materials/models/player/prisoner_blue/prisoner_n.vtf
