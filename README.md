@@ -21,6 +21,7 @@ Modular SourceMod plugin system for CS:S/CS:GO JailBreak servers with many featu
 ### Special thanks to:
 - [SHAREN](https://github.com/SHAREN) - Bug reports, ideas and Russian translation (not completed)
 - [Arhar](http://steamcommunity.com/profiles/76561198015855520/) - Slovenian translation  (not completed)
+- [peace-maker](https://github.com/peace-maker) - Nice pull request solving compilation with 1.7+ compilers
 
 ## Games
 
