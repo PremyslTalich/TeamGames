@@ -1,7 +1,7 @@
 To do list
 ==========
 
-- [ ] Make a MoreTeams module (adding more "teams" acting as none team - no able to play games)
+- [ ] Make a MoreTeams module (adding more "teams" acting as none team - not able to play games)
 - [ ] Add support for team (red x blue) hands for prosiners
 - [ ] Make the game *Magic dodgeball*
 - [ ] Make the game *Dodge the prop*
