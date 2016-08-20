@@ -32,7 +32,7 @@ public OnPluginStart()
 public Action:TG_OnMenuDisplay(client)
 {
 	if (GetConVarBool(g_hMenu) && !CheckWardenAccess(client, g_hMenu)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
@@ -42,7 +42,7 @@ public Action:TG_OnMenuDisplay(client)
 public Action:TG_OnGameStartMenu(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
 	if (!CheckWardenAccess(client, g_hGames)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
@@ -52,7 +52,7 @@ public Action:TG_OnGameStartMenu(const String:id[], TG_GameType:gameType, client
 public Action:TG_OnPlayerStopGame(client, const String:id[])
 {
 	if (!CheckWardenAccess(client, g_hGames)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
@@ -62,17 +62,17 @@ public Action:TG_OnPlayerStopGame(client, const String:id[])
 public Action:TG_OnMenuSelect(TG_ModuleType:type, const String:id[], TG_GameType:gameType, client)
 {
 	if ((type == TG_Game || StrContains(id, "Core_GamesMenu", false) == 0) && !CheckWardenAccess(client, g_hGames)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
 	if (StrEqual(id, "Core_FencesMenu") && !CheckWardenAccess(client, g_hFences)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
 	if (StrEqual(id, "Core_TeamsMenu") && !CheckWardenAccess(client, g_hTeams)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
@@ -104,7 +104,7 @@ public Action:TG_OnMarkSpawn(client, TG_Team:team, Float:position[3], Float:life
 public Action:TG_OnLaserFenceCreate(client, Float:a[3], Float:c[3])
 {
 	if (!CheckWardenAccess(client, g_hFences)) {
-		PrintClientAccessDenied(client)
+		PrintClientAccessDenied(client);
 		return Plugin_Handled;
 	}
 
