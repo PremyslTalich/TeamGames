@@ -4,11 +4,11 @@
 // Player moved to team
 	"PlayerMove-RedTeam" // msg for all players when player {1} moved {2} to team red
 	{
-		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-redteam} красных {default} !"
+		"ru"		"{1} переместил заключённого{highlight} {2}{default} в команду {tg-redteam} красных {default} !"
 	}
 	"PlayerMove-BlueTeam" // msg for all players when player {1} moved {2} to team blue
 	{
-		"ru"		"{1} переместил игрока{highlight} {2}{default} в команду {tg-blueteam} синих {default} !"
+		"ru"		"{1} переместил заключённого{highlight} {2}{default} в команду {tg-blueteam} синих {default} !"
 	}
 	"PlayerMove-NoneTeam" // msg for all players when player {1} was moved out of any team
 	{
@@ -24,15 +24,15 @@
 	}
 	"PlayerMove-RedTeamAll"
 	{
-		"en"		"{1} переместил всех в команду {tg-redteam} красных!"
+		"ru"		"{1} переместил всех в команду {tg-redteam} красных!"
 	}
 	"PlayerMove-FiftyFiftyAll"
 	{
-		"en"		"{1} поделил всех на 2 команды!"
+		"ru"		"{1} поделил всех на 2 команды!"
 	}
 	"PlayerMove-NoneTeamAll"
 	{
-		"en"		"Всех игроков исключили из команды!"
+		"ru"		"Всех игроков исключили из команды!"
 	}
 //------------------------------------------------------------------------------------------------
 // Player team hints
@@ -90,7 +90,7 @@
 	}
 	"StopGameInfo" // msg for CTs players about how they can stop the game
 	{
-		"ru"		"Ты можешь остановить игру командой {command}!stoptg{default} или в меню {command}TG menu{default} -> {command}{1}{default} !"
+		"ru"		"Ты можешь остановить игру с помощью {command}!stoptg{default} или в {command}TG меню{default} -> {command}{1}{default} !"
 	}
 	"GameStop" // msg for all players when someone stop the game ({1} = player name)
 	{

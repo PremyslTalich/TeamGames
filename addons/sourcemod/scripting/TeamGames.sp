@@ -81,7 +81,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "1.0.0.0"
+#define _PLUGIN_VERSION "1.1.0.7"
 
 public Plugin:myinfo =
 {
@@ -101,6 +101,7 @@ public OnPluginStart()
 
 	g_hAutoUpdate = 				CreateConVar("tg_autoupdate", 				"1", 						"Should TeamGames use plugin Updater? (https://forums.alliedmods.net/showthread.php?t=169095) (1 = true, 0 = false)");
 	g_hLogTime = 					CreateConVar("tg_logtime", 					"72.0", 					"How long should logs be hold (in hours)\n\t0.0 = logging turned off\n\t-1.0 = loggin on + logs are held forever\n\t>0.0 = loggin on + older logs are deleted", _, true, -1.0, true, 600.0);
+	g_hCTFriendlyFire = 			CreateConVar("tg_ct_friendlyfire", 			"0", 						"");
 
 	g_hModuleDefVisibility = 		CreateConVar("tg_module_defvisibility",		"1", 						"Default visibility of new modules (might not work properly). (1 = visible, 0 = invisible)");
 
@@ -377,7 +378,7 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 	new iAttackerTeam = GetClientTeam(iAttacker);
 
 	// CT can't hurt CT
-	if (iAttackerTeam == CS_TEAM_CT && iVictimTeam == CS_TEAM_CT)
+	if (!GetConVarBool(g_hCTFriendlyFire) && iAttackerTeam == CS_TEAM_CT && iVictimTeam == CS_TEAM_CT)
 		return Plugin_Handled;
 
 	// CT can always hurt T

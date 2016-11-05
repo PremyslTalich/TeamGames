@@ -2,7 +2,7 @@ new bool:g_bLockMenu;
 
 public Action:Command_BindAction(iClient, const String:sCommand[], iArgs)
 {
-	if (!Client_IsValid(iClient, true) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_CT) {
+	if (!Client_IsIngame(iClient) || !IsPlayerAlive(iClient) || GetClientTeam(iClient) != CS_TEAM_CT) {
 		return Plugin_Continue;
 	}
 

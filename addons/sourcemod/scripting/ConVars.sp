@@ -1,5 +1,6 @@
 new Handle:g_hLogTime, bool:g_bLogCvar, String:g_sLogFile[PLATFORM_MAX_PATH];
 new Handle:g_hAutoUpdate;
+new Handle:g_hCTFriendlyFire;
 
 new Handle:g_hModuleDefVisibility;
 

@@ -14,7 +14,7 @@ public Plugin:myinfo =
 	name = "[TG] HotPotato",
 	author = "Raska",
 	description = "",
-	version = "0.6",
+	version = "0.7",
 	url = ""
 }
 
@@ -111,7 +111,8 @@ public TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const S
 			if (!TG_IsPlayerRedOrBlue(i) || !Client_IsIngame(i))
 				continue;
 
-			SDKHook(i, SDKHook_WeaponDrop, Hook_WeaponDrop);
+			SDKHook(i, SDKHook_WeaponDrop,   Hook_WeaponDrop);
+			SDKHook(i, SDKHook_WeaponCanUse, Hook_OnWeaponCanUse);
 
 			if (GetConVarInt(g_heathCheck) == 2) {
 				TG_AttachPlayerHealthBar(i);
@@ -134,6 +135,21 @@ public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const Str
 	g_damageTimer = CreateTimer(GetConVarFloat(g_damageInterval), Timer_SlapClient, _, TIMER_REPEAT);
 
 	return;
+}
+
+public Action:Hook_OnWeaponCanUse(client, weapon)
+{
+	if (!TG_IsCurrentGameID(GAME_ID) || !TG_IsPlayerRedOrBlue(client))
+		return Plugin_Continue;
+
+	new String:weaponClassName[32];
+	GetEdictClassname(weapon, weaponClassName, sizeof(weaponClassName));
+
+	if (StrEqual(weaponClassName, "weapon_c4") && weapon != g_potato) {
+		return Plugin_Handled;
+	}
+
+	return Plugin_Continue;
 }
 
 public Action:Hook_WeaponDrop(client, weapon)
@@ -231,7 +247,8 @@ public TG_OnPlayerLeaveGame(const String:id[], TG_GameType:gameType, client, TG_
 		SetEntityRenderColor(client, 255, 255, 255, 255);
 	}
 
-	SDKUnhook(client, SDKHook_WeaponDrop, Hook_WeaponDrop);
+	SDKUnhook(client, SDKHook_WeaponDrop,   Hook_WeaponDrop);
+	SDKUnhook(client, SDKHook_WeaponCanUse, Hook_OnWeaponCanUse);
 
 	if (client != g_victim)
 		return;
