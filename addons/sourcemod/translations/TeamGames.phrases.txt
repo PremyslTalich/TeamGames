@@ -46,11 +46,11 @@
 // Player team hints
 	"TeamHud-RedTeam" // hint msg for player in team red
 	{
-		"en"		"You are in red team!"
+		"en"		"You are in <font color='#ff0000'>red team</font>!"
 	}
 	"TeamHud-BlueTeam" // hint msg for player in team blue
 	{
-		"en"		"You are in blue team!"
+		"en"		"You are in <font color='#0000ff'>blue team</font>!"
 	}
 	"TeamHud-NoneTeam" // hint msg for player moved out of team
 	{
