@@ -13,6 +13,7 @@
 #undef REQUIRE_PLUGIN
 #include <scp>
 #include <updater>
+#include <hosties>
 #include <lastrequest>
 
 // Modifying defines might cause problems... Do not modify them, unless you exactly know, what you are doing.
@@ -81,7 +82,7 @@ new EngineVersion:g_iEngineVersion;
 #include "Api.sp"
 
 // major.minor.patch.build
-#define _PLUGIN_VERSION "1.1.0.7"
+#define _PLUGIN_VERSION "1.1.0.7-fix" //edit by shanapu 
 
 public Plugin:myinfo =
 {
@@ -286,7 +287,7 @@ public OnClientDisconnect(iClient)
 	if (g_Game[GameProgress] != TG_NoGame && TG_IsPlayerRedOrBlue(iClient)) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iClient, g_PlayerData[iClient][Team], TG_Disconnect);
+		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[TGType], iClient, g_PlayerData[iClient][Team], TG_Disconnect);
 	}
 
 	if (TG_IsTeamRedOrBlue(g_PlayerData[iClient][Team]) && GetCountPlayersInTeam(g_PlayerData[iClient][Team]) - 1 == 0) {
@@ -296,7 +297,7 @@ public OnClientDisconnect(iClient)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Disconnect\")", iClient, (g_PlayerData[iClient][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iClient][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_OnTeamEmpty(g_Game[GameID], g_Game[GameType], iClient, g_PlayerData[iClient][Team], TG_Death);
+		Call_OnTeamEmpty(g_Game[GameID], g_Game[TGType], iClient, g_PlayerData[iClient][Team], TG_Death);
 	}
 
 	ClearPlayerData(iClient);
@@ -460,7 +461,7 @@ Action:Hook_PlayerAttack(bool:bTraceAttack, iVictim, &iAttacker, &iInflictor, &F
 			if (iAttackerTGTeam == TG_NoneTeam && iVictimTGTeam == TG_NoneTeam) {
 				// FN
 				return CallForward_PlayerAttack(bTraceAttack, false, Plugin_Handled, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
-			} else if (TG_InOppositeTeams(iAttacker, iVictim) || (g_Game[GameType] == TG_RedOnly && iAttackerTGTeam == iVictimTGTeam)) {
+			} else if (TG_InOppositeTeams(iAttacker, iVictim) || (g_Game[TGType] == TG_RedOnly && iAttackerTGTeam == iVictimTGTeam)) {
 				// FG
 				return CallForward_PlayerAttack(bTraceAttack, true, Plugin_Changed, iVictim, iAttacker, iInflictor, fDamage, iDamageType, iAmmoType, iHitBox, iHitGroup);
 			} else if (iAttackerTGTeam == iVictimTGTeam) {
@@ -553,14 +554,14 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 	Call_PushString(sWeapon);
 	Call_PushCell(g_Game[GameProgress]);
 	Call_PushString(g_Game[GameID]);
-	Call_PushCell(g_Game[GameType]);
+	Call_PushCell(g_Game[TGType]);
 	Call_Finish();
 
 	decl String:sVictimName[64];
 	GetClientName(iVictim, sVictimName, sizeof(sVictimName));
 
 	if (g_Game[GameProgress] != TG_NoGame) {
-		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iVictim, g_PlayerData[iVictim][Team], TG_Death);
+		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[TGType], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 
 		TG_LogGameMessage(g_Game[GameID], "PlayerDeath", "\"%L\" (%s) killed \"%L\" (%s)", iAttacker, (GetClientTeam2(iAttacker) == CS_TEAM_CT) ? "CT" : (g_PlayerData[iAttacker][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iAttacker][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 	} else {
@@ -580,7 +581,7 @@ public Action:Event_PlayerDeath(Handle:hEvent, const String:sName[], bool:bDontB
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Death\")", iVictim, (g_PlayerData[iVictim][Team] == TG_RedTeam) ? "RedTeam" : (g_PlayerData[iVictim][Team] == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_OnTeamEmpty(g_Game[GameID], g_Game[GameType], iVictim, g_PlayerData[iVictim][Team], TG_Death);
+		Call_OnTeamEmpty(g_Game[GameID], g_Game[TGType], iVictim, g_PlayerData[iVictim][Team], TG_Death);
 	}
 
 	g_PlayerData[iVictim][MenuLock] = true;

@@ -9,7 +9,7 @@ enum gamestatusinfo
 	TG_GameProgress:GameProgress,
 	String:GameID[TG_MODULE_ID_LENGTH],
 	String:DefaultName[TG_MODULE_NAME_LENGTH],
-	TG_GameType:GameType,
+	TG_GameType:TGType,
 	bool:HealthBarVisibility,
 	String:GameSettings[TG_GAME_SETTINGS_LENGTH],
 	Handle:GameDataPack,
@@ -56,7 +56,7 @@ bool:IsModuleDisabled(TG_ModuleType:iType, const String:sID[])
 ClearGameStatusInfo()
 {
 	g_Game[GameProgress] = TG_NoGame;
-	g_Game[GameType] = TG_None;
+	g_Game[TGType] = TG_None;
 	g_Game[HealthBarVisibility] = true;
 	strcopy(g_Game[GameID], TG_MODULE_ID_LENGTH, "Core_NoGame");
 	strcopy(g_Game[DefaultName], TG_MODULE_ID_LENGTH, "Core_NoGame");
@@ -96,7 +96,7 @@ enum GameStruct
 	bool:Visible,
 	String:Id[TG_MODULE_ID_LENGTH],
     String:DefaultName[TG_MODULE_NAME_LENGTH],
-    TG_GameType:GameType,
+    TG_GameType:TGType,
 	bool:HealthBarVisibility,
 	Separator
 }

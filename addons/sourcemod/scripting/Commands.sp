@@ -301,11 +301,11 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 
 			if (StrEqual(sKey, "TeamGame")) {
 				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-TeamGame", iClient);
-				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_TeamGame);
+				PushMenuCell(hSubMenu, "Core_-TGType-", _:TG_TeamGame);
 
 				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
-					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_TeamGame) {
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][TGType] == TG_TeamGame) {
 						Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName));
 
 						AddMenuItem(hSubMenu, g_GameList[i][Id], sName);
@@ -313,11 +313,11 @@ public GamesListMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 				}
 			} else {
 				SetMenuTitle(hSubMenu, "%T", "MenuGamesList-Title-RedOnly", iClient);
-				PushMenuCell(hSubMenu, "Core_-GameType-", _:TG_RedOnly);
+				PushMenuCell(hSubMenu, "Core_-TGType-", _:TG_RedOnly);
 
 				new String:sName[TG_MODULE_NAME_LENGTH];
 				for (new i = 0; i < MAX_GAMES; i++) {
-					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][GameType] == TG_RedOnly) {
+					if (g_GameList[i][Used] && g_GameList[i][Visible] && g_GameList[i][TGType] == TG_RedOnly) {
 						Call_AskModuleName(g_GameList[i][Id], TG_Game, iClient, sName, sizeof(sName));
 
 						AddMenuItem(hSubMenu, g_GameList[i][Id], sName);
@@ -339,7 +339,7 @@ public GamesListSubMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 	switch (iAction) {
 		case MenuAction_Select: {
 			new String:sGameID[TG_MODULE_ID_LENGTH], String:sGameName[TG_MODULE_NAME_LENGTH], String:sClientName[64];
-			new TG_GameType:iType = TG_GameType:GetMenuCell(hMenu, "Core_-GameType-");
+			new TG_GameType:iType = TG_GameType:GetMenuCell(hMenu, "Core_-TGType-");
 			GetMenuItem(hMenu, iKey, sGameID, sizeof(sGameID));
 			GetClientName(iClient, sClientName, sizeof(sClientName));
 
