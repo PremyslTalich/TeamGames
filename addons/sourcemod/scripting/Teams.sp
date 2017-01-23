@@ -237,7 +237,7 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam, bool:bPrintChatMessages = true)
 	if (g_Game[GameProgress] != TG_NoGame && iTeam == TG_NoneTeam) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iClient, iOldTeam, TG_ChangeTGTeam);
+		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[TGType], iClient, iOldTeam, TG_ChangeTGTeam);
 	}
 
 	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
@@ -247,7 +247,7 @@ SwitchToTeam(iActivator, iClient, TG_Team:iTeam, bool:bPrintChatMessages = true)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"ChangeTGTeam\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_OnTeamEmpty(g_Game[GameID], g_Game[GameType], iClient, iOldTeam, TG_ChangeTGTeam);
+		Call_OnTeamEmpty(g_Game[GameID], g_Game[TGType], iClient, iOldTeam, TG_ChangeTGTeam);
 	}
 
 	#if defined DEBUG
@@ -427,7 +427,7 @@ bool:MakeRebel(iClient)
 	if (g_Game[GameProgress] != TG_NoGame) {
 		TG_LogGameMessage(g_Game[GameID], "PlayerLeaveGame", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 
-		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], iClient, g_PlayerData[iClient][Team], TG_Rebel);
+		Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[TGType], iClient, g_PlayerData[iClient][Team], TG_Rebel);
 	}
 
 	if (TG_IsTeamRedOrBlue(iOldTeam) && GetCountPlayersInTeam(iOldTeam) == 0) {
@@ -437,7 +437,7 @@ bool:MakeRebel(iClient)
 			TG_LogRoundMessage("OnTeamEmpty", "\"%L\" (%s) (reason = \"Rebel\")", iClient, (iOldTeam == TG_RedTeam) ? "RedTeam" : (iOldTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 		}
 
-		Call_OnTeamEmpty(g_Game[GameID], g_Game[GameType], iClient, iOldTeam, TG_Rebel);
+		Call_OnTeamEmpty(g_Game[GameID], g_Game[TGType], iClient, iOldTeam, TG_Rebel);
 	}
 
 	return true;

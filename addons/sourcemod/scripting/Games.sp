@@ -20,7 +20,7 @@ GamesMenu(iClient, TG_GameType:iTypeSpecific = TG_None)
 			if (!g_GameList[i][Used] || !g_GameList[i][Visible])
 				continue;
 
-			if (!(g_GameList[i][GameType] & iTypeSpecific))
+			if (!(g_GameList[i][TGType] & iTypeSpecific))
 				continue;
 
 			if (!TG_CheckModuleAccess(iClient, TG_Game, g_GameList[i][Id]))
@@ -81,9 +81,9 @@ TG_GameType:GetGameTypeByName(String:sTypeStr[])
 public TG_OnTeamEmpty(const String:sID[], TG_GameType:iGameType, iClient, TG_Team:iTeam, TG_PlayerTrigger:iTrigger)
 {
 	if (g_Game[GameProgress] != TG_NoGame && g_Game[EndOnTeamEmpty]) {
-		if (g_Game[GameType] == TG_TeamGame) {
+		if (g_Game[TGType] == TG_TeamGame) {
 			TG_StopGame(TG_GetOppositeTeam(iTeam));
-		} else if (g_Game[GameType] == TG_RedOnly && iTeam == TG_RedTeam) {
+		} else if (g_Game[TGType] == TG_RedOnly && iTeam == TG_RedTeam) {
 			TG_StopGame(TG_RedTeam);
 		}
 	}
@@ -95,7 +95,7 @@ public TG_OnPlayerLeaveGame(const String:sID[], TG_GameType:iGameType, iClient, 
 		SDKUnhook(iClient, SDKHook_WeaponDrop, Hook_WeaponDrop);
 	}
 
-	if (g_Game[GameType] == TG_RedOnly && g_Game[EndOnTeamEmpty] && iTeam == TG_RedTeam && TG_GetTeamCount(TG_RedTeam) == 1) {
+	if (g_Game[TGType] == TG_RedOnly && g_Game[EndOnTeamEmpty] && iTeam == TG_RedTeam && TG_GetTeamCount(TG_RedTeam) == 1) {
 		new Handle:hWinner = CreateArray();
 		for (new i = 0; i < MaxClients; i++) {
 			if (TG_GetPlayerTeam(i) == TG_RedTeam) {

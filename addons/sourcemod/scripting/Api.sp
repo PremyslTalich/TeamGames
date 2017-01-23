@@ -180,11 +180,11 @@ public Native_RegGame(Handle:hPlugin, iNumParams)
 	}
 
 	g_GameList[iIndex][Used] = true;
-	g_GameList[iIndex][GameType] = iType;
+	g_GameList[iIndex][TGType] = iType;
 	strcopy(g_GameList[iIndex][DefaultName], TG_MODULE_NAME_LENGTH, sName);
 
 	#if defined DEBUG
-	LogMessage("[TG DEBUG] Registred game index = '%d', id = '%s', defaultname = '%s, type = '%d'. (g_iGameListEnd = '%d')", iIndex, g_GameList[iIndex][Id], g_GameList[iIndex][DefaultName], g_GameList[iIndex][GameType], g_iGameListEnd);
+	LogMessage("[TG DEBUG] Registred game index = '%d', id = '%s', defaultname = '%s, type = '%d'. (g_iGameListEnd = '%d')", iIndex, g_GameList[iIndex][Id], g_GameList[iIndex][DefaultName], g_GameList[iIndex][TGType], g_iGameListEnd);
 	#endif
 
 	return 0;
@@ -495,7 +495,7 @@ public Native_StartGame(Handle:hPlugin, iNumParams)
 	new bool:bEndOnTeamEmpty = GetNativeCell(7);
 
 	if (iGameType != TG_TeamGame && iGameType != TG_RedOnly) {
-		return ThrowNativeError(1, "GameType arg. in TG_StartGame must be equal to \"TG_TeamGame\" or \"TG_RedTeam\" !");
+		return ThrowNativeError(1, "TGType arg. in TG_StartGame must be equal to \"TG_TeamGame\" or \"TG_RedTeam\" !");
 	}
 
 	if (iClient == 0) {
@@ -578,7 +578,7 @@ public Native_GetCurrentGameSettings(Handle:hPlugin, iNumParams)
 
 public Native_GetCurrentGameType(Handle:hPlugin, iNumParams)
 {
-	return _:g_Game[GameType];
+	return _:g_Game[TGType];
 }
 
 public Native_GetGameType(Handle:hPlugin, iNumParams)
@@ -591,7 +591,7 @@ public Native_GetGameType(Handle:hPlugin, iNumParams)
 	if (!ExistGame(sID))
 		return 2;
 
-	return _:g_GameList[GetGameIndex(sID)][GameType];
+	return _:g_GameList[GetGameIndex(sID)][TGType];
 }
 
 public Native_StopGame(Handle:hPlugin, iNumParams)
@@ -640,7 +640,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 		CloseHandle(hWinners);
 		SetNativeCellRef(2, INVALID_HANDLE);
 	} else {
-		if (g_Game[GameType] == TG_TeamGame && TG_IsTeamRedOrBlue(iTeam)) {
+		if (g_Game[TGType] == TG_TeamGame && TG_IsTeamRedOrBlue(iTeam)) {
 			for (new i = 0; i < MAXPLAYERS + 1; i++) {
 				if ((iTeam == TG_RedTeam && g_Game[RedTeam][i] == 0) || (iTeam == TG_BlueTeam && g_Game[BlueTeam][i] == 0)) {
 					break;
@@ -661,7 +661,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				iWinners[i] = iUser;
 				iWinnersCount++;
 			}
-		} else if (g_Game[GameType] == TG_RedOnly && (iTeam == TG_RedTeam || iTeam == TG_BlueTeam)) {
+		} else if (g_Game[TGType] == TG_RedOnly && (iTeam == TG_RedTeam || iTeam == TG_BlueTeam)) {
 			for (new i = 0; i < MAXPLAYERS + 1; i++) {
 				if (g_Game[RedTeam][i] == 0) {
 					break;
@@ -695,7 +695,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				iCount1++;
 			}
 
-			if (g_Game[GameType] == TG_TeamGame && TG_GetPlayerTeam(i) == TG_BlueTeam) {
+			if (g_Game[TGType] == TG_TeamGame && TG_GetPlayerTeam(i) == TG_BlueTeam) {
 				Format(sTeam2, sizeof(sTeam2), "%s%L, ", sTeam2, i);
 				iCount2++;
 			}
@@ -713,12 +713,12 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 		TG_LogRoundMessage(   "GameEnd", "(ID: \"%s\")", g_Game[GameID]);
 		TG_LogRoundMessage(_, "{");
-		if (g_Game[GameType] == TG_TeamGame) {
+		if (g_Game[TGType] == TG_TeamGame) {
 			TG_LogRoundMessage(_, "\tWinner team: \"%s\"", (iTeam == TG_RedTeam) ? "RedTeam" : (iTeam == TG_BlueTeam) ? "BlueTeam" : "NoneTeam");
 			TG_LogRoundMessage(_, "");
 			TG_LogRoundMessage(_, "\tSurvivors RedTeam (%d):  \"%s\"", iCount1, sTeam1);
 			TG_LogRoundMessage(_, "\tSurvivors BlueTeam (%d): \"%s\"", iCount2, sTeam2);
-		} else if (g_Game[GameType] == TG_RedOnly) {
+		} else if (g_Game[TGType] == TG_RedOnly) {
 			TG_LogRoundMessage(_, "\tSurvivors (%d):  \"%s\"", iCount1, sTeam1);
 			TG_LogRoundMessage(_, "\tWinners (%d):  \"%s\"", iWinnersCount, sWinners);
 		}
@@ -740,7 +740,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 	Call_StartForward(Forward_OnGameEnd);
 	Call_PushString(g_Game[GameID]);
-	Call_PushCell(g_Game[GameType]);
+	Call_PushCell(g_Game[TGType]);
 	Call_PushCell(iTeam);
 	Call_PushArray(iWinners, MAXPLAYERS + 1);
 	Call_PushCell(iWinnersCount);
@@ -749,7 +749,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 
 	for (new i = 1; i <= MaxClients; i++) {
 		if (TG_IsPlayerRedOrBlue(i)) {
-			Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[GameType], i, g_PlayerData[i][Team], TG_GameEnd);
+			Call_OnPlayerLeaveGame(g_Game[GameID], g_Game[TGType], i, g_PlayerData[i][Team], TG_GameEnd);
 		}
 	}
 
@@ -760,7 +760,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 		ClearTeams();
 	}
 
-	if (g_Game[GameType] == TG_TeamGame) {
+	if (g_Game[TGType] == TG_TeamGame) {
 		for (new iUser = 1; iUser <= MaxClients; iUser++) {
 			if (!IsClientInGame(iUser)) {
 				continue;
@@ -770,7 +770,7 @@ public Native_StopGame(Handle:hPlugin, iNumParams)
 				CPrintToChat(iUser, "%T", (iTeam == TG_RedTeam) ? "TeamWins-RedTeam" : (iTeam == TG_BlueTeam) ? "TeamWins-BlueTeam" : "TeamWins-Tie", iUser);
 			}
 		}
-	} else if (g_Game[GameType] == TG_RedOnly) {
+	} else if (g_Game[TGType] == TG_RedOnly) {
 		new String:sGameName[TG_MODULE_NAME_LENGTH];
 
 		if (iWinnersCount > 0) {
@@ -1206,7 +1206,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], TG_GameType:iG
 	g_Game[GameDataPack] = hGameCustomDataPack;
 	strcopy(g_Game[GameSettings], TG_GAME_SETTINGS_LENGTH, sSettings);
 	g_Game[GameStarter] = iClient;
-	g_Game[GameType] = iGameType;
+	g_Game[TGType] = iGameType;
 	g_Game[RemoveDrops] = bRemoveDropppedWeapons;
 	g_Game[EndOnTeamEmpty] = bEndOnTeamEmpty;
 	g_Game[HealthBarVisibility] = g_GameList[iGameIndex][HealthBarVisibility];
@@ -1278,7 +1278,7 @@ TG_StartGamePreparation(iClient, String:sID[TG_MODULE_ID_LENGTH], TG_GameType:iG
 
 	Call_StartForward(Forward_OnGamePrepare);
 	Call_PushString(g_Game[GameID]);
-	Call_PushCell(g_Game[GameType]);
+	Call_PushCell(g_Game[TGType]);
 	Call_PushCell(g_Game[GameStarter]);
 	Call_PushString(g_Game[GameSettings]);
 	Call_PushCell(g_Game[GameDataPack]);
@@ -1373,7 +1373,7 @@ public Action:Timer_CountDownGamePrepare(Handle:hTimer)
 
 		Call_StartForward(Forward_OnGameStart);
 		Call_PushString(g_Game[GameID]);
-		Call_PushCell(g_Game[GameType]);
+		Call_PushCell(g_Game[TGType]);
 		Call_PushCell(g_Game[GameStarter]);
 		Call_PushString(g_Game[GameSettings]);
 		Call_PushCell(g_Game[GameDataPack]);
