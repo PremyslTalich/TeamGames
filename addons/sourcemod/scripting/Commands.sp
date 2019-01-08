@@ -179,7 +179,7 @@ public VisibleMainMenu_Handler(Handle:hMenu, MenuAction:iAction, iClient, iKey)
 		else if (StrEqual(sKey, "games", false))
 			Command_VisibleSubMenu(iClient, TG_Game);
 	} else if (iAction == MenuAction_End) {
-		CloneHandle(hMenu);
+		CloseHandle(hMenu);
 	}
 }
 
