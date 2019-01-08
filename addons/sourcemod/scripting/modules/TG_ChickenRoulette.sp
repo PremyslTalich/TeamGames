@@ -109,7 +109,7 @@ public TG_OnGamePrepare(const String:id[], TG_GameType:gameType, client, const S
 		}
 	}
 
-	CloneHandle(players);
+	CloseHandle(players);
 }
 public TG_OnGameStart(const String:id[], TG_GameType:gameType, client, const String:gameSettings[], Handle:dataPack)
 {
