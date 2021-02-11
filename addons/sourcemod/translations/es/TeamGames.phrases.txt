@@ -1,0 +1,367 @@
+"Phrases"
+{
+//------------------------------------------------------------------------------------------------
+// Player moved to team
+	"PlayerMove-RedTeam" // msg para todos los jugadores cuando son prisioneros {1} movido {2} al equipo rojo
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"{1} prisionero movido{highlight} {2}{default} al{tg-redteam} team{default} rojo!"
+	}
+	"PlayerMove-BlueTeam" // mensaje para todos los jugadores cuando son prisioneros {1} movidos {2} al team azul
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"{1} prisionero movido{highlight} {2}{default} al{tg-redteam} team{default} azul!"
+	}
+	"PlayerMove-NoneTeam" // mensaje para todos los jugadores cuando son prisioneros {1} fue sacaado fuera de algún equipo
+	{
+		"#format"	"{1:s}"
+		"es"		"{1} ya no está en un equipo!"
+	}
+	"PlayerMove-RedTeam-Game"
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"Juego {highlight}{1}{default} prisionero movido{highlight} {2}{default} al{tg-redteam} red{default} team!"
+	}
+	"PlayerMove-BlueTeam-Game"
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"Juego {highlight}{1}{default} prisionero movido{highlight} {2}{default} al{tg-blueteam} blue{default} team!"
+	}
+	"PlayerMove-RedTeamAll"
+	{
+		"#format"	"{1:s}"
+		"es"		"{1}{default} todos los prisioneros movidos al{tg-redteam} red{default} team!"
+	}
+	"PlayerMove-FiftyFiftyAll"
+	{
+		"#format"	"{1:s}"
+		"es"		"{1} divide a todos los prisioneros en {tg-redteam} red{default} y{tg-blueteam} blue{default} team!"
+	}
+	"PlayerMove-NoneTeamAll"
+	{
+		"#format"	"{1:s}"
+		"es"		"{1} ambos equipos despejados!"
+	}
+//------------------------------------------------------------------------------------------------
+// Player team hints
+	"TeamHud-RedTeam" // hint msg for player in team red
+	{
+		"es"		"Estás en el team rojo (red team)!"
+	}
+	"TeamHud-BlueTeam" // hint msg for player in team blue
+	{
+		"es"		"Estás en el team azul (blue team)"
+	}
+	"TeamHud-NoneTeam" // mensaje de sugerencia para jugadores que hayan sido movidos fuera de un equipo
+	{
+		"es"		"No estás en un equipo !"
+	}
+	"TeamHud-CSGO-RedTeam" // Mensaje de sugerencia para un jugador del equipo rojo (red team)
+	{
+		"es"		"Estás en<font color='#ff0000'>equipo rojo</font>!"
+	}
+	"TeamHud-CSGO-BlueTeam" // Mensaje de sugerencia para un jugador del equipo azul (blue team)
+	{
+		"es"		"Tú estás en el <font color='#0000ff'>equipo azul</font>!"
+	}
+	"TeamHud-CSGO-NoneTeam" // Mensaje de sugerencia para un jugador que haya sido movido fuera de algún equipo
+	{
+		"es"		"No estás en un team !"
+	}
+//------------------------------------------------------------------------------------------------
+// Player chat prefix - uses phrases "Red team" and "Blue team" for team colors
+	"TeamPrefix-RedTeam" // player prefix in chat (team red)
+	{
+		"es"		"[red]"
+	}
+	"TeamPrefix-BlueTeam" // player prefix in chat (team blue)
+	{
+		"es"		"[blue]"
+	}
+//------------------------------------------------------------------------------------------------
+// Game progress
+	"GamePreparation" // msg for all players when started preparation for game ({1} = game name)
+	{
+		"#format"	"{1:s}"
+		"es"		"Preparación para el juego {tg-module}{1}{default} !!!"
+	}
+	"GamePreparation-Settings" // msg for all players when started preparation for game ({1} = game name, {2} = game settings)
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"Preparación para el juego {tg-module}{1}{default} - {tg-settings}{2}{default} !!!"
+	}
+	"GameStart" // msg for all players when GameStart ({1} = game name)
+	{
+		"#format"	"{1:s}"
+		"es"		"El juego {tg-module}{1}{default} comenzó !!!"
+	}
+	"GameStart-Settings" // msg for all players when GameStart ({1} = game name, {2} = game settings)
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"El juego {tg-module}{1}{default} - {tg-settings}{2}{default} comenzó !!!"
+	}
+	"StopGameInfo" // msg for CTs players about how they can stop the game
+	{
+		"#format"	"{1:t}"
+		"es"		"Puedes detener el juego actual con {command}!stoptg{default} o {command}TG menu{default} -> {command}{1}{default} !"
+	}
+	"GameStop" // msg for all players when someone stop the game ({1} = player name)
+	{
+		"#format"	"{1:s}"
+		"es"		"Jugador {player}{1}{default} ha parado el juego actual !!!"
+	}
+	"GameEnd"
+	{
+		"#format"	"{1:s}"
+		"es"		"Jugador {tg-module}{1}{default} se acabó !!!"
+	}
+	"PlayerDeath-RedTeam" // msg for all players that player from team red died ({1} = red player name)
+	{
+		"#format"	"{1:s}"
+		"es"		"Murió {1} from{tg-redteam} rojo {default}team !"
+	}
+	"PlayerDeath-BlueTeam" // msg for all players that player from team blue died ({1} = blue player name)
+	{
+		"#format"	"{1:s}"
+		"es"		"Murió {1} from team{tg-blueteam} azul{default} !"
+	}
+	"TeamWins-RedTeam" // msg for all players that team red wins
+	{
+		"es"		"{tg-redteam}Red{default} team ganó !!!"
+	}
+	"TeamWins-BlueTeam" // msg for all players that team blue wins
+	{
+		"es"		"{tg-blueteam}Blue{default} team ganó !!!"
+	}
+	"TeamWins-Tie" // msg for all players that teams tied
+	{
+		"es"		"Equipos empatados !!!"
+	}
+	"TeamWins-Winner" // msg for all players that teams tied
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"Jugador {tg-redteam}{1} {default}ganó el juego {tg-module}{2}!"
+	}
+	"TeamWins-Winners" // msg for all players that teams tied
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"Jugadores {tg-redteam}{1} {default}ganan el juego {tg-module}{2}!"
+	}
+//------------------------------------------------------------------------------------------------
+// Main menu - lock/unlock
+	"Menu-TimeLock" // msg for CTs trying gto use tg menu over time lock
+	{
+		"#format"	"{1:d}"
+		"es"		"El menú de TeamGames se desbloqueará después de {highlight}{1}{default} segundos !"
+	}
+	"Menu-AliveOnly" // msg for dead CT player trying open main menu
+	{
+		"es"		"Solo los jugadores vivos pueden utilizar equipos y juegos !"
+	}
+	"Menu-CTOnly" // msg for T player trying open main menu
+	{
+		"es"		"Solo los jugadores CT pueden utilizar equipos y juegos !"
+	}
+	"Menu-Locked" // msg for all players if somebody (must be CT and alive) try to open main menu and main menu is locked
+	{
+		"#format"	"{1:d},{2:d}"
+		"es"		"{highlight}{1}/{2}{default} necesario{highlight} !tg{default} para desbloquear."
+	}
+	"Menu-Unlocked" // msg for all players when main menu is unlocked
+	{
+		"es"		"{default}!tg menu{highlight} está desbloqueado !"
+	}
+//------------------------------------------------------------------------------------------------
+// Main menu
+	"Menu-Title"
+	{
+		"es"		"TeamGames:"
+	}
+	"Menu-Teams"
+	{
+		"es"		"Distribuir a los equipos"
+	}
+	"Menu-Games"
+	{
+		"es"		"Escoge un juego"
+	}
+	"Menu-Games-TeamGame"
+	{
+		"es"		"Escoge un juego (Team game)"
+	}
+	"Menu-Games-RedOnly"
+	{
+		"es"		"Escoge un juego (Solo rojo)"
+	}
+	"Menu-CreateFence"
+	{
+		"es"		"Crea una valla"
+	}
+	"Menu-StopGame"
+	{
+		"es"		"Detener el juego actual !"
+	}
+	"Menu-CountGamesInfo"
+	{
+		"#format"	"{1:d}"
+		"es"		"Tu puedes jugar {1} juego en esta ronda."
+	}
+	"Menu-NoMoreGames"
+	{
+		"es"		"No puedes jugar ningún juego en este momento."
+	}
+	"Menu-Games-TimeLock"
+	{
+		"#format" 	"{1:d}"
+		"es"		"Los juegos estarán disponibles en {1} segundos !"
+	}
+//------------------------------------------------------------------------------------------------
+// Teams menu
+	"MenuTeams-Title"
+	{
+		"es"		"Mover a los jugadores a:"
+	}
+	"MenuTeams-RedTeam"
+	{
+		"es"		"Team rojo"
+	}
+	"MenuTeams-BlueTeam"
+	{
+		"es"		"Team azul"
+	}
+	"MenuTeams-NoneTeam"
+	{
+		"es"		"Fuera del equipo"
+	}
+	"MenuTeams-NoneTeamAll"
+	{
+		"es"		"Todos los juadores fuera de los equipos"
+	}
+	"MenuTeams-FiftyFiftyAll"
+	{
+		"es"		"Divide los jugadores entre el Team Rojo y el Team Azul"
+	}
+	"MenuTeams-RedTeamAll"
+	{
+		"es"		"Todo el mundo dentro del Team Rojo"
+	}
+//------------------------------------------------------------------------------------------------
+// Games menu
+	"MenuGames-Start-Title" // {1} = nombre del juego
+	{
+		"#format"	"{1:s}"
+		"es"		"{1}"
+	}
+	"MenuGames-Start"
+	{
+		"es"		"Jugar el juego*"
+	}
+//------------------------------------------------------------------------------------------------
+// Games list menu
+	"MenuGamesList-Title"
+	{
+		"es"		"Escoge un modo de juego:"
+	}
+	"MenuGamesList-TeamGame"
+	{
+		"es"		"TeamGame - Rojo vs. Azul"
+	}
+	"MenuGamesList-RedOnly"
+	{
+		"es"		"RedOnly - Red vs. Red"
+	}
+	"MenuGamesList-Title-TeamGame"
+	{
+		"es"		"Red'N'Blue games"
+	}
+	"MenuGamesList-Title-RedOnly"
+	{
+		"es"		"RedOnly games"
+	}
+	"MenuGamesList-Chosen-TeamGame"
+	{
+		"#format"	"{1:s},{2:s}"
+		"es"		"Jugador {1} ha elegido el juego {tg-module}{2}"
+	}
+	"MenuGamesList-Chosen-RedOnly"
+	{
+		"#format"	"{1:s},{2:s}"
+		"en"		"Jugador {1} ha elegido el juego {tg-module}{2} {tg-redteam}(RedOnly)"
+	}
+//------------------------------------------------------------------------------------------------
+// Fences menu
+	"MenuFences-Confirm"
+	{
+		"es"		"Confirme la valla"
+	}
+	"Fences-PlayerCross"
+	{
+		"#format"	"{1:s}"
+		"es"		"Jugador {1} cruzó la valla láser !"
+	}
+//------------------------------------------------------------------------------------------------
+// Player select menu
+	"MenuPlayerSelect-Title"
+	{
+		"es"		"Escoge un jugador:"
+	}
+	"MenuPlayerSelect-Random"
+	{
+		"es"		"*Jugador random"
+	}
+//------------------------------------------------------------------------------------------------
+// Visibility menu
+	"MenuVisibility-Title"
+	{
+		"en"		"Escoja el tipo de módulo:"
+	}
+	"MenuVisibility-MenuItems"
+	{
+		"en"		"Elementos del menú"
+	}
+	"MenuVisibility-Games"
+	{
+		"en"		"Juegos"
+	}
+	"MenuVisibility-SubTitle"
+	{
+		"en"		"Las marcas son visibles:"
+	}
+//------------------------------------------------------------------------------------------------
+// Game start errors
+	"StartGame-AnotherGameInProgress"
+	{
+		"es"		"Otro juego en progeso!"
+	}
+	"StartGame-BadTeamRatio"
+	{
+		"es"		"Proporción de equipos malos!"
+	}
+	"StartGame-AliveOnly"
+	{
+		"es"		"Solo el jugador vivo puede comenzar el juego!"
+	}
+//------------------------------------------------------------------------------------------------
+// Rebel
+	"Rebel-PrisonersOnly"
+	{
+		"es"	"Solo los prisioneros pueden utilizar este comando!"
+	}
+	"Rebel-AliveOnly"
+	{
+		"es"	"Solo los prisioneros vivos pueden utilizar este comando!"
+	}
+	"Rebel-InTeamOnly"
+	{
+		"es"	"Solo los prisioneros en TG pueden utilizar este comando!"
+	}
+	"Rebel-NoGame"
+	{
+		"es"	"No puedes utilizar este comando duarnte el juego!"
+	}
+	"Rebel-Become"
+	{
+		"#format"	"{1:s}"
+		"es"	"Jugador{highlight}{1}{default} conviértete en rebelde!"
+	}
+}

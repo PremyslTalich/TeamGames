@@ -1,0 +1,23 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"es"		"Patata Caliente"
+	}
+	"Menu-Title"
+	{
+		"es"		"Escoge el modo de juego:"
+	}
+	"Menu-OneDeath"
+	{
+		"es"		"Solo una muerte"
+	}
+	"Menu-LastManStanding"
+	{
+		"es"		"Último hombre en pie"
+	}
+	"Menu-ChooseFirstPotato"
+	{
+		"es"		"Escoge la primera víctima"
+	}
+}

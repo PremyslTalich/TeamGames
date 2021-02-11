@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"AccessDenied"
+	{
+		"es"		"{error}Debes ser un guardian para usar TeamGames!"
+	}
+}

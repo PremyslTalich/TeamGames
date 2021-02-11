@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"es"		"Fiesta de Cocteles"
+	}
+}

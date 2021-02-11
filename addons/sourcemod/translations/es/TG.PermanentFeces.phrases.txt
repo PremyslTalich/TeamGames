@@ -1,0 +1,31 @@
+"Phrases"
+{
+	"CreateFence"
+	{
+		"es"		"Crea una valla permanente"
+	}
+	"CreateFence-MenuTitle"
+	{
+		"es"		"Coloca una esquina diagonal"
+	}
+	"CreatePointC"
+	{
+		"es"		"Confirma la valla"
+	}
+	"FenceCreated"
+	{
+		"es"		"{prefix}[PermanentFence]{default} Valla creada."
+	}
+	"DeleteFence"
+	{
+		"es"		"Quitar la valla permanente."
+	}
+	"FenceDeleted"
+	{
+		"es"		"{prefix}[PermanentFence]{default} valla eliminado."
+	}
+	"MustStandInFence"
+	{
+		"es"		"{prefix}[PermanentFence]{highlight} Debes pararte en la valla que deseas eliminar!"
+	}
+}
