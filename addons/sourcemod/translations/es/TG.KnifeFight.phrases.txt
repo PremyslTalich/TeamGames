@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"es"		"Pelea de Cuchillos"
+	}
+	"ChooseHP"
+	{
+		"es"		"Escoge el nivel de HP"
+	}
+}

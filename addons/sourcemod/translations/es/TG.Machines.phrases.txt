@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"es"		"Máquinas + 500 HP"
+	}
+}

@@ -1,0 +1,11 @@
+"Phrases"
+{
+	"GameName"
+	{
+		"es"		"Batalla solo Headshot"
+	}
+	"ChooseWeapon"
+	{
+		"es"		"Escoge un arma"
+	}
+}

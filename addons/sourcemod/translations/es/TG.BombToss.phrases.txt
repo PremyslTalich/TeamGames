@@ -1,0 +1,27 @@
+"Phrases"
+{
+	"SpawnBomb"
+	{
+		"#format"	"{1:d}"
+		"es"		"Spawnea la bomba ({1})"
+	}
+	"SpawnTarget"
+	{
+		"es"		"Objetivo BombToss"
+	}
+	"BombInfo"
+	{
+		"#format"	"{1:s}"
+		"es"		"Dropped: {1}"
+	}
+	"BombInfoWithTarget"
+	{
+		"#format"	"{1:s},{2:f}"
+		"es"		"Dropped: {1} ({2})"
+	}
+	"TargetInfo"
+	{
+		"#format"	"{1:s},{2:f},{3:s},{4:f}"
+		"es"		"Más cercano: {1} ({2})\nFarthest: {3} ({4})"
+	}
+}
